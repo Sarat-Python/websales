@@ -1,0 +1,25 @@
+@charset "utf-8";
+/* CSS Document */
+
+*{margin:0px; padding:0px}
+body{background-color:#ffffff; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px}
+ul,li,ol,div,span,h1,h2,h3,img,a{margin:0px; padding:0px}
+
+#wrapper{width:1000px; margin:0 auto; padding:20px}
+
+#footer{height:30px; display:block;  border-top:#999999 1px solid; margin:0 auto; width:900px}
+
+.title{font-size:25px; font-family: 'Comfortaa', cursive; display:block; text-align:center; padding-bottom:10px }
+
+.note{color:#FF3300; font-size:14px; display:block; text-align:center; margin-bottom:15px}
+
+#article{text-align:justify}
+#article:first-letter{font-size:45px; float:left; padding-right:3px}
+
+#article ol{list-style:inside; list-style-type:decimal; font-size:18px}
+#article ol li{margin-top:10px}
+
+.claws{font-size:12px; line-height:18px; padding-left:30px; padding-top:5px}
+
+.alpha ol{list-style:inside; margin-left:50px; font-size:12px}
+.alpha ol li{font-size:12px; line-height:18px; list-style-type:lower-alpha }

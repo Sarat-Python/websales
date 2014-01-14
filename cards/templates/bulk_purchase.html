@@ -1,0 +1,419 @@
+<link rel="stylesheet" type="text/css" href="/static/css/validationEngine.jquery.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/fancy-style.css"/>
+<style>
+.popup-box{
+  display: none;
+}
+.combiner a{
+  color: #FFFFFF;
+  font-style:italic;
+}
+.footer-btn {
+  position: absolute;
+  bottom: 5px;
+}
+#card_code{
+  width: 520px;
+}
+.infoError {
+  color: #FF0000;
+  font-size: 18px;
+  font-style: oblique;
+  margin-bottom: 10px;
+  padding-left: 130px;
+}
+.accSubmit {
+  margin-left: 50px;
+}
+
+.selected_cards{
+  background: none repeat scroll 0 0 #EAE4E4;
+  clear: both;
+  float: left;
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 16px;
+  margin-top: 40px;
+  padding: 10px 20px 20px;
+  width: 1160px;
+  text-align: left;
+}
+
+td{
+  padding: 6px;
+}
+.stats{
+  float: right;
+  margin-top: 20px;
+  padding-right: 60px;
+  font-size: 25px;
+}
+.stats span{
+  padding: 0 25px;
+}
+
+</style>
+
+
+
+<script type="text/javascript" src="/static/scripts/jquery-1.6.2.js"></script>
+<script type="text/javascript" src="/static/scripts/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+<script type="text/javascript" src="/static/scripts/popup.js"></script>
+<script type="text/javascript" src="/static/scripts/jquery.tabify.js"></script>
+<script type="text/javascript" src="/static/scripts/curvycorners.js"></script>
+<script type="text/javascript" src="/static/scripts/jquery.maskedinput-1.3.min.js"></script>
+<script type="text/javascript" src="/static/scripts/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="/static/scripts/jquery.validationEngine-en.js"></script>
+
+
+<div id="productRight" style="width:100%">
+  <form id="bulk_gift_cards" name="bulk_gift_cards" method="POST" action="">
+    {% csrf_token %}
+  </form>
+  <div id="accountInfo">
+    <div class="welMsg">Gift Card Bulk Purchase</div>
+    <div class="accTitle">Enter Card Details</div>
+    <div class="combiner">
+      <div class="infoError">
+      </div>
+    </div>
+    <div class="combiner">
+      <div class="infoText">
+        <label for="input_methods">Input Method</label>
+      </div>
+      <input name="input_methods" type="radio" value="keyboard" /> Keyboard
+      <input name="input_methods" type="radio" value="barcode" /> Barcode Scanner
+      <input name="input_methods" type="radio" value="card_swipe" /> Card Swipe Device
+    </div>
+    <div class="combiner">
+      <div class="infoText">
+        <label for="card_type">Card Type</label>
+      </div>
+      <input name="card_type" type="radio" value="blackhawk" /> Blackhawk
+      <input name="card_type" type="radio" value="woolworth" /> Woolworths
+    </div>
+    <div class="combiner">
+      <div class="infoText">
+        <label for="card_code">Gift Card Code</label>
+      </div>
+      <input class="validate[required] infoInput" id="card_code" name="card_code"  type="text" value="" />
+    </div>
+    <div class="combiner">
+      <div class="infoText">
+        <label for="card_amount">Card Amount</label>
+      </div>
+      <input class="infoInput" id="card_amount" name="card_amount" type="text" value="" />
+    </div>
+
+    <div class="combiner">
+      <div class="infoText">
+      </div>
+      <input id="add_button" class="accSubmit" name="Add" type="button" value="Add" />
+      <input id="submit" class="accSubmit" name="Submit" type="submit" value="Submit" />
+    </div>
+  </div>
+
+  <div class="selected_cards">
+    <table width="100%">
+      <tr>
+        <th>Gift Card Name</th>
+        <th>Card Number</th>
+        <th>Amount</th>
+        <th>Action</th>
+      </tr>
+      <tr>
+        <td colspan="5" align="center" class="empty_table">Please enter the card details.</td>
+      </tr>
+    </table>
+    <div class="stats">
+      <span class="total_items">0 items</span>
+      <span class="total_amount">A $ 0.00</span>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+//js variable to hold the selected cards with amount
+var selected_cards=[];
+var credit_amount = '';
+
+function check_card_type(data, input_method){
+  if (data[1]=='B'){
+    return 'blackhawk';
+  }else{
+    return 'woolworth';
+  }
+}
+
+function blackhawk_upc_code(card_number){
+  //First 11 digits of a card is a upc code.
+  var upc_code = card_number.slice(0,11);
+  return upc_code;
+}
+
+function woolworth_batch_number(card_number){
+  // First 9 digits of a card is a batch number.
+  var upc_code = card_number.slice(0,9);
+  return upc_code;
+}
+
+function woolworth_card_number(data){
+  // Woolworth Gift Card
+  // 19 char. long
+  // swipe_data = ';6280005000012354202=271150216491?'
+  // card_number = 6280005000012354202
+  card_data = data.split('=')[0]
+  card_number = card_data.slice(1, card_data.length)
+  return card_number;
+}
+
+function get_upc_code(card_number, card_type){
+  var upc_code = ''
+  if (card_type=='blackhawk'){
+    upc_code= blackhawk_upc_code(card_number);
+  }else{
+    upc_code= woolworth_batch_number(card_number);
+  }
+  return upc_code
+}
+
+function check_card_length(card_type, card_number){
+  if (card_type=='woolworth' && card_number.length == 19){
+    return true;
+  }
+  else if (card_type=='blackhawk' && card_number.length == 30 ){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+function check_duplicate_card(card_number){
+  // return true if the card is already selected
+  var status = false;
+  for(var i=0; i < selected_cards.length; i++){
+    if (selected_cards[i][0] === card_number){
+      status = true;
+      break;
+    }
+  }
+  return status;
+}
+
+function remove_card(card_number){
+  for(var i=0; i < selected_cards.length; i++){
+    if (selected_cards[i][0] === card_number){
+      selected_cards.splice(i, 1);
+      break;
+    }
+  }
+}
+
+function zeroPad(num, numZeros) {
+  var n = Math.abs(num);
+  var zeros = Math.max(0, numZeros - Math.floor(n).toString().length );
+  var zeroString = Math.pow(10,zeros).toString().substr(1);
+  if( num < 0 ) {
+    zeroString = '-' + zeroString;
+  }
+  return zeroString+n;
+}
+
+function blackhawk_card_number(swipe_data){
+  data = swipe_data.split(' ')[0];
+  card_data = data.split('^');
+  first_block = card_data[1];
+  second_block = card_data[0].slice(2,card_data[0].length)
+  if ((first_block.length + second_block.length) < 30){
+    zfill_number = 30 - first_block.length;
+    second_block = zeroPad(second_block, zfill_number);
+  }
+  card_number = first_block + second_block;
+  return card_number;
+}
+
+(function($){
+  $(document).ready(function(){
+    //$('#form_card_inquiry').validationEngine();
+  });
+
+  //prevent the form submit when enter is pressed.
+  $(document).keydown(function(event){
+    if(event.keyCode == 13) {
+      event.preventDefault();
+      return false;
+    }
+  });
+
+  $('#submit').click(function(){
+    if (selected_cards.length > 0)
+      $('#bulk_gift_cards').submit();
+    else{
+      $('.infoError').text('Please, select at least one gift card.');
+      return false;
+    }
+  });
+
+  function check_woolworth_amount(card_type, selected_amount){
+    if((card_type=='woolworth') && isNaN(parseFloat(selected_amount))){
+      return false;
+    }
+    return true;
+  }
+
+  function updated_gift_cards(){
+    var user_selected_cards = []
+    $.each(selected_cards, function(index, value) {
+      user_selected_cards.push(value[0] + '-' + value[1]);
+    });
+    $('#selected_gift_cards').val(user_selected_cards);
+    update_totals();
+  }
+
+  function update_totals(){
+    // update product count
+    var product_count = selected_cards.length;
+    if (product_count == 1)
+      $('.stats .total_items').text( product_count + ' item');
+    else
+      $('.stats .total_items').text( product_count + ' items');
+
+    // update the total amount.
+    var total_amount = 0.00;
+    $.each(selected_cards, function(index, value) {
+      total_amount += parseFloat(value[1]);
+    });
+    $('.stats .total_amount').text( 'A$ ' + parseFloat(total_amount).toFixed(2));
+  }
+
+
+  // var $j = jQuery.noConflict();
+  // var c = $j("input[type='radio'][name='card_type']:checked");
+  // console.log(c.size())
+
+  //enable or disabled the amount field depending upon the gift card type
+  $("input[type='radio'][name='card_type']").click(function(){
+    var selected =  $("input[type='radio'][name='card_type']:checked");
+    if (selected.size() > 0){
+      if(selected.val() == 'woolworth'){
+        $("#card_amount").removeAttr("disabled");
+      }
+      else{
+        $("#card_amount").val('');
+        $("#card_amount").attr("disabled", "disabled");
+      };
+    }
+  });
+
+  //enable or disabled the amount field depending upon the gift card type
+  $("#add_button").click(function(){
+    $('.infoError').text('');
+    var input_method = '' // keyboard, barcode, card_swipe
+    var card_type = ''// blackhawk, woolworth;
+    var card_number = ''
+    var amount = 0;
+
+    // determine the input method
+    var selected_input_method =  $("input[type='radio'][name='input_methods']:checked");
+    if (selected_input_method.size() > 0){
+      input_method = selected_input_method.val();
+    }else{
+      $('.infoError').text('Please, select an input method i.e keyboard,  barcode scanner or card swipe device.');
+      return false;
+    }
+
+    // determine the card type
+    var selected_card_type =  $("input[type='radio'][name='card_type']:checked");
+    if (selected_card_type.size() > 0){
+      card_type = selected_card_type.val();
+    }else{
+      $('.infoError').text('Please, select the gift card type.');
+      return false;
+    }
+
+    //for woolworth, get the amount as well.
+    selected_amount = $('#card_amount').val();
+    check_woolworth_amount(card_type, selected_amount);
+    if(!check_woolworth_amount(card_type, selected_amount)){
+      $('.infoError').text('Please, insert the correct amount for the gift card.');
+      return false;
+    }
+    amount = selected_amount;
+
+    //validate the card length
+    if (input_method=='card_swipe'){
+      var swipe_data = $('#card_code').val();
+      if(card_type == 'blackhawk'){
+        card_number = blackhawk_card_number(swipe_data);
+      }
+      else if(card_type == 'woolworth'){
+        card_number = woolworth_card_number(swipe_data);
+      }
+    }else{
+      card_number = $('#card_code').val();
+    }
+
+    if (!check_card_length(card_type, card_number)){
+      $('.infoError').text('Invalid Card Number!');
+      return false;
+    }
+
+    //check for the duplicate card number
+    if (check_duplicate_card(card_number)){
+      $('.infoError').text('Duplicate Card!');
+      return false;
+    }
+
+    card_info = get_card_info(card_number, amount);
+
+    //if the card type is woolworth, get the amount
+    // send request to the server for the card type
+    // add them to the top of the table and update the total amounts
+    return false
+  });
+
+function add_selected_card(card_name, card_number, amount){
+  $('.selected_cards .empty_table').parent().remove()
+  $('.selected_cards table').append('<tr class="card_item">'+
+    '<td>'+card_name+'</td>'+
+    '<td class="gift_card_number">'+card_number+'</td>'+
+    '<td class="card_price">'+parseFloat(amount).toFixed(2)+'</td>'+
+    '<td><a href="#" class="remove_card">remove</a></td>'+
+    '</tr>');
+}
+
+function get_card_info(card_number, amount){
+  //send AJAX request to add product to the cart
+  var card_info_url="/gift-cards/card-info/" + card_number + '?amount=' + amount;
+
+  $.ajax({
+    url: card_info_url,
+    success: function(response){
+      if(response.status == 1){
+        add_selected_card(response.name, response.card_number, response.amount);
+        selected_cards.push([response.card_number, response.amount]);
+        updated_gift_cards();
+      }else{
+        $('.infoError').text(response.message);
+      }
+      return response;
+    }
+  });
+}
+
+$('.remove_card').live('click', function(event){
+  event.preventDefault();
+  // get the card number to remove
+  card_number =$(this).parents('tr').find('.gift_card_number').text();
+  remove_card(card_number);
+  update_totals();
+
+  //remove the tr element
+  $(this).parent().parent().remove();
+  if ($('.selected_cards .card_item').size()== 0){
+    $('.selected_cards table').append('<tr>'+
+      '<td colspan="5" align="center" class="empty_table">Please enter the card details.</td>'+
+      '</tr>');
+  }
+});
+}(jQuery))
+</script>

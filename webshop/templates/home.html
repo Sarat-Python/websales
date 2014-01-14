@@ -1,0 +1,42 @@
+<html>
+	<head><title>{{ title }}</title></head>
+	<body>
+		<form action="/user/login/" method="POST">
+			{% csrf_token %}
+			<input type="text" name="email" value="" placeholder="user@domain.com" />
+			<input type="password" name="password" value="" placeholder="Enter your password"/>
+			<input type="submit" value="Login" />
+		</form>
+		
+		<form action="/user/loggedin/" method="POST">
+		{% csrf_token %}
+			<input type="submit" value="Logedin" />
+		</form>
+		
+		<form action="/user/invalid/" method="POST">
+		{% csrf_token %}
+			<input type="submit" value="invalid" />
+		</form>
+		
+		<form action="/user/logout/" method="POST">
+		{% csrf_token %}
+			<input type="submit" value="Logout" />
+		</form>
+		
+		<form action="/user/register/" method="GET">
+		
+			<input type="submit" value="register" />
+		</form>
+		
+		<form action="/user/register/activate/" method="POST">
+		{% csrf_token %}
+			<input type="submit" value="activate user" />
+		</form>
+		
+		<form action="/user/register/response/" method="POST">
+		{% csrf_token %}
+			<input type="submit" value="Reg response" />
+		</form>
+		
+	</body>
+</html>

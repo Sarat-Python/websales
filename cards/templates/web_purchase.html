@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+    <div class="container" style="min-height: 640px">
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>
+                    Fill in and swipe cards for bulk purchase
+                </h3>
+            </div>
+        </div>
+        <form class="form-inline" action="" method="post">{% csrf_token %}
+           <div class="row">
+                <div class="col-lg-2">
+                    {{ form.card_type.label_tag }} {{ form.card_type|styleclass:'input-group form-control' }}
+                </div>
+                <div class="col-lg-1">
+                    {{ form.amount.label_tag }} {{ form.amount|styleclass:'form-control' }}
+                </div>
+                <div class="col-lg-4">
+                    {{ form.card_number.label_tag }} {{ form.card_number|styleclass:'form-control' }}
+                </div>
+                <div class="col-lg-2">
+                    <h3><input type="submit" class="btn btn-primary" value="Add card" /></h3>
+                </div>
+                <div class="col-lg-3">
+                    <h3><button type="submit" class="btn btn-danger" value="shop">Shop</button> </h3>
+                </div>
+           </div>
+        </form>
+        <div class="row">
+            {% if table != None %}
+                <p>
+                {% render_table table 'batches.html'%}
+                </p>
+           <script language="JavaScript">
+            function toggle(source) {
+                checkboxes = document.getElementsByName('selection');
+                for(var i in checkboxes)
+                    checkboxes[i].checked = source.checked;
+            }
+            </script>
+        {% endif %}
+        </div>
+    </div>
+<script type="text/javascript">
+    (function($){
+     //prevent the form submit when enter is pressed.
+        $(document).keydown(function(event){
+          alert('comin');
+          if(event.keyCode == 10 || event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+          }
+        });
+    }(jquery))
+</script>
+
+{% endblock %}

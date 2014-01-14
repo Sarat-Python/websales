@@ -1,0 +1,75 @@
+.dataTables_filter{
+	float:right; 
+	margin-top:-40px; 
+	}
+	
+.dataTables_filter input{
+    background-image: url("../images/search.png");
+    color: #999999;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 30px;
+    padding-right: 10px;
+    width: 210px;
+	}
+	
+.dataTables_scrollHead{
+/*    background-image: url("../images/form-top.jpg");
+    display: block;
+    height: 32px;
+    padding-top: 7px;*/
+}
+
+.dataTables_scrollBody{
+    height: 470px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: relative;
+    width: 100%;
+}
+
+.dataTables_info{
+	margin-top:20px;
+	padding: 5px 10px;
+	background-color:#FFCCCC; font-size: 14px; 
+}
+
+.dataTables_empty{
+	padding-left: 10px;
+}
+
+.tablesorter th{
+    background-color: #ECD770;
+    border-left: 1px solid #EAE4E4;
+    color: #000000;
+    font-size: 14px;
+    line-height: 40px;
+    text-align: left;
+    padding-left: 10px;
+    font-weight:normal;
+    text-transform: uppercase;
+    width: 25%;
+    }
+    
+    .tablesorter th:hover{cursor:pointer}
+    
+.tablesorter tbody tr{
+    height: 35px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: relative;
+    width: 100%;
+}
+
+.tablesorter tbody td{
+    color: #333333;
+    font-size: 12px;
+    line-height: 30px;
+    padding-left: 10px;
+}
+
+.tablesorter tbody tr:hover{
+	background-color:#4ba250; 
+	background-image:none
+	}

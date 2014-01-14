@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block child %}
+<div class="jumbotron">
+	<div class="container">
+		<h2> Account Activation: </h2>
+		{% load filters %}
+		{% if just_registered %}
+		<h3>Congratulations! your registration is successful created, please activate your account.</h3>
+		{% endif %}
+		<h5>Please use the activation code sent to your registered email address.</h5>
+		
+		<form action="" method="post">{% csrf_token %}
+		<div class="row">
+			<div class="col-lg-3">
+			<h4>{{ aform.email.label_tag }}*</h4> {{aform.email|styleclass:'form-control'}}
+			</div>
+			</div>
+		<div class="row">
+			<div class="col-lg-3">
+			<h4>{{ aform.activation_code.label_tag }}*</h4> {{aform.activation_code|styleclass:'form-control'}}			
+			</div>
+			</div>
+		<p></p>
+		<div class="row">
+			<div class="col-lg-4" >
+			 <label></label><input type="submit" class="btn btn-primary btn-lg" value="Activate" /> 
+			</div>
+		</div>
+		</form>
+		<div class="row">
+			<div class="col-lg-6" >
+			 {% if msg != None %} {{ msg }} {% endif %}
+			</div>
+		</div>
+		
+	</div>
+</div>
+{% endblock %}

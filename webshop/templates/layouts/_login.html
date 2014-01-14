@@ -1,0 +1,34 @@
+ {% if session.user_id %}
+ 	<div id="loginMessage">
+    	<div id="welcome">Welcome, {% if session.username %}{{ session.username }} {% else %} User {% endif %} </div>
+        <div id="settings"><a href="{{ url_for('users.edit_profile') }}">Settings</a></div>
+        <div id="transactions"><a href="{{ url_for('web_transactions.index') }}">My Transactions</a></div>
+        <div id="logout"><a href="{{ url_for('users.logout') }}">logout</a></div>
+	</div>
+ {% else %}
+	<div id="login" style="display:none">
+		<form id="login_form" action="{{ url_for('users.login') }}" method="POST">
+	    	<input class="textfield" name="user_name" onfocus="if (this.value=='username') this.value = ''"   type="text"  value="username" >
+	        <input class="passwd" type="password" name="pass_word" onfocus="if (this.value=='password') this.value = ''"   type="text"  value="" >
+	        <button id="login-btn">Log In</button>
+	    </form>
+	    <div id="login-link">
+	    	<a href="{{ url_for('users.register_customer')}}">Register Now</a> | <a href="#">Forget Password</a>
+<!-- 	    	<a href="{{ url_for('users.register_customer') }}">Register Now</a> | <a href="{{ url_for('users.forgot_password') }}">Forget Password</a>
+ -->	    </div>
+	</div>
+<script type="text/javascript">
+( function($) {
+  $(document).ready(function(){
+  	   var current_url=$(location).attr('href').split('/').pop();
+  	   if (current_url=="checkout"){
+  	       $('#login').hide();
+  	   }
+  	   else{
+  	       $('#login').show();
+  	   }
+  });
+}) ( jQuery );
+</script>
+ {% endif %}
+

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+    <div class="container" style="min-height: 640px">
+        <div class="row">
+            <div class="col-lg-4">
+                <h3>
+                    Batch selection for purchase
+                </h3>
+            </div>
+        </div>
+        <form class="form-inline" action="/cards/bulk/update/" method="post">{% csrf_token %}
+            <p>
+                <div class="row">
+                    <h5>
+                       {% if table %}
+                           {% render_table table "batches.html" %}
+                            <script language="JavaScript">
+                             function toggle(source) {
+                                 checkboxes = document.getElementsByName('selection');
+                                 for(var i in checkboxes)
+                                     checkboxes[i].checked = source.checked;
+                             }
+                             </script>
+                        {% endif %}
+                    </h5>
+                </div>
+            </p>
+            <p>
+                <div class="row" style="float:right" >
+                    <div class="col-lg-3" >
+                        <input type="submit" class="btn btn-primary" name="update" value="Add to Cart" />
+                    </div>
+                </div>        
+            </p>
+        </form>
+    </div>
+
+
+{% endblock %}

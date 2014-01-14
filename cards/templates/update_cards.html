@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+    <div class="container" style="min-height: 640px">
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>
+                    Update card details
+                </h3>
+            </div>
+        </div>
+        {% if formset %}
+        <form action="" method="POST">
+            {%for form in formset.forms %}
+            {{ form.id }}
+            <p>
+               <div class="row">
+                    
+                    <div class="col-lg-2">
+                        {% if forloop.first %} {{ form.card_type.label_tag }} {% endif %} {{ form.card_type|styleclass:'input-group form-control' }}
+                    </div> 
+                    <div class="col-lg-3">
+                       {% if forloop.first %} {{ form.card_number.label_tag }} {% endif %} {{ form.card_number|styleclass:'form-control' }}
+                    </div>
+                     <div class="col-lg-2">
+                        {% if forloop.first %} {{ form.upc_code.label_tag }} {% endif %} {{ form.upc_code|styleclass:'form-control' }}
+                    </div>
+                     <div class="col-lg-1">
+                        {% if forloop.first %}{{ form.amount.label_tag }} {% endif %} {{ form.amount|styleclass:'form-control' }}
+                    </div>
+               </div>
+            </p>
+            
+               {% endfor %}
+               <p>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div style="float:right">                             
+                            {{ formset.management_form }}
+                            {% csrf_token %}
+                            <button class="btn btn-primary" type="submit" name="action" value="save">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+               </p>
+               </form>
+        {% endif%}
+        
+    </div>
+
+
+{% endblock %}

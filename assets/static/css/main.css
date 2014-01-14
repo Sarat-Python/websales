@@ -1,0 +1,34 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+
+.title {
+	color: #b63e20;
+}
+
+
+#terms-content-area {
+    display:none;
+    height:200px;
+    overflow:auto;
+    margin-bottom:1.5em;
+    padding:10px;
+    border:solid 1px #d7d7d7;
+    color:#505050;
+    background-color:#ffffff;
+    font-size:90%;
+}
+
+
+
+
+
+
+
+
+
+

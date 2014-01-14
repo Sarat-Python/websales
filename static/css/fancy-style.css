@@ -1,0 +1,27 @@
+@charset "utf-8";
+/* CSS Document */
+
+.article-fancy h1{font-size:22px; font-family:Arial, Helvetica, sans-serif; line-height:35px; color:#FF0000 }
+.article-fancy h2{font-size:16px; line-height:20px; font-family:Arial, Helvetica, sans-serif}
+.article-fancy h3,.article-fancy h4{margin-top:10px; font-size:14px; line-height:20px;}
+.article-fancy p{line-height:18px; font-size:12px; margin-top:10px}
+.article-fancy ul li{list-style:none; margin-bottom:10px; line-height:18px; padding-left:20px; font-size:12px; background-image:url(../images/bullet.png); background-repeat:no-repeat; background-position:0.3em 0.2em}
+
+
+
+/*** button & button position ***/
+
+.footer-btn button{
+        background: #FFFFFF;
+        background-image: url("/static/images/login.png");
+        border: none;
+        color: #FFFFFF;
+        height: 33px;
+        line-height: 25px;
+        text-decoration: none;
+        width: 88px;
+        cursor: pointer;
+    }
+    button.btn-orange {
+        background-position: -89px center;
+    }

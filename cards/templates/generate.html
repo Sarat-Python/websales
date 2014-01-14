@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-7">
+        <h3>Generate new card batch below</h3>         
+        </div>
+        <div class="col-lg-4">
+            <h3>
+                <form action="/cards/purchase/" method="POST">{% csrf_token %}
+                    <input type="submit" class="btn btn-danger btn-lg" value="Purchase"/>    
+                </form>
+                
+            </h3>
+        </div>
+    </div>
+</div>
+<div class="container clearfix">
+    
+    <form class="form-inline" method="post">{% csrf_token %}
+    <div class="row">
+        <div class="col-lg-2">
+           {{ form.batch_number.label_tag }} {{ form.batch_number|styleclass:'form-control' }}
+        </div>
+        
+        <div class="col-lg-2">
+           {{ form.num_cards.label_tag }} {{ form.num_cards|styleclass:'form-control' }}
+        </div>
+        
+        <div class="col-lg-1">
+             {{ form.cost.label_tag }} {{ form.cost|styleclass:'form-control' }}
+        </div>
+        
+        <div class="col-lg-1">
+             {{ form.card_type.label_tag }} {{ form.card_type|styleclass:'select' }}
+        </div>
+        <div class="col-lg-1">
+             
+        </div>
+        
+        <div class="col-lg-3" >            
+            <h4><input type="submit" name="generate" value="Generate Numbers" class="btn btn-primary btn-lg bottom" /></h4>
+            <!--<input type="submit" name="generate" value="Save" class="btn btn-primary btn-lg" /> -->
+        </div>
+        
+    </div>
+    </form>
+    {% if card_type != None %}
+    <div class="row">
+        <div class="col-lg-4">
+        <h4>Last Batch Generated: {{ card_type }}</h4>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container" style="min-height: 640px">
+    <div class="row">
+        <div class="col-lg-5">
+            
+        {% if table != None %}
+           {% render_table table%}
+           <script language="JavaScript">
+            function toggle(source) {
+                checkboxes = document.getElementsByName('selection');
+                for(var i in checkboxes)
+                    checkboxes[i].checked = source.checked;
+            }
+            </script>
+        {% endif %}
+        
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

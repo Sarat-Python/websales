@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+
+    <div class="container" style="min-height: 640px">
+        
+    <form class="form-inline" action="/cards/bulk/update/" method="post">{% csrf_token %}
+    <p>
+        <div class="row">
+            <h5>
+             {% for field in form %}
+                
+                <div class="col-lg-1">                    
+                    <p>{{ field.label_tag }} {{ field|styleclass:'form-control' }}</p>
+                </div>
+               
+            {% endfor %}
+            </h5>
+        </div>
+    </p>
+    <p>
+        <div class="row" style="float:right" ><div class="col-lg-3" ><input type="submit" class="btn btn-primary" name="update" value="Update" /></div></div>        
+    </p>
+        
+    </form>
+    
+    </div>
+
+{% endblock %}

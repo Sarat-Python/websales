@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Pit Stop Recharge</title>
+
+  {% block style %}
+  <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/scripts/fancybox/jquery.fancybox-1.3.4.css" />
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Oxygen">
+  {% endblock %}
+
+  {% block script %}
+  <script type="text/javascript" charset="utf-8" src="/static/scripts/jquery-1.6.2.js"></script>
+  <script type="text/javascript" charset="utf-8" src="/static/scripts/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+  <script type="text/javascript" charset="utf-8" src="/static/scripts/popup.js"></script>
+  <script type="text/javascript" charset="utf-8" src="/static/scripts/jquery.tabify.js"></script>
+  <script type="text/javascript" src="/static/scripts/suckerfish.js"></script>
+  <script type="text/javascript" src="/static/scripts/lib.js"></script>
+  <script type="text/javascript" src="/static/scripts/main.js"></script>
+  <script type="text/javascript" src="/static/scripts/curvycorners.js"></script>
+  {% endblock %}
+
+<!--[if lt IE 7]>
+  <style type="text/css">
+  div, img { behavior: url(iepngfix.htc) }
+  </style>
+  <![endif]
+-->
+
+<script type="text/javascript">
+(function($) {
+  $(document).ready(function () {
+    $('.tabMenu').tabify();
+    // Get rid of domain name
+    current_page = location.href.substring(7);
+    current_page = current_page.substring(current_page.indexOf("/"));
+
+    $('#menu li').removeClass('current');
+
+    // apply selected states depending on current page
+    if (current_page=="/") {
+      $("#menu li:eq(0)").addClass('current');
+    } else if (current_page=='/products/') {
+      $("#menu li:eq(1)").addClass('current');
+    } else if (current_page=='/gift-cards/') {
+      $("#menu li:eq(2)").addClass('current');
+    } else if (current_page=='/coupons/') {
+      $("#menu li:eq(3)").addClass('current');
+    } else if (current_page=='/FAQs') {
+      $("#menu li:eq(4)").addClass('current');
+    } else if (current_page=='/about') {
+      $("#menu li:eq(5)").addClass('current');
+    } else if (current_page=='/contact') {
+      $("#menu li:eq(6)").addClass('current');
+    } else { // don't mark any nav links as selected
+      $("#menu li").removeClass('current');
+    };
+
+    $('input[type="password"]').focus(function() {
+      $(this).addClass("textfield");
+      $(this).removeClass("passwd");
+    });
+
+    $('input[type="password"]').blur(function() {
+      $(this).removeClass("passwd");
+    });
+  });
+})( jQuery );
+</script>
+</head>
+
+<body>
+  <div id="main-wrapper">
+    <div id="top">
+     <div id="banner">
+       <div id="kiosk">
+         <img src="/static/images/kiosk.png" alt="Kiosk" />
+       </div>
+       {% block login %}
+       {% include "layouts/_login.html" %}
+       {% endblock %}
+
+       {% block user_cart %}
+       {% include 'products/_cart.html' %}
+       {% endblock %}
+     </div>
+   </div>
+
+   {% block menu %}
+   {% include "layouts/_menu.html" %}
+   {% endblock %}
+   <div id="wrapper">
+     <div id="content">
+       {% block message %}
+       {% include "layouts/_message.html" %}
+       {% endblock %}
+
+       {% block content %}
+
+       {% endblock %}
+     </div>
+     <div class="push"></div>
+   </div>
+ </div>
+ <div id="footer">
+  <div id="footer-content">
+   <span>&copy; 2012</span>
+   <a href="/terms-and-conditions" class="fancybox fancybox.iframe"> Terms and Conditions</a> |
+   <a href="/terms-and-conditions-purchase" class="fancybox fancybox.iframe">Terms and Conditions for purchase</a> |
+   <a href="/privacy-policy" class="fancybox fancybox.iframe">Privacy Policy</a>
+ </div>
+</div>
+</body>
+</html>
+
