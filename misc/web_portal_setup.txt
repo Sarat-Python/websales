@@ -1,0 +1,5 @@
+sudo easy_install django==1.5.1
+sudo easy_install MySQL-python
+sudo apt-get install python-mysqldb
+sudo easy_install django_tables2
+sudo easy_install recaptcha-client
