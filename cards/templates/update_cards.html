@@ -21,6 +21,9 @@
                         {% if forloop.first %} {{ form.card_type.label_tag }} {% endif %} {{ form.card_type|styleclass:'input-group form-control' }}
                     </div> 
                     <div class="col-lg-3">
+                       {% if forloop.first %} {{ form.card_flavour.label_tag }} {% endif %} {{ form.card_flavour|styleclass:'form-control' }}
+                    </div>  
+                    <div class="col-lg-3">
                        {% if forloop.first %} {{ form.card_number.label_tag }} {% endif %} {{ form.card_number|styleclass:'form-control' }}
                     </div>
                      <div class="col-lg-2">
