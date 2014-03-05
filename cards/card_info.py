@@ -26,5 +26,10 @@ CARD_TYPES = (
         ('BLKHWK','BlackHawk'),
     )
 
+CARD_FLAVOUR = (
+          ('WISH', 'WishCard'), 
+          ('Petrol','PetrolCard'),
+    )
+
 def display(self):
         pass
