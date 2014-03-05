@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+    <div class="container" style="min-height: 640px">
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>
+                </h3>
+            </div>
+        </div>
+        
+        <form action="bulk/add_cart/" method="POST">
+            <p>
+              <div class="row" >
+<table border="1px" cellpadding="10px" cellspacing="10px" align="center" id="cartTable">
+
+{% for numbers, cart in cart_items %}
+<tr id="tr_{{forloop.counter }}">
+<td>
+	Item  {{forloop.counter }}<br>
+  <img src="{{ STATIC_URL }}images/shopping_cart.PNG" alt="{{ numbers.card_type }}">
+  
+  <input type="hidden" id="ctype_{{forloop.counter }}" name="ctype" value="{{ numbers.card_type }}">  
+  <input type="hidden" id="batchid_{{forloop.counter }}" name="batchid" value="{{ numbers.batch_id }}"> 
+</td>
+<td>
+   {{ numbers.card_flavour }}
+	<input type="hidden" id="cflavour_{{forloop.counter }}" name="cflavour" value="{{ numbers.card_flavour }}">   
+</td>
+<td>
+     <input type="hidden" id="card_count" name="card_count" readonly="readonly">
+     Quantity: <a title="
+     {% for a in cart %}
+      	Card Number: {{ a.card_number }}
+     {% endfor %}
+     
+     " href="/loyalty/1">{{ numbers.card_flavour__count }} </a>
+</td>
+ <td>
+     $1,00.00
+     <a class="deleteLink" href="#" onclick="removeCartItems('{{forloop.counter }}');">Remove </a> | <a href="#">Update  </a>
+</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+            </p>
+               <p>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div style="float:right">                             
+                           
+                            <a href="../purchase/">Continue Shopping</a>
+                            <a href="#">Proceed To Checkout</a>
+                            
+                        </div>
+                    </div>
+                </div>
+               </p>
+               </form>        
+    </div>
+<script src="{{ STATIC_URL }}js/vendor/jquery/1.10.1/jquery.min.js"></script><script src="http://code.jquery.com/jquery-latest.min.js"
+        type="text/javascript"></script>
+<script>
+
+function removeCartItems(counter) {
+        
+		  var ctype = $( "#ctype_"+counter ).val();
+        var batchid = $( "#batchid_"+counter ).val();
+        var cflavour = $( "#cflavour_"+counter ).val();
+        
+        $.ajax({
+        	 type: "POST",
+       	 url: "../del_cart/",
+        	 data: {
+            batchid: batchid,
+            ctype : ctype,
+            cflavour : cflavour,
+         },
+       	success: function(data) {
+            alert("Deleting selected Item success");
+        	},
+        	error: function(xhr, textStatus, errorThrown) {
+            alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
+        	}
+    	   });
+       		  	
+		  $( "#tr_"+counter ).remove();
+		    
+}
+
+function continueShop(){
+	$.ajax({
+        	 type: "POST",
+       	 url: "../continue_cart/",
+        	 data: {
+          continue_shop = 'true'
+         },
+       	success: function(data) {
+         
+        	},
+        	error: function(xhr, textStatus, errorThrown) {
+            alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
+        	}
+    	   }); 
+}
+</script>
+{% endblock %}
