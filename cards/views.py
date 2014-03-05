@@ -11,6 +11,10 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 * deposited with the Australian Copyright Office. 
 *
 PIT_STOP_RECHARGE_END_TAG
+
+select count(card_flavour)  from cards_swipedcard where batch_id=2 group by card_type, card_flavour;
+
+
 '''
 '''
 Begin Change Log ***************************************************************
@@ -29,7 +33,7 @@ from django.contrib.auth import login as dj_login, logout as dj_logout
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from django.forms.formsets import formset_factory
-
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 #from cards.forms import GenerateBulkCardsForm, EditBulkCardsForm
@@ -40,6 +44,7 @@ import tables
 from django_tables2 import RequestConfig
 from users.models import WebUser
 #from cards.models import generated_batch
+from django.db.models import Count
 
 def bulk(request):
     form = SwipedCardForm(request.POST or None)
@@ -69,7 +74,44 @@ def bulk(request):
             #print batch_number
             request.session['batch_number'] = batch_number
     else:
-        #print batch_number
+        batch = Batch.objects.get(batch_number = batch_number)
+        if request.method == 'POST':
+            ctype = request.POST.get('card_type')
+            cnumber = request.POST.get('card_number')
+            card_flavour = request.POST.get('card_flavour')
+            amt = request.POST.get('amount')
+             
+            print ctype
+            print cnumber
+            
+            print 'form is valid'
+            cleaned_card = card_utils.extract_card_number(cnumber,
+                                                          ctype)
+            upc_code = card_utils.extract_upc_code(cleaned_card,
+                                                   ctype)
+            print 'before'
+            
+            print cleaned_card
+            print ctype 
+            
+            batch1 = SwipedCard(card_number = cleaned_card,
+                      card_type = ctype,
+                      card_flavour = card_flavour,                      
+                      upc_code = upc_code,
+                      amount = amt,
+                      batch_id = batch.id,
+                      )
+                      
+             
+            #submitted = batch1.save(commit=False)
+            submitted = batch1.save()
+            if batch1.verify_card_number():
+                batch.total_cost = float(batch.total_cost) + float(amt)
+                batch.save()
+            form = SwipedCardForm(initial={'card_type':ctype,
+                                           'amount':amt,'card_focus':'on','msgs':'Success'})
+            response_dict.update({'form':form}) 
+            #print batch_number
         batch = Batch.objects.get(batch_number = batch_number)
         if form.is_valid():
             #print 'form is valid'
@@ -89,8 +131,9 @@ def bulk(request):
                 batch.total_cost = batch.total_cost+ submitted.amount
                 batch.save()
                 print submitted.card_number
+                msgs='Batchnum' 
                 form = SwipedCardForm(initial={'card_type':submitted.card_type,
-                                           'amount':submitted.amount,'card_focus':'on'})
+                                           'amount':submitted.amount,'card_focus':'on','msgs':msgs})
             response_dict.update({'form':form})
             
         else:
@@ -98,7 +141,8 @@ def bulk(request):
         response_dict.update({'batch_total':batch.total_cost})
         new_cards = SwipedCard.objects.filter(batch_id=batch.id, deleted=False)
         table = tables.SwipedCardTable(new_cards)
-        RequestConfig(request,paginate={"per_page": 15}).configure(table)
+        RequestConfig(request,paginate={"per_page": 10}).configure(table)
+        
         response_dict.update({'table':table})
     return render(request,'web_purchase.html', response_dict)
 
@@ -204,8 +248,63 @@ def purchase(request):
         
     return render(request,'purchase.html', response_dict)
     
-        
+     
+def add_cart(request):
+    response_dict = []
+    #response_dict_snos = {}	
+    if request.session.get('batch_number', False):
+        batch_number = request.session.get('batch_number', False)    	
+        batch = Batch.objects.get(batch_number = batch_number)
+        #cart_flavours = SwipedCard.objects.filter(batch = batch.id, deleted=False)
+        cart_flavours = SwipedCard.objects.values('card_type', 'card_flavour','batch_id').filter(batch_id=batch.id, deleted=False).annotate(Count('card_flavour'))
+        for c in cart_flavours:
+            #card_numbers = SwipedCard.objects.filter(batch_id=batch.id,c['card_type'],c['card_flavour'] deleted=False)
+            card_numbers = SwipedCard.objects.values('id','card_number').filter(batch_id=batch.id, card_type=c['card_type'], card_flavour=c['card_flavour'], deleted=False)
+            response_dict.append(card_numbers)
+
+    resp_dict1 = zip(cart_flavours,response_dict)            	
+    resp_dict = {'cart_items':resp_dict1}
+    #print resp_dict 
     
-        
-        
+    #########  cards_shopcart table need to be inserted without duplicates ################## 
     
+    return render(request,'shopping_cart.html', resp_dict)
+    
+@csrf_exempt    
+def del_cart(request):
+    resp_dict = []
+    if request.is_ajax():
+        ctype = request.POST.get('ctype')  
+        cflavour = request.POST.get('cflavour')
+        batchid = request.POST.get('batchid')  	
+        to_delete = SwipedCard.objects.filter(card_type=ctype, card_flavour=cflavour, batch=batchid)
+        print to_delete
+    return render(request,'shopping_cart.html', resp_dict)
+ 	   
+ 	   
+def continue_cart(request):
+    resp_dict = []	
+    return render(request,'purchase.html', response_dict)
+           	
+'''
+    def index(request):
+    article_group = []
+    newsletter = Newsletter.objects.all().order_by('-year', '-number')
+    for n in newsletter:
+        article_group.append(n.article_set.all())
+    articles_per_newsletter = zip(newsletter, article_group)
+
+    return render_to_response('newsletter/newsletter_list.html',
+                              {'newsletter_list': articles_per_newsletter})    
+                              
+                              {% for newsletter, articles in newsletter_list %}
+    <h2>{{ newsletter.label }}</h2>
+    <p>Volume {{ newsletter.volume }}, Number {{ newsletter.number }}</p>
+    <p>{{ newsletter.article }}</p>
+    <ul>
+    {% for a in articles %}
+      <li>{{ a.title }}</li>
+    {% endfor %}
+    </ul>
+  {% endfor %}
+'''
