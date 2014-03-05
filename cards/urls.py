@@ -33,6 +33,8 @@ urlpatterns = patterns('',
     # For bulk card activation
     url(r'^bulk/purchase/$', 'cards.views.bulk'),
     url(r'^bulk/update/$', 'cards.views.update'),
+    url(r'^bulk/add_cart/$', 'cards.views.add_cart'),
+    url(r'^bulk/del_cart/$', 'cards.views.del_cart'),
     #url(r'^bulk/edit/$', 'cards.views.bulk_edit'),
     #url(r'^bulk/update/$', 'cards.views.bulk_update'),
     url(r'^purchase/$', 'cards.views.purchase'),
