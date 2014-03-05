@@ -31,11 +31,14 @@ from django.forms.models import modelformset_factory
 from cards.models import Batch, SwipedCard
 from utils import card_utils
 from utils.card_info import CARD_TYPES
+from cards.card_info import CARD_FLAVOUR
 
 
 
 class SwipedCardForm(ModelForm):
     card_type = forms.ChoiceField(choices=CARD_TYPES)
+    card_flavour = forms.ChoiceField(choices=CARD_FLAVOUR)
+    #card_flavour = forms.ChoiceField(widget = forms.Select(attrs = {'onclick' : "cardModel(this)"}))
     
     def __init__(self, *args, **kwargs):
         super(SwipedCardForm, self).__init__(*args, **kwargs)                   
@@ -44,10 +47,10 @@ class SwipedCardForm(ModelForm):
     
     class Meta:
         model = SwipedCard
-        fields = ['card_type','amount','card_number']
+        fields = ['card_type','card_flavour','amount','card_number']
 
 UpdateSetBase = modelformset_factory(
-    SwipedCard, extra=0, fields=('card_type','amount','card_number', 'upc_code'))
+    SwipedCard, extra=0, fields=('card_type','card_flavour','amount','card_number', 'upc_code'))
 
 class UpdateFormSet(UpdateSetBase):
     
@@ -57,11 +60,14 @@ class UpdateFormSet(UpdateSetBase):
         #form.fields['is_checked'] = forms.BooleanField(label='Select', required=False)
         form.fields['upc_code'] = forms.CharField(label='UPC / Batch Code', required = True)
         form.fields['card_type'] = forms.ChoiceField(choices=CARD_TYPES)
-
+        form.fields['card_flavour'] = forms.ChoiceField(choices=CARD_FLAVOUR)
 
    
 class UpdateSwipedCardForm(ModelForm):
     card_type = forms.ChoiceField(choices=CARD_TYPES)
+    card_flavour = forms.ChoiceField(choices=CARD_FLAVOUR)
+    #card_flavour = forms.ChoiceField(widget = forms.Select(attrs = {
+     #       'onclick' : "cardModel(this)"}))
     
     def __init__(self, *args, **kwargs):
         super(UpdateSwipedCardForm, self).__init__(*args, **kwargs)                   
@@ -69,7 +75,7 @@ class UpdateSwipedCardForm(ModelForm):
     
     class Meta:
         model = SwipedCard
-        fields = ['card_type','amount','card_number', 'upc_code']
+        fields = ['card_type','card_flavour','amount','card_number', 'upc_code']
 
     #def verify_card_length(self):
     #    if card_type:
