@@ -1,3 +1,26 @@
+<script>
+var json = {
+    "Woolsworth": ["WoolworthPetrol Gift Card", "Woolworths Gift Card"],
+    "BlackHawk": ["AdrenalinV8Experience $100", "V-Card $200", "Rebel Sport $50","Battle On! Games $24.95","iTunes $50","iTunes $30","iTunes $20","Happy Birthday iTunes $30","BHN Only 1 Visa $200.00"]
+};
+
+function cardMake () {
+    select = document.getElementById('slct1');
+    select.options.length = 0;
+    for(make in json) {
+        select.options[select.options.length] = new Option(make, make);
+    }
+}
+
+function cardModel(sel) {
+    var card_make = sel.options[sel.selectedIndex].value
+    select = document.getElementById('slct2');
+    select.options.length = 0;
+    for(var i=0;i<json[card_make].length;i++) {
+        select.options[select.options.length] = new Option(json[card_make][i], json[card_make][i]);
+    }
+}
+</script>
 {% extends 'base.html' %}
 {% block child %}
 {% load filters %}
@@ -9,12 +32,17 @@
                     Fill in and swipe cards for bulk purchase
                 </h3>
             </div>
-        </div>
-        <form class="form-inline" action="" method="post">{% csrf_token %}
+        </div><span style="color:red;">{{msg}}</span> {{msgs}}  {{batch_number}} 
+        <form class="form-inline" action="" method="POST">{% csrf_token %}
            <div class="row">
-                <div class="col-lg-2">
-                    {{ form.card_type.label_tag }} {{ form.card_type|styleclass:'input-group form-control' }}
+                <div class="col-lg-2"><b>Card Type</b>
+  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  
+<!--           {{ form.card_type.label_tag }} {{ form.card_type|styleclass:'input-group form-control' }} -->
                 </div>
+                <div class="col-lg-2"><b>Card Flavour</b>
+		<select class="form-control" id="slct2" name="card_flavour" value="card_flavour">  </select> 
+<!--                	  {{ form.card_flavour.label_tag }} {{ form.card_flavour|styleclass:'input-group form-control' }}  -->  
+		</div>
                 <div class="col-lg-1">
                     {{ form.amount.label_tag }} {{ form.amount|styleclass:'form-control' }}
                 </div>
@@ -24,12 +52,12 @@
                 <div class="col-lg-2">
                     <h3><input type="submit" class="btn btn-primary" value="Add card" /></h3>
                 </div>
-                <div class="col-lg-3">
+                <!--<div class="col-lg-3">
                     <h3><button type="submit" class="btn btn-danger" value="shop">Shop</button> </h3>
-                </div>
-           </div>
+                </div>-->
+          </div>
         </form>
-        <div class="row">
+        <div class="row"> 
             {% if table != None %}
                 <p>
                 {% render_table table 'batches.html'%}
@@ -56,5 +84,4 @@
         });
     }(jquery))
 </script>
-
 {% endblock %}
