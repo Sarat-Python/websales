@@ -1,0 +1,22 @@
+@charset "utf-8";
+/* CSS Document */
+.cartitem
+{
+  border:1px solid;
+  width:200px;
+  height:130px;
+}
+
+.cardflavour
+{
+color:blue;
+font:20px;
+}
+
+.quantitybox
+{
+
+width:50px;
+height:20px;
+
+}
