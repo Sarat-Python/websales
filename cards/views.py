@@ -24,7 +24,6 @@ Begin Change Log ***************************************************************
   0.9    339      prashanth  19/01/2014  Added copyright Info
  End Change Log ****************************************************************
 '''
-
 # Create your views here.
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -38,24 +37,29 @@ from django.conf import settings
 
 #from cards.forms import GenerateBulkCardsForm, EditBulkCardsForm
 from cards.forms import SwipedCardForm, UpdateSwipedCardForm, UpdateFormSet
-from cards.models import SwipedCard, Batch
+from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 import card_utils
 import tables
 from django_tables2 import RequestConfig
 from users.models import WebUser
 #from cards.models import generated_batch
-from django.db.models import Count
+from django.db.models import Count,Sum
+from django.core import serializers
+from django.utils import simplejson
+from cards.card_utils import verify_card_length
+
+
 
 def bulk(request):
     form = SwipedCardForm(request.POST or None)
     response_dict = {'form':form}
     batch_number = request.session.get('batch_number', False)
-    print batch_number
+   
     email = request.user
+    msgs=''
+    
     if not batch_number:
-        print 'batch number not present: fresh request'
         batch_number = datetime.now().isoformat()
-       
         try:
             batch = Batch.objects.get(batch_number = batch_number, created_by = email)
         except Batch.DoesNotExist:
@@ -65,86 +69,90 @@ def bulk(request):
             batch = Batch(batch_number = batch_number,
                       created_by = user,
                       assigned_to = user,                      
-                      total_cost = total
+                      total_cost = total,
                       )
             batch.save()
-            #form = SwipedCardForm(initial={'batch_id':batch.id})
-            #form.batch = batch
-            #print 'batch saved %s' % (form.batch)
-            #print batch_number
+
             request.session['batch_number'] = batch_number
+
+            to_delete_cart = shopcart.objects.filter(activate_card_batch_id=batch.id)
+            to_delete_cart.delete()
     else:
-        batch = Batch.objects.get(batch_number = batch_number)
+             
+	batch = Batch.objects.get(batch_number = batch_number)
         if request.method == 'POST':
             ctype = request.POST.get('card_type')
             cnumber = request.POST.get('card_number')
-            card_flavour = request.POST.get('card_flavour')
+            print request.POST
+            gift_card_id = request.POST.get('cardflavour_dropdown')
             amt = request.POST.get('amount')
-             
-            print ctype
-            print cnumber
-            
-            print 'form is valid'
+
             cleaned_card = card_utils.extract_card_number(cnumber,
                                                           ctype)
-            upc_code = card_utils.extract_upc_code(cleaned_card,
-                                                   ctype)
-            print 'before'
+            if gift_card_id:
+                card_flavour = gift_cards.objects.filter(id=gift_card_id)
+
+                for card_flavour_name in card_flavour:
+                    card_flv_name = card_flavour_name.name
+                    upc_code = card_flavour_name.upc_code
+
+            if  ctype and cnumber and amt and gift_card_id:
+       
             
-            print cleaned_card
-            print ctype 
-            
-            batch1 = SwipedCard(card_number = cleaned_card,
-                      card_type = ctype,
-                      card_flavour = card_flavour,                      
-                      upc_code = upc_code,
-                      amount = amt,
-                      batch_id = batch.id,
-                      )
-                      
-             
-            #submitted = batch1.save(commit=False)
-            submitted = batch1.save()
-            if batch1.verify_card_number():
-                batch.total_cost = float(batch.total_cost) + float(amt)
-                batch.save()
+                if verify_card_number(ctype, cleaned_card):
+                     batch1 = SwipedCard(card_number = cleaned_card,
+                     card_type = ctype,
+                     card_flavour = card_flv_name,
+                     gift_card_id = gift_card_id,                         
+                     upc_code = upc_code,
+                     amount = amt,
+                     batch_id = batch.id,
+                     ) 
+                     batch1.save()
+                     batch.total_cost = float(batch.total_cost) + float(amt)
+                     batch.save()
+                     msgs = 'Success' 
+                else:
+                     msgs = 'Card Number already added!!'   
+            else: 
+                msgs = 'Please enter all the fields'
+
             form = SwipedCardForm(initial={'card_type':ctype,
-                                           'amount':amt,'card_focus':'on','msgs':'Success'})
+                                           'amount':amt,'card_focus':'on'})
             response_dict.update({'form':form}) 
-            #print batch_number
-        batch = Batch.objects.get(batch_number = batch_number)
-        if form.is_valid():
-            #print 'form is valid'
-            cleaned_card = card_utils.extract_card_number(form.cleaned_data.get('card_number'),
-                                                          form.cleaned_data.get('card_type'))
-            upc_code = card_utils.extract_upc_code(cleaned_card,
-                                                   form.cleaned_data.get('card_type'))
-            submitted = form.save(commit=False)
-            submitted.card_number = cleaned_card
-            submitted.upc_code = upc_code                        
-            submitted.batch_id = batch.id
-            print cleaned_card, upc_code
-            print submitted.verify_card_number()
-            if submitted.verify_card_number():
-                submitted.save()
-                print batch.total_cost+submitted.amount
-                batch.total_cost = batch.total_cost+ submitted.amount
-                batch.save()
-                print submitted.card_number
-                msgs='Batchnum' 
-                form = SwipedCardForm(initial={'card_type':submitted.card_type,
-                                           'amount':submitted.amount,'card_focus':'on','msgs':msgs})
-            response_dict.update({'form':form})
             
-        else:
-            print 'invalid form'
         response_dict.update({'batch_total':batch.total_cost})
         new_cards = SwipedCard.objects.filter(batch_id=batch.id, deleted=False)
         table = tables.SwipedCardTable(new_cards)
-        RequestConfig(request,paginate={"per_page": 10}).configure(table)
-        
-        response_dict.update({'table':table})
+        RequestConfig(request,paginate={"per_page": 10}).configure(table)    
+        response_dict.update({'table':table,'msgs':msgs})
+    
     return render(request,'web_purchase.html', response_dict)
+
+def verify_card_number(card_type, card_number):
+    valid = verify_card_length(card_type, card_number)
+    card = SwipedCard.objects.filter(card_number=card_number)
+    if len(card) > 0: 
+        return False
+    else:
+        return True
+
+
+@csrf_exempt
+def load_flavours(request):
+    response_dict = {}
+    flavours_data = []
+    card_type = request.POST.get('card_type')
+    query = "select id,name,upc_code,small_image_file,card_type from gift_cards where card_type='"+card_type+"'"
+    card_flavours = gift_cards.objects.raw(query)
+    for flavours in card_flavours:
+        flavours_data.append(flavours)
+    
+    request.session['card_flv'] = flavours_data
+    request.session['card_selected'] = card_type
+    
+    return render(request,'web_purchase.html', response_dict)
+
 
 def update(request):
     
@@ -153,13 +161,16 @@ def update(request):
         form_set  = SwipedCardForm()
         action = request.POST.get('action')
         response_dict ={'formset':form_set}
-        print request.session['batch_number']
         
         if action == 'save':
             formset = UpdateFormSet(request.POST)
             for form in formset.forms:
-                form.save()
-                print 'form saved'
+                submitted = form.save()
+                batch_number = request.session['batch_number']
+                batch = Batch.objects.get(batch_number = batch_number)
+                batch.total_cost = batch.total_cost - submitted.amount
+                batch.save()
+                
             return HttpResponseRedirect('/cards/bulk/purchase/')
         
         if action == 'delete':
@@ -172,7 +183,6 @@ def update(request):
                 submitted.save()
                 batch.total_cost = batch.total_cost - submitted.amount
                 batch.save()
-                print 'form saved'
             response_dict={'batch_total': batch.total_cost}
             return HttpResponseRedirect('/cards/bulk/purchase/', response_dict)
 
@@ -181,92 +191,61 @@ def update(request):
 
     return render(request, 'update_cards.html', response_dict)
 
- #UpdateCardForms = formset_factory(UpdateSwipedCardForm, extra=len(selected))
-            #formset =UpdateCardForms()
-            #if formset.is_valid():
-            #    for form in formset.form():
-            #        form.card_number = card.card_number
-                #form = UpdateSwipedCardForm(instance=card)
-#
-#def bulk_generate(request):
-#    form = GenerateBulkCardsForm(request.POST or None)
-#    response_dict = {'form':form}
-#    if form.is_valid():
-#        print request.session['email']
-#        form.save_generated_cards(request.session['email'])
-#        request.session['batch_number'] = form.cleaned_data['batch_number']        
-#    else:
-#        msg = "Invalid details! Please retry"
-#        print msg
-#        response_dict.update({'msg':msg})
-#        
-#    if request.session.get('batch_number', False):
-#        batch_number = request.session.get('batch_number')
-#        new_cards = card_utils.get_cards_for_batch(batch_number)
-#        card_type = generated_batch.objects.get(batch_number=batch_number).card_type
-#        response_dict.update({'card_type':card_type})
-#        table = tables.BulkCardTable(new_cards)
-#        RequestConfig(request, paginate={"per_page": 15}).configure(table)
-#        response_dict.update({'table':table})
-#    
-#    return render(request, 'generate.html',response_dict)
-#
-#def bulk_edit(request):
-#    if request.method == 'POST':
-#        selected = request.POST.getlist('selection', None)
-#        if selected != None:
-#            form = EditBulkCardsForm(request.POST or None, extra=selected)
-#            return render(request, 'edit.html',{'form':form})        
-#    form = GenerateBulkCardsForm()        
-#    return render(request,'generate.html',{'form':form})
-#
-#def bulk_update(request):
-#    if request.method == 'POST':
-#        card_utils.update_card_details(request)     
-#    return HttpResponseRedirect('/cards/bulk/generate/')
-
 def purchase(request):
     if request.method == 'POST':
-        #email = request.user
-        #print email
-        #batch_list = card_utils.get_batch_for_user(email)
-        #table = tables.BatchDisplayTable(batch_list)
-        #print (table==None)
-        #RequestConfig(request,paginate={"per_page":15}).configure(table)
-        #response_dict = {'table' : table}
-        #batch_number = request.POST.get('batch', None)
-        #search_number = request.POST.get('search', None)
-        #
-        #print 'before batch'
-        #print batch_number, search_number
-        #
-        #if batch_number:
-        #    pass
-        #
-        #if search_number:
-            pass
+        pass
         
     return render(request,'purchase.html', response_dict)
     
      
 def add_cart(request):
     response_dict = []
-    #response_dict_snos = {}	
+    
+    shop_cart = []
+    card_numbers = []
     if request.session.get('batch_number', False):
         batch_number = request.session.get('batch_number', False)    	
         batch = Batch.objects.get(batch_number = batch_number)
-        #cart_flavours = SwipedCard.objects.filter(batch = batch.id, deleted=False)
-        cart_flavours = SwipedCard.objects.values('card_type', 'card_flavour','batch_id').filter(batch_id=batch.id, deleted=False).annotate(Count('card_flavour'))
-        for c in cart_flavours:
-            #card_numbers = SwipedCard.objects.filter(batch_id=batch.id,c['card_type'],c['card_flavour'] deleted=False)
-            card_numbers = SwipedCard.objects.values('id','card_number').filter(batch_id=batch.id, card_type=c['card_type'], card_flavour=c['card_flavour'], deleted=False)
-            response_dict.append(card_numbers)
+        
+        cart_flavours = SwipedCard.objects.values('card_type', 'card_flavour',
+                                                  'batch_id','upc_code','gift_card_id').filter(batch_id=batch.id, deleted=False).annotate(Count('card_flavour')).annotate(Sum('amount'))
+                
+        for c in cart_flavours:                     	
+            
+            card_number = SwipedCard.objects.values('id','card_number','card_flavour','card_type','batch_id').filter(batch_id=batch.id, card_type=c['card_type'], card_flavour=c['card_flavour'], deleted=False)
+            card_numbers.append(card_number)
 
     resp_dict1 = zip(cart_flavours,response_dict)            	
-    resp_dict = {'cart_items':resp_dict1}
-    #print resp_dict 
+    createdby_id=request.user
+
+    to_delete_cart = shopcart.objects.filter(activate_card_batch_id=batch.id)
+    to_delete_cart.delete()
     
-    #########  cards_shopcart table need to be inserted without duplicates ################## 
+    for cart in cart_flavours:
+        gift_card_details = gift_cards.objects.values('id','normal_image_file').filter(id=cart['gift_card_id'])
+        for details in gift_card_details:
+       
+            if details['normal_image_file']:
+                image_name = details['normal_image_file']
+            else:
+                image_name = 'noImage.png'
+        
+            sr = shopcart(card_type = cart['card_type'],gift_card_id=cart['gift_card_id'],card_flavour_image_file=image_name,
+        													card_flavour = cart['card_flavour'],
+        													activate_card_batch_id = cart['batch_id'], 
+        													upc_code=cart['upc_code'],
+        													quantity=cart['card_flavour__count'],
+        													total_amount = cart['amount__sum'],
+        													createdby_id = createdby_id.id)
+            sr.save()
+            cart_items = shopcart.objects.values('card_flavour',
+                                             'total_amount',
+					     'card_type','quantity',
+                                             'activate_card_batch_id','card_flavour_image_file').filter(activate_card_batch_id = batch.id,card_flavour = cart['card_flavour']).distinct()
+            shop_cart.append(cart_items)
+
+    request.session['cartcount'] = len(shop_cart)
+    resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers}
     
     return render(request,'shopping_cart.html', resp_dict)
     
@@ -277,8 +256,14 @@ def del_cart(request):
         ctype = request.POST.get('ctype')  
         cflavour = request.POST.get('cflavour')
         batchid = request.POST.get('batchid')  	
-        to_delete = SwipedCard.objects.filter(card_type=ctype, card_flavour=cflavour, batch=batchid)
-        print to_delete
+        to_delete_cart = shopcart.objects.filter(card_type=ctype, card_flavour=cflavour, activate_card_batch_id=batchid)
+        to_delete_cart.delete()
+        to_delete_swiped = SwipedCard.objects.filter(card_type=ctype, card_flavour=cflavour, batch_id=batchid)
+        to_delete_swiped.delete()
+        
+        cart_count = shopcart.objects.filter(card_type=ctype, card_flavour=cflavour, activate_card_batch_id=batchid)
+        resp_dict.append(cart_count)
+    resp_dict = {'cart_items':'5'}
     return render(request,'shopping_cart.html', resp_dict)
  	   
  	   
@@ -286,25 +271,4 @@ def continue_cart(request):
     resp_dict = []	
     return render(request,'purchase.html', response_dict)
            	
-'''
-    def index(request):
-    article_group = []
-    newsletter = Newsletter.objects.all().order_by('-year', '-number')
-    for n in newsletter:
-        article_group.append(n.article_set.all())
-    articles_per_newsletter = zip(newsletter, article_group)
 
-    return render_to_response('newsletter/newsletter_list.html',
-                              {'newsletter_list': articles_per_newsletter})    
-                              
-                              {% for newsletter, articles in newsletter_list %}
-    <h2>{{ newsletter.label }}</h2>
-    <p>Volume {{ newsletter.volume }}, Number {{ newsletter.number }}</p>
-    <p>{{ newsletter.article }}</p>
-    <ul>
-    {% for a in articles %}
-      <li>{{ a.title }}</li>
-    {% endfor %}
-    </ul>
-  {% endfor %}
-'''
