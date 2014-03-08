@@ -40,6 +40,7 @@
           
         </div>
         <div class="navbar-collapse collapse">
+<!-- <img src="{{ STATIC_URL }}images/topbar.png" /> -->
           <ul class="nav navbar-nav">
             <li ><a href="/home/">Home</a></li>
             <li ><a href="/about/">About</a></li>
@@ -58,10 +59,19 @@
 		  </form>
 	  {% else %}
 		<form class="navbar-form navbar-right" action="/user/logout/" method="POST">{% csrf_token %}
-                      <div style="color:#DB3600;border:1px solid;background-color:black;width:100px;">WELCOME</div>
-			<div style="color:white;">{{request.session.email}} 
-		    <button type="submit" value="login" name="submit" class="btn btn-success">logout</button></div>
-		   
+		<ul class="nav navbar-nav" style="background-color:black">
+		<li style="border-right:1px solid;padding: 5px 10px;"><span style="color:#DB3600;">WELCOME</span><br><span style="color:white;">{{request.session.email}}</span></li>
+		<li style="padding: 5px 10px;"><img src="{{ STATIC_URL }}images/Bulk_Purchase.png"></li>
+               
+					 {% if request.session.cartcount  %}                
+                	 <li style="color:white;background-color:orange;width:10px;text-align:center;"><label id="cart_count"><a href="../add_cart/" class="likeabutton">{{ request.session.cartcount }} </a>
+			 </label></li>
+					 {% endif %}               	
+                	
+               
+                <li style="margin-top:20px;padding: 2px 5px;color:white"></li>
+		<li style="border-left:1px solid;padding: 5px 10px;"> <button type="submit" value="login" name="submit" class="btn btn-success">logout</button></li>
+		</ul>
 		  </form>
 	  {% endif %}
         </div><!--/.navbar-collapse -->
@@ -77,11 +87,11 @@
       <footer>
         <p>&copy; Pitstop Recharge 2013, Australia</p>
       </footer>
-    </div> <!-- /container -->        <script src="{{ STATIC_URL }}js/vendor/jquery/1.10.1/jquery.min.js"></script>
+    </div> <!-- /container -->        <script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"></script>
         <script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
 
         <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
-
+<script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
         <script src="{{ STATIC_URL }}js/plugins.js"></script>
         <script src="{{ STATIC_URL }}js/main.js"></script>
 		<!--
