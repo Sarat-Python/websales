@@ -43,6 +43,9 @@ urlpatterns = patterns('',
         url(r'^home/$', TemplateView.as_view(template_name='index.html')),
         url(r'^about/$', TemplateView.as_view(template_name='about.html')),
         url(r'^contact/$', TemplateView.as_view(template_name='contact.html')),
+        #url(r'^home/$', 'webshop.views.home'),
+        #url(r'^about/$', 'webshop.views.about'),
+        #url(r'^contact/$', 'webshop.views.contact'),
         url(r'^termsandconditions/$', 'webshop.views.terms'),
 	
 	# user registration and authentication module
