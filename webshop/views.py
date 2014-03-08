@@ -34,3 +34,18 @@ def terms(request):
     termsdata = render_to_string('terms.html')    
     return HttpResponse(termsdata)
 
+'''
+def home(request):
+    termsdata = render_to_string('home.html')    
+    return HttpResponse(termsdata)
+
+
+def about(request):
+    termsdata = render_to_string('about.html')    
+    return HttpResponse(termsdata)
+
+
+def contact(request):
+    termsdata = render_to_string('contact.html')    
+    return HttpResponse(termsdata)
+'''
