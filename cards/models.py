@@ -28,9 +28,24 @@ from cards.card_utils import verify_card_length
 from cards.card_info import CARD_TYPES
 # Create your models here.
 
+class shopcart(models.Model):
+    shopcart_id = models.CharField( max_length=100)
+    activate_card_batch_id = models.CharField( max_length=100)    
+    gift_card_id = models.CharField(max_length=50)
+    card_type = models.CharField(max_length=100)
+    card_flavour = models.CharField(max_length=255)
+    upc_code = models.CharField(max_length=100)
+    quantity = models.CharField(max_length=50)
+    total_amount = models.CharField(max_length=50) 
+    card_flavour_image_file = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    createdby = models.ForeignKey(WebUser, related_name='createdby')
+    
+
 class Batch(models.Model):
     batch_number = models.CharField(max_length=100)
     card_type= models.CharField(max_length=10, choices=CARD_TYPES)
+    card_flavour = models.CharField(max_length=100)
     created_on = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(WebUser, related_name='created_by')
     assigned_to = models.ForeignKey(WebUser, related_name='assigned_to')
@@ -43,20 +58,39 @@ class Batch(models.Model):
         unique_together = ('batch_number','assigned_to')
         
 
-#
-#class bulk_cards(models.Model):
-#    card_number = models.IntegerField(unique = True)
-#    card_type= models.CharField(max_length=10)
-#    batch = models.ForeignKey(generated_batch)
-#    cost = models.FloatField()
-#    active_status = models.BooleanField(default=False)
-#    class Meta:
-#        unique_together = ('card_number', 'card_type',)
+class EnumField(models.Field):
+
+    def __init__(self, *args, **kwargs):
+        super(EnumField, self).__init__(*args, **kwargs)
+        if not self.choices:
+            raise AttributeError('EnumField requires `choices` attribute.')
+
+    def db_type(self):
+        return "enum(%s)" % ','.join("'%s'" % k for (k, _) in self.choices)
+
+CARD_TYPE1 = 'WLWRTH'
+CARD_TYPE2 = 'BLKHWK'
+CARD_CHOICES = (
+    (CARD_TYPE1, 'WLWRTH'),
+    (CARD_TYPE2, 'BLKHWK'),
+)
+
+class gift_cards(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=250)
+    small_image_file = models.CharField(max_length=150)
+    upc_code =models.CharField(max_length=50)
+    card_type = EnumField(choices=CARD_CHOICES)
+    normal_image_file = models.CharField(max_length=150)
+
+    class Meta:
+       db_table = 'gift_cards'
 
 class SwipedCard(models.Model):
     card_number = models.CharField( max_length=100)
-    # change here to accomodate lenghtier card type names
     card_type = models.CharField(max_length=15)
+    card_flavour = models.CharField(max_length=255)
+    gift_card_id = models.IntegerField(max_length=25)
     upc_code = models.CharField(max_length=30)
     amount = models.FloatField()
     activated = models.BooleanField(default=False)    
@@ -65,13 +99,6 @@ class SwipedCard(models.Model):
     deleted = models.BooleanField(default=False)
     def __unicode__(self):
         return self.card_number
-    
-    def verify_card_number(self):
-        card_type = self.card_type
-        card_number = self.card_number
-        valid = verify_card_length(card_type, card_number)
-        return valid
-    
-    
+   
 
-    
+
