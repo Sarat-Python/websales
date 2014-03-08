@@ -1,8 +1,34 @@
+{% extends 'base.html' %}
+{% block child %}
+{% load filters %}
+{% load render_table from django_tables2 %}
+
 <script>
-var json = {
-    "Woolsworth": ["WoolworthPetrol Gift Card", "Woolworths Gift Card"],
-    "BlackHawk": ["AdrenalinV8Experience $100", "V-Card $200", "Rebel Sport $50","Battle On! Games $24.95","iTunes $50","iTunes $30","iTunes $20","Happy Birthday iTunes $30","BHN Only 1 Visa $200.00"]
-};
+function PopulateCardFlavour(){
+     card_type = document.getElementById('card_type').value;
+     $.ajax({
+	type: "POST",
+       	 url: "../load_flavours/",
+        	 data: {
+            card_type: card_type,
+         },
+       	success: function(data) {
+       			//alert(cart_flv);
+            		location.reload();
+        	},
+        	error: function(xhr, textStatus, errorThrown) {
+            		alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
+        	}
+    	   });
+
+	
+}
+
+function debug_test(){
+    var giftCardId = $("#cardflavour_dropdown").msDropdown().value;
+    alert($("#cardflavour_dropdown").msDropdown().getData());
+}
+
 
 function cardMake () {
     select = document.getElementById('slct1');
@@ -11,20 +37,18 @@ function cardMake () {
         select.options[select.options.length] = new Option(make, make);
     }
 }
-
-function cardModel(sel) {
-    var card_make = sel.options[sel.selectedIndex].value
-    select = document.getElementById('slct2');
-    select.options.length = 0;
-    for(var i=0;i<json[card_make].length;i++) {
-        select.options[select.options.length] = new Option(json[card_make][i], json[card_make][i]);
-    }
-}
 </script>
-{% extends 'base.html' %}
-{% block child %}
-{% load filters %}
-{% load render_table from django_tables2 %}
+
+
+<script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"></script> 
+<!-- <msdropdown> -->
+
+
+<!-- </msdropdown> -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dd.css" />
+<script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/skin2.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
     <div class="container" style="min-height: 640px">
         <div class="row">
             <div class="col-lg-6">
@@ -32,36 +56,56 @@ function cardModel(sel) {
                     Fill in and swipe cards for bulk purchase
                 </h3>
             </div>
-        </div><span style="color:red;">{{msg}}</span> {{msgs}}  {{batch_number}} 
+        </div>
+<div style="color:red;text-align:center;"><h4>{{msgs}}</h4><hr></div>
+<input type="hidden" id="woolsworth" name="Language" value= "{% autoescape off %}{% for card in cardsjson %}{% if card.card_type = 'BLKHWK' %}{{card.id}}^^{{card.name}}^^{{card.small_image_file}}**{% endif %}{% endfor %}{% endautoescape %} ">
+	<input type="hidden" id="cardsjson" name="Language" value= "" >
         <form class="form-inline" action="" method="POST">{% csrf_token %}
            <div class="row">
-                <div class="col-lg-2"><b>Card Type</b>
-  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  
-<!--           {{ form.card_type.label_tag }} {{ form.card_type|styleclass:'input-group form-control' }} -->
-                </div>
-                <div class="col-lg-2"><b>Card Flavour</b>
-		<select class="form-control" id="slct2" name="card_flavour" value="card_flavour">  </select> 
-<!--                	  {{ form.card_flavour.label_tag }} {{ form.card_flavour|styleclass:'input-group form-control' }}  -->  
-		</div>
-                <div class="col-lg-1">
-                    {{ form.amount.label_tag }} {{ form.amount|styleclass:'form-control' }}
-                </div>
-                <div class="col-lg-4">
-                    {{ form.card_number.label_tag }} {{ form.card_number|styleclass:'form-control' }}
+                <div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
+	{{ a }}---testmessage
+{% endfor %}</b>
+<!--  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  -->
+	
+
+<select class="form-control" name="card_type" id="card_type" onchange="PopulateCardFlavour(this)" value="card_type" >
+		<option value="">Select Card Type</option>
+                <option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolsworth</option>
+		<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
+ </select>
                 </div>
                 <div class="col-lg-2">
-                    <h3><input type="submit" class="btn btn-primary" value="Add card" /></h3>
+
+
+<b>Card Flavour</b>
+ 
+
+  <select name="cardflavour_dropdown" class="form-control" id="cardflavour_dropdown" onchange="debug_test();">
+        <option value="" data-description="Card Flavour"></option>
+{% for card in request.session.card_flv %}
+	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}"></option>
+{% endfor%}       
+    </select>  
+
+	
+		</div>
+                <div class="col-lg-1">
+                    {{ form.amount.label_tag }} {{ form.amount }}
                 </div>
-                <!--<div class="col-lg-3">
-                    <h3><button type="submit" class="btn btn-danger" value="shop">Shop</button> </h3>
-                </div>-->
+                <div class="col-lg-4" style="margin-left:97px; " >
+                    {{ form.card_number.label_tag }}<br/> {{ form.card_number }} <input type="submit" class="btn btn-primary" value="Add card" />
+                </div>
+             
+              
           </div>
         </form>
+
         <div class="row"> 
             {% if table != None %}
                 <p>
-                {% render_table table 'batches.html'%}
+                	{% render_table table 'batches.html'%}
                 </p>
+
            <script language="JavaScript">
             function toggle(source) {
                 checkboxes = document.getElementsByName('selection');
@@ -72,11 +116,19 @@ function cardModel(sel) {
         {% endif %}
         </div>
     </div>
+<script>
+
+$(document).ready(function(e) {	
+	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
+        $('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1);
+});
+
+
+</script>
 <script type="text/javascript">
     (function($){
      //prevent the form submit when enter is pressed.
         $(document).keydown(function(event){
-          alert('comin');
           if(event.keyCode == 10 || event.keyCode == 13) {
             event.preventDefault();
             return false;
