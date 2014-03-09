@@ -248,6 +248,7 @@ def add_cart(request):
     resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers}
     
     return render(request,'shopping_cart.html', resp_dict)
+
     
 @csrf_exempt    
 def del_cart(request):
@@ -257,16 +258,33 @@ def del_cart(request):
         cflavour = request.POST.get('cflavour')
         batchid = request.POST.get('batchid')  	
         to_delete_cart = shopcart.objects.filter(card_type=ctype, card_flavour=cflavour, activate_card_batch_id=batchid)
-        to_delete_cart.delete()
-        to_delete_swiped = SwipedCard.objects.filter(card_type=ctype, card_flavour=cflavour, batch_id=batchid)
-        to_delete_swiped.delete()
+        batch_total = shopcart.objects.values('id','activate_card_batch_id').filter(card_type=ctype, card_flavour=cflavour, activate_card_batch_id=batchid).annotate(Sum('total_amount'))
+        for total in batch_total:
+        	   success = update_batch_total(total['activate_card_batch_id'],total['total_amount__sum'])
+        	   if success:
+        	   	    to_delete_cart.delete()
+        	   	    to_delete_swiped = SwipedCard.objects.filter(card_type=ctype, card_flavour=cflavour, batch_id=batchid)
+        	   	    to_delete_swiped.delete()
         
         cart_count = shopcart.objects.filter(card_type=ctype, card_flavour=cflavour, activate_card_batch_id=batchid)
         resp_dict.append(cart_count)
     resp_dict = {'cart_items':'5'}
     return render(request,'shopping_cart.html', resp_dict)
+
  	   
- 	   
+def update_batch_total(batch_id,deleted_amount):
+	   success = False
+	   batch_update = Batch.objects.values('total_cost').filter(id=batch_id)
+	   for batch_tot in batch_update:
+	   	    new_amount = batch_tot['total_cost'] - deleted_amount
+	   	    batch_update_total = Batch.objects.get(id=batch_id)
+	   	    batch_update_total.total_cost = new_amount
+	   	    batch_update_total.save()
+	   	    success = True
+	   return success    
+     
+	 	  
+	 	   
 def continue_cart(request):
     resp_dict = []	
     return render(request,'purchase.html', response_dict)
