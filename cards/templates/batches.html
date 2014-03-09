@@ -84,11 +84,13 @@
 {% endwith %}
   
 </ul>
-<div style="float: right;border-top:1px solid #dddddd;width:400px;text-align:right;margin-top:10px;">{% if batch_total %} <h3>Total Amount: {{ batch_total }} </h3>{% endif %} 
 
-</div>
 </form>
 </div>
+<div style="width:95%;">
+<div style="float: right;border-top:1px solid #dddddd;width:400px;text-align:right;margin-top:10px;">{% if batch_total %} <h3>Total Amount: {{ batch_total }} </h3>{% endif %}
+
+ 
 <ul class="pagination">
 <li>
                 <button type="submit" class="btn btn-primary" value="add" name="cart" onclick="gotoCart();">Add to cart</button>    
@@ -97,6 +99,8 @@
                 <button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout">Proceed to checkout</button>    
             </li>
 </ul>
+</div>
+</div>
 <script>
 function gotoCart()
   {
