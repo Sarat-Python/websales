@@ -57,7 +57,9 @@ function cardMake () {
                 </h3>
             </div>
         </div>
-<div style="color:red;text-align:center;"><h4>{{msgs}}</h4><hr></div>
+{% if msgs != 'Success' %}
+<div style="color:red;text-align:left;"><h4>{{ msgs }}</h4><hr></div>
+{% endif %}
 <input type="hidden" id="woolsworth" name="Language" value= "{% autoescape off %}{% for card in cardsjson %}{% if card.card_type = 'BLKHWK' %}{{card.id}}^^{{card.name}}^^{{card.small_image_file}}**{% endif %}{% endfor %}{% endautoescape %} ">
 	<input type="hidden" id="cardsjson" name="Language" value= "" >
         <form class="form-inline" action="" method="POST">{% csrf_token %}
