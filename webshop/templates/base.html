@@ -64,7 +64,9 @@
 		<li style="padding: 5px 10px;"><img src="{{ STATIC_URL }}images/Bulk_Purchase.png"></li>
                
 					 {% if request.session.cartcount  %}                
-                	 <li style="color:white;background-color:orange;width:10px;text-align:center;"><label id="cart_count"><a href="../add_cart/" class="likeabutton">{{ request.session.cartcount }} </a>
+				<li style="color:white;background-color:orange;width: 27px;text-align:center;margin-top: 8px;color:white">				
+					<label id="cart_count">
+				<a href="../add_cart/">{{ request.session.cartcount }} </a>
 			 </label></li>
 					 {% endif %}               	
                 	
