@@ -22,7 +22,7 @@ Begin Change Log ***************************************************************
 '''
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.core.context_processors import csrf
 from django.template import RequestContext
 from django.contrib.auth import authenticate
@@ -111,7 +111,9 @@ def register(request):
 			
 			# send the email for immediate activation
 			activation_form = ActivationForm(initial={'email':inactive_user.email})
-			return render(request, 'activate.html', {'aform':activation_form, 'just_registered':True})
+			#return render(request, 'activate.html', {'aform':activation_form, 'just_registered':True})
+			#return HttpResponseRedirect('/user/register/activate',{'aform':activation_form,'just_registered':True})
+			return redirect('/user/register/activate', {'aform':activation_form, 'just_registered':True})
 		else:
 			response_dict.update({'f':webuser_form})
 			return render(request, 'register.html', response_dict)
@@ -142,6 +144,7 @@ def activate(request):
 				# auto authenticate
 				inactive_user.backend = "django.contrib.auth.backends.ModelBackend"
 				dj_login(request, inactive_user)
+				request.session['email'] = inactive_user.email
 				return HttpResponseRedirect('/cards/bulk/purchase/')
 			else:
 				response_dict = {
