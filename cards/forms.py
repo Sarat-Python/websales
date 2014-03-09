@@ -29,8 +29,9 @@ from django.forms import ModelForm
 from django.forms.models import modelformset_factory
 #from cards.models import generated_batch, bulk_cards
 from cards.models import Batch, SwipedCard
-from utils import card_utils
-from utils.card_info import CARD_TYPES
+from cards import card_utils
+#from utils.card_info import CARD_TYPES
+from cards.card_info import CARD_TYPES
 from cards.card_info import CARD_FLAVOUR
 
 
