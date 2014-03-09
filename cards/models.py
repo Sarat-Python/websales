@@ -56,7 +56,7 @@ class Batch(models.Model):
     
     class Meta:
         unique_together = ('batch_number','assigned_to')
-        
+     
 
 class EnumField(models.Field):
 
