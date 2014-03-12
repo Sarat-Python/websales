@@ -38,8 +38,13 @@ function cardMake () {
     }
 }
 </script>
-
-
+<script type="text/javascript">
+function movetoNext(current, nextFieldID) {
+if (current.value.length >= current.maxLength) {
+document.getElementById(nextFieldID).focus();
+}
+}
+</script>
 <script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"></script> 
 <!-- <msdropdown> -->
 
@@ -51,7 +56,7 @@ function cardMake () {
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
     <div class="container" style="min-height: 640px">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-6"><br>
                 <h3>
                     Fill in and swipe cards for bulk purchase
                 </h3>
@@ -70,9 +75,9 @@ function cardMake () {
 <!--  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  -->
 	
 
-<select class="form-control" name="card_type" id="card_type" onchange="PopulateCardFlavour(this)" value="card_type" >
+<select class="form-control" name="card_type" id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}} >
 		<option value="">Select Card Type</option>
-                <option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolsworth</option>
+                <option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolworths</option>
 		<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
  </select>
                 </div>
@@ -82,24 +87,25 @@ function cardMake () {
 <b>Card Flavour</b>
  
 
-  <select name="cardflavour_dropdown" class="form-control" id="cardflavour_dropdown" onchange="debug_test();">
+ <select name="cardflavour_dropdown" class="form-control" id="cardflavour_dropdown" onchange="debug_test();" value={{cflavour}} >
         <option value="" data-description="Card Flavour"></option>
 {% for card in request.session.card_flv %}
-	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}"></option>
+	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" 
+{% if card.name == cflavour %} selected="selected" {%endif %} ></option>
 {% endfor%}       
     </select>  
 
-	
 		</div>
-                <div class="col-lg-1">
-                    {{ form.amount.label_tag }} {{ form.amount }}
+                <div class="col-lg-1" >
+                    {{ form.amount.label_tag }} {{ form.amount }} {{card.amount}}
                 </div>
-                <div class="col-lg-4" style="margin-left:97px; " >
-                    {{ form.card_number.label_tag }}<br/> {{ form.card_number }} <input type="submit" class="btn btn-primary" value="Add card" />
+                <div class="col-lg-4 " style="margin-left:7px; " >
+                   {{ form.card_number.label_tag }}<br/> {{ form.card_number }} <span>&nbsp;</span> <span>&nbsp;</span><input type="submit" class="btn btn-primary" value="Add card" />
                 </div>
              
               
           </div>
+
         </form>
 
         <div class="row"> 
@@ -122,9 +128,13 @@ function cardMake () {
 
 $(document).ready(function(e) {	
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
-        $('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1);
+        //$('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1);
 });
 
+function validateitems(){
+	alert(this.value);
+
+}
 
 </script>
 <script type="text/javascript">
