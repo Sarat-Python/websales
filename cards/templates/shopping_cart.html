@@ -16,7 +16,7 @@
 }
 </style>
     <div class="container" style="min-height: 640px">
-        <div class="row">
+        <div class="row" >
             <div class="col-lg-6">
                 <h3>
                 </h3>
@@ -25,32 +25,42 @@
         
         <form action="bulk/add_cart/" method="POST">
             <p>
-              <div class="row" >
+              <div class="row" style="overflow-y: scroll; height: 500px;padding-right:40px;">
               
-<table border="1px" cellpadding="10px" cellspacing="10px" align="center" id="cartTable">
+<table style="border-top:1px solid; border-bottom:1px solid; overflow-y: scroll;" cellpadding="10px" cellspacing="10px" align="center" id="cartTable">
 
 {% for cart in cart_items %}
-<tr id="tr_{{forloop.counter }}">
+<tr id="tr_{{forloop.counter }}" style="border-top:1px solid; border-bottom:1px solid; overflow-y: scroll;">
 	
 	{% for items in cart %}
 	    <td>
-	    		<b>Item  {{forloop.parentloop.counter}}</b> <br><img src="{{ STATIC_URL }}images/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" height="82" width="142">
+	    		<b>Item  {{forloop.parentloop.counter}}</b> <br><img src="{{ STATIC_URL }}images/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" height="100" width="142">
 	    		   <input type="hidden" id="ctype_{{forloop.parentloop.counter}}" name="ctype" value="{{ items.card_type }}">  
   					<input type="hidden" id="batchid_{{forloop.parentloop.counter}}" name="batchid" value="{{ items.activate_card_batch_id }}"> 
-	    </td>
-	    <td>
-	    		{{ items.card_flavour }}
+	    </td><td></td>
+	    <td style="color:#6666FF;padding-bottom:32px;font-size:20px">
+	    		{{ items.card_flavour }}  
 	    		<input type="hidden" id="cflavour_{{forloop.parentloop.counter }}" name="cflavour" value="{{ items.card_flavour }}">
-	    </td>
-	    <td>
+	    </td><td></td><td></td><td></td>
+	    <td style="padding-bottom:30px;font-size:13px">
 	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='javascript:void(0);)'>{{ items.quantity }} </a>
 	    </td>
 	    <td>
-	   		{{ items.total_amount }}
+			<table style="margin-top:40px;">
+                                <tr>
+                                        <td></td>
+					<td colspan="2" style="font-size:25px;padding-bottom:25px;">{{ items.total_amount }}</td></tr><tr>
+					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove </a>| </td><td><a href="#"> Update </a> </td>
+				</tr>
+                        </table>
+	   		 <br>
 	    </td>
-	    <td>
-          	<a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove </a> | <a href="#"> Update </a>
-		 </td> 
+	<!--	<td>
+	   		GST : {{ items.total_gst__sum }}
+	    </td>
+		<td>
+	   		Service Charge : {{ items.total_service_charge__sum }}
+	    </td>   -->
   {% endfor %}
  </tr>
 {% endfor %}
@@ -60,11 +70,11 @@
                	{% if request.session.cartcount != 0  %}                
                 	 <p>
                 <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-lg-8" style="float:right;margin-right:240px;">
                         <div style="float:right">                             
                            
-                            <a href="../purchase/" class="likeabutton">Continue Shopping</a>
-                            <a href="#l" class="likeabutton" >Proceed To Checkout</a>
+                            <a href="../purchase/" class="btn btn-primary">Continue Shopping</a>
+                            <a href="#" class="btn btn-primary" >Proceed To Checkout</a>
                             
                         </div>
                     </div>
