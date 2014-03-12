@@ -28,12 +28,14 @@ from cards.models import SwipedCard
 class SwipedCardTable(tables.Table):
     selection = tables.CheckBoxColumn(accessor="pk", attrs = { "th__input":
                                         {"onclick": "toggle(this)"}},
-                                        orderable=False)
+                                        orderable=False)  
+
     class Meta:
         model = SwipedCard
         attrs = {'class': 'table'}
         fields = ('card_number', 'card_flavour', 'upc_code', 'amount',  'card_type', 'Activated', 'created_on')
         sequence = ('selection', 'card_type', 'card_flavour', 'card_number', 'upc_code', 'amount', 'Activated', 'created_on')
+        
         
 #class BulkCardTable(tables.Table):
 #    
