@@ -39,13 +39,16 @@ from cards.card_info import CARD_FLAVOUR
 class SwipedCardForm(ModelForm):
     card_type = forms.ChoiceField(choices=CARD_TYPES)
     card_flavour = forms.ChoiceField(choices=CARD_FLAVOUR)
+    #amount = forms.CharField(max_size=2)
+    #amount = forms.CharField(widget=forms.TextInput(attrs={'onmouseout':'return validateitems(this);'}))
     #card_flavour = forms.ChoiceField(widget = forms.Select(attrs = {'onclick' : "cardModel(this)"}))
     
     def __init__(self, *args, **kwargs):
         super(SwipedCardForm, self).__init__(*args, **kwargs)                   
-        self.fields['card_number'].widget.attrs['autofocus']  = 'on'        
-            
-    
+        self.fields['card_number'].widget.attrs['autofocus']  = 'on'
+        self.fields['amount'].widget.attrs['size'] = 5
+        self.fields['amount'].widget.attrs['maxlength'] = 5
+   
     class Meta:
         model = SwipedCard
         fields = ['card_type','card_flavour','amount','card_number']
