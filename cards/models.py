@@ -40,6 +40,8 @@ class shopcart(models.Model):
     card_flavour_image_file = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     createdby = models.ForeignKey(WebUser, related_name='createdby')
+    total_gst = models.FloatField()
+    total_service_charge = models.FloatField()
     
 
 class Batch(models.Model):
@@ -53,6 +55,8 @@ class Batch(models.Model):
     purchased = models.BooleanField(default=False)
     total_cost = models.FloatField()
     deleted = models.BooleanField(default=False)
+    total_gst = models.FloatField()
+    total_service_charge = models.FloatField()
     
     class Meta:
         unique_together = ('batch_number','assigned_to')
@@ -82,7 +86,8 @@ class gift_cards(models.Model):
     upc_code =models.CharField(max_length=50)
     card_type = EnumField(choices=CARD_CHOICES)
     normal_image_file = models.CharField(max_length=150)
-
+    service_charge = models.CharField(max_length=150)
+    gst = models.CharField(max_length=150)
     class Meta:
        db_table = 'gift_cards'
 
