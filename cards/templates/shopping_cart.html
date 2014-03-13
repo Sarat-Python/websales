@@ -66,9 +66,28 @@
 {% endfor %}
 </table>
 </div>
+<div style="width:95%;">
+<div style="float: right;border-top:1px solid #dddddd;width:400px;text-align:right;margin-top:10px;">
+{% if main_total %}
+	<p style="font-family:arial;color:#A52A2A;font-size:16px;font-weight:bold;">Total Card(s) Amount : AUD  {{ batch_total }} </p>
+ 	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">Service Charge : AUD  {{ service_charge_total }} </p>
+	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">GST Amount : AUD  {{ gst_total }} </p>
+	<hr>
+	<h3>Total Amount: AUD {{ main_total }} </h3>
+{% endif %}
+<ul class="pagination">
+<li>
+                <a href="../purchase/" class="btn btn-primary">Continue Shopping</a>
+            </li>
+            <li style="margin-left:5px;">
+                <a href="#" class="btn btn-primary" >Proceed To Checkout</a>
+            </li>
+</ul>
+</div>
+</div>
             </p>
                	{% if request.session.cartcount != 0  %}                
-                	 <p>
+                	 <!--p>
                 <div class="row">
                     <div class="col-lg-8" style="float:right;margin-right:240px;">
                         <div style="float:right">                             
@@ -79,7 +98,7 @@
                         </div>
                     </div>
                 </div>
-               </p>
+               </p-->
 		{% else %}
 		    <p>
                 <div class="row">
