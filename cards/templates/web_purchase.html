@@ -91,10 +91,11 @@ document.getElementById(nextFieldID).focus();
                 </div>
                 <div class="col-lg-2">
 <b>Card Flavour</b>
-  <select name="cardflavour_dropdown" class="form-control styled validate[required]" id="cardflavour_dropdown" onchange="debug_test();" value={{cflavour}} >
+  <select name="cardflavour_dropdown" class="form-control styled validate[required]" id="cardflavour_dropdown" onchange="debug_test();">
         <option value="" data-description="Card Flavour"></option>
 {% for card in request.session.card_flv %}
-	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" {% if card.name == cflavour %} selected="selected" {%endif %} ></option>
+	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" 
+{% if cflavour = card.name %}selected="selected"{% endif%}></option>
 {% endfor%}       
     </select>  
 		</div>
@@ -130,7 +131,7 @@ document.getElementById(nextFieldID).focus();
 //var j10 = $.noConflict(true);
 $(document).ready(function(e) {	
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
-        $('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1); 
+        //$('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1); 
 
 });
 
