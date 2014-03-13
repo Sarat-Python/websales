@@ -11,14 +11,10 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 * deposited with the Australian Copyright Office. 
 *
 PIT_STOP_RECHARGE_END_TAG
-
 select count(card_flavour)  from cards_swipedcard where batch_id=2 group by card_type, card_flavour;
-
-
 '''
 '''
 Begin Change Log ***************************************************************
-                                                                      
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
   0.9    339      prashanth  19/01/2014  Added copyright Info
@@ -48,14 +44,13 @@ from django.core import serializers
 from django.utils import simplejson
 from cards.card_utils import verify_card_length
 
-
-
 def bulk(request):
     form = SwipedCardForm(request.POST or None)
     response_dict = {'form':form}
     batch_number = request.session.get('batch_number', False)
     card_flv_name = ''
     email = request.user
+    gst_total, service_total = 0.00, 0.00		
     msgs=''
     
     if not batch_number:
@@ -95,13 +90,12 @@ def bulk(request):
                 for card_flavour_name in card_flavour:
                     card_flv_name = card_flavour_name.name
                     upc_code = card_flavour_name.upc_code
+                    gst = card_flavour_name.gst
+                    service_charge = card_flavour_name.service_charge
                     check_card_flavor = cnumber.find(upc_code)
                     
 
             if  ctype and cnumber and amt and gift_card_id:
-       
-                #print upc_code
-                #print check_card_flavor
                 
                 if check_card_flavor != -1:
                      if verify_card_number(ctype, cleaned_card): 
@@ -111,7 +105,8 @@ def bulk(request):
                           gift_card_id = gift_card_id,
                           upc_code = upc_code,
                           amount = amt,
-                          batch_id = batch.id,)
+                          gst = gst, service_charge=service_charge,    						  
+                          batch_id = batch.id)
                           batch1.save()
                           batch.total_cost = float(batch.total_cost) + float(amt)
                           batch.save()
@@ -125,8 +120,17 @@ def bulk(request):
 
             form = SwipedCardForm(initial={'card_type':ctype,
                                            'amount':amt,'card_focus':'on'})
-            response_dict.update({'form':form}) 
+            response_dict.update({'form':form})
+
             
+        			
+        charge_list = SwipedCard.objects.values('id').filter(batch_id=batch.id).annotate(Sum('gst')).annotate(Sum('service_charge'))  
+        if charge_list:
+            other_totals = reduce(sum_dict, charge_list)
+            gst_total = other_totals['gst__sum']
+            service_total = other_totals['service_charge__sum']
+            main_total = batch.total_cost + gst_total + service_total			
+            response_dict.update({'batch_total':batch.total_cost,'gst_total':gst_total,'main_total':main_total, 'service_charge_total': service_total})
         response_dict.update({'batch_total':batch.total_cost})
         new_cards = SwipedCard.objects.filter(batch_id=batch.id, deleted=False)
         table = tables.SwipedCardTable(new_cards)
@@ -135,6 +139,11 @@ def bulk(request):
     
     return render(request,'web_purchase.html', response_dict)
 
+def sum_dict(d1, d2):
+    for key, value in d1.items():
+        d1[key] = value + d2.get(key, 0)
+    return d1
+	
 def verify_card_number(card_type, card_number):
     valid = verify_card_length(card_type, card_number)
     card = SwipedCard.objects.filter(card_number=card_number)
@@ -209,15 +218,13 @@ def add_cart(request):
     cart_items = []
     shop_cart = []
     card_numbers = []
+    total_amount, gst_total, service_total = 0.00, 0.00, 0.00
     if request.session.get('batch_number', False):
         batch_number = request.session.get('batch_number', False)    	
         batch = Batch.objects.get(batch_number = batch_number)
-        
         cart_flavours = SwipedCard.objects.values('card_type', 'card_flavour',
                                                   'batch_id','upc_code','gift_card_id').filter(batch_id=batch.id, deleted=False).annotate(Count('card_flavour')).annotate(Sum('amount'))
-                
         for c in cart_flavours:                     	
-            
             card_number = SwipedCard.objects.values('id','card_number','card_flavour','card_type','batch_id').filter(batch_id=batch.id, card_type=c['card_type'], card_flavour=c['card_flavour'], deleted=False)
             card_numbers.append(card_number)
 
@@ -229,10 +236,7 @@ def add_cart(request):
     
     for cart in cart_flavours:
         gift_card_details = gift_cards.objects.values('id','normal_image_file','service_charge','gst').filter(id=cart['gift_card_id'])
-        #.annotate(Sum('service_charge')).annotate(Sum('gst'))
-        
         for details in gift_card_details:
-            
             if details['normal_image_file']:
                 image_name = details['normal_image_file']
             else:
@@ -258,16 +262,23 @@ def add_cart(request):
             cart_items = shopcart.objects.values('card_flavour',
                                              'total_amount',
 					     'card_type','quantity',
-                                             'activate_card_batch_id','card_flavour_image_file','total_gst','total_service_charge').filter(activate_card_batch_id = batch.id,card_flavour = cart['card_flavour']).distinct().annotate(Sum('total_gst')).annotate(Sum('total_service_charge'))
+                                             'activate_card_batch_id','card_flavour_image_file','total_gst','total_service_charge').filter(activate_card_batch_id = batch.id,card_flavour = cart['card_flavour']).distinct().annotate(Sum('total_gst')).annotate(Sum('total_service_charge')).annotate(Sum('total_amount'))
             shop_cart.append(cart_items)
+    
     for batch_item in cart_items:
-        #print batch_item['activate_card_batch_id']
         batch_update = Batch.objects.get(id=batch_item['activate_card_batch_id'])
         batch_update.total_gst = round(batch_item['total_gst__sum'], 2)
         batch_update.total_service_charge = round(batch_item['total_service_charge__sum'], 2)
         batch_update.save()
     request.session['cartcount'] = len(shop_cart)
-    resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers}
+
+    charge_list = shopcart.objects.values('id').filter(activate_card_batch_id=batch.id).annotate(Sum('total_amount')).annotate(Sum('total_gst')).annotate(Sum('total_service_charge'))  
+    other_totals = reduce(sum_dict, charge_list)
+    gst_total = other_totals['total_gst__sum']
+    total_amount = other_totals['total_amount__sum']
+    service_total = other_totals['total_service_charge__sum']
+    main_total = total_amount + gst_total + service_total		
+    resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers,'total_amount':total_amount, 'gst_total':gst_total, 'service_total':service_total, 'main_total':main_total}
     
     return render(request,'shopping_cart.html', resp_dict)
 
