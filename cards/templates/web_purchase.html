@@ -75,10 +75,9 @@ document.getElementById(nextFieldID).focus();
                 <div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
 	{{ a }}---testmessage
 {% endfor %}</b>
-<!--  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  -->
+<!--  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  class="styled validate[required]" -->
 	
-		
-<select class="styled validate[required]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
+<select class="form-control styled validate[required]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
 		<option value="">Select Card Type</option>
                 <option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolworths</option>
 		<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
@@ -140,51 +139,5 @@ function validateitems(){
 
 }
 
-</script>
-<script type="text/javascript">
-/*
-if ($('#cardflavour_dropdown').length > 0) {
-
-
-          if  ($("#cardflavour_dropdown").hasClass('validate[required]'))
-          {
-            $("#valutanem_msdd").addClass('validate[required]')
-
-            var element  = document.getElementById("valutanem_msdd")
-
-     // need to clone the element because IE does not allow to set the type 
-    //only if it is a newly created element
-            var newObject = element.cloneNode(true);  
-            newObject.type = "ms-dropdown-source";
-
-            element.parentNode.replaceChild(newObject,element)
-          }
-
-
-
-        $.valHooks['ms-dropdown-source'] = {
-          get: function (el) {
-            element_id = $.trim($(el).attr('id').split('_msdd')[0])
-            return $("#"+element_id).val();
-          },
-          set: function (el, val) {
-            element_id = $.trim($(el).attr('id').split('_msdd')[0])
-            return $("#"+element_id).val(val);
-          }
-        };
-
-    }
-
-*/
-	
-    //(function($){
-     ////prevent the form submit when enter is pressed.
-       // $(document).keydown(function(event){
-         // if(event.keyCode == 10 || event.keyCode == 13) {
-           // event.preventDefault();
-            //return false;
-          //}
-        //});
-   // }(jquery))
 </script>
 {% endblock %}
