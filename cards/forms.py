@@ -46,8 +46,10 @@ class SwipedCardForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SwipedCardForm, self).__init__(*args, **kwargs)                   
         self.fields['card_number'].widget.attrs['autofocus']  = 'on'
+        self.fields['amount'].widget.attrs = {'class':'styled validate[required]'}
         self.fields['amount'].widget.attrs['size'] = 5
         self.fields['amount'].widget.attrs['maxlength'] = 5
+        self.fields['card_number'].widget.attrs = {'class':'styled validate[required]'}
    
     class Meta:
         model = SwipedCard
