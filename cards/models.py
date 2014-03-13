@@ -102,6 +102,8 @@ class SwipedCard(models.Model):
     batch = models.ForeignKey(Batch)
     created_on = models.DateTimeField(default=timezone.now)
     deleted = models.BooleanField(default=False)
+    gst = models.FloatField()
+    service_charge = models.FloatField()    
     def __unicode__(self):
         return self.card_number
    
