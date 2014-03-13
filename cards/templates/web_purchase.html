@@ -2,8 +2,10 @@
 {% block child %}
 {% load filters %}
 {% load render_table from django_tables2 %}
-
+<link rel="stylesheet" href="{{ STATIC_URL }}css/validationEngine.jquery.css" type="text/css" media="screen" title="no title"
+charset="utf-8" />
 <script>
+
 function PopulateCardFlavour(){
      card_type = document.getElementById('card_type').value;
      $.ajax({
@@ -45,7 +47,13 @@ document.getElementById(nextFieldID).focus();
 }
 }
 </script>
-<script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"></script> 
+<script src="{{ STATIC_URL }}js/jquery-1.6.min.js"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.simpletip-1.3.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validationEngine-en.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validationEngine.js"></script>
+
+<!--<script src="{{ STATIC_URL }}js/vendor/jquery.balloon.js"></script>-->
 <!-- <msdropdown> -->
 
 
@@ -67,34 +75,28 @@ document.getElementById(nextFieldID).focus();
 {% endif %}
 <input type="hidden" id="woolsworth" name="Language" value= "{% autoescape off %}{% for card in cardsjson %}{% if card.card_type = 'BLKHWK' %}{{card.id}}^^{{card.name}}^^{{card.small_image_file}}**{% endif %}{% endfor %}{% endautoescape %} ">
 	<input type="hidden" id="cardsjson" name="Language" value= "" >
-        <form class="form-inline" action="" method="POST">{% csrf_token %}
+        <form class="form-inline" action="" id="formSubmit" method="POST">{% csrf_token %}
            <div class="row">
                 <div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
 	{{ a }}---testmessage
 {% endfor %}</b>
 <!--  <select class="form-control" name="card_type" id="slct1" value="card_type" onclick="cardModel(this)"></select> <script> cardMake(); </script>  -->
 	
-
-<select class="form-control" name="card_type" id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}} >
+		
+<select class="styled validate[required]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
 		<option value="">Select Card Type</option>
                 <option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolworths</option>
 		<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
  </select>
                 </div>
                 <div class="col-lg-2">
-
-
 <b>Card Flavour</b>
- 
-
- <select name="cardflavour_dropdown" class="form-control" id="cardflavour_dropdown" onchange="debug_test();" value={{cflavour}} >
+  <select name="cardflavour_dropdown" class="form-control styled validate[required]" id="cardflavour_dropdown" onchange="debug_test();" value={{cflavour}} >
         <option value="" data-description="Card Flavour"></option>
 {% for card in request.session.card_flv %}
-	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" 
-{% if card.name == cflavour %} selected="selected" {%endif %} ></option>
+	<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" {% if card.name == cflavour %} selected="selected" {%endif %} ></option>
 {% endfor%}       
     </select>  
-
 		</div>
                 <div class="col-lg-1" >
                     {{ form.amount.label_tag }} {{ form.amount }} {{card.amount}}
@@ -124,11 +126,18 @@ document.getElementById(nextFieldID).focus();
         {% endif %}
         </div>
     </div>
-<script>
-
+	<script>
+//var j10 = $.noConflict(true);
 $(document).ready(function(e) {	
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
-        //$('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1);
+        $('#cardflavour_dropdown').msDropDown().data('dd').set('selectedIndex',1); 
+
+});
+
+var j6 = $.noConflict(true);
+j6(document).ready(function(e) {	
+j6("#formSubmit").validationEngine();
+
 });
 
 function validateitems(){
@@ -138,14 +147,16 @@ function validateitems(){
 
 </script>
 <script type="text/javascript">
-    (function($){
-     //prevent the form submit when enter is pressed.
-        $(document).keydown(function(event){
-          if(event.keyCode == 10 || event.keyCode == 13) {
-            event.preventDefault();
-            return false;
-          }
-        });
-    }(jquery))
+
+	
+    //(function($){
+     ////prevent the form submit when enter is pressed.
+       // $(document).keydown(function(event){
+         // if(event.keyCode == 10 || event.keyCode == 13) {
+           // event.preventDefault();
+            //return false;
+          //}
+        //});
+   // }(jquery))
 </script>
 {% endblock %}
