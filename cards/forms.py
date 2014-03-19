@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+  Itr        Def/Req               Userid      Date           Description
+  -----     --------               --------  --------       -------------------------------
+  Sprint     Bug 8,9,10,11,12      NaveeN    19/03/2014       Added Shopcart Functionality
+ End Change Log ***************************************************************************
 '''
 
 from django import forms
@@ -28,7 +28,7 @@ from django.db import models
 from django.forms import ModelForm
 from django.forms.models import modelformset_factory
 #from cards.models import generated_batch, bulk_cards
-from cards.models import Batch, SwipedCard
+from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 from cards import card_utils
 #from utils.card_info import CARD_TYPES
 from cards.card_info import CARD_TYPES
@@ -39,17 +39,11 @@ from cards.card_info import CARD_FLAVOUR
 class SwipedCardForm(ModelForm):
     card_type = forms.ChoiceField(choices=CARD_TYPES)
     card_flavour = forms.ChoiceField(choices=CARD_FLAVOUR)
-    #amount = forms.CharField(max_size=2)
-    #amount = forms.CharField(widget=forms.TextInput(attrs={'onmouseout':'return validateitems(this);'}))
-    #card_flavour = forms.ChoiceField(widget = forms.Select(attrs = {'onclick' : "cardModel(this)"}))
     
     def __init__(self, *args, **kwargs):
-        super(SwipedCardForm, self).__init__(*args, **kwargs)                   
-        self.fields['card_number'].widget.attrs['autofocus']  = 'on'
-        self.fields['amount'].widget.attrs = {'class':'styled validate[required]'}
-        self.fields['amount'].widget.attrs['size'] = 5
-        self.fields['amount'].widget.attrs['maxlength'] = 5
-        self.fields['card_number'].widget.attrs = {'class':'styled validate[required]'}
+        super(SwipedCardForm, self).__init__(*args, **kwargs)       
+        self.fields['amount'].widget.attrs = {'class':'styled validate[required,custom[number]]','size':5,'maxlength':5}
+        self.fields['card_number'].widget.attrs = {'class':'styled validate[required]','size':40}
    
     class Meta:
         model = SwipedCard
@@ -62,27 +56,31 @@ class UpdateFormSet(UpdateSetBase):
     
     def add_fields(self, form, index):
         super(UpdateFormSet, self).add_fields(form, index)
-        form.fields['card_number'].widget.attrs['readonly']  = True 
-        #form.fields['is_checked'] = forms.BooleanField(label='Select', required=False)
+        form.fields['card_number'].widget.attrs['readonly']  = True
         form.fields['upc_code'] = forms.CharField(label='UPC / Batch Code', required = True)
-        form.fields['card_type'] = forms.ChoiceField(choices=CARD_TYPES)
-        form.fields['card_flavour'] = forms.ChoiceField(choices=CARD_FLAVOUR)
+        form.fields['card_type'].queryset = forms.ModelChoiceField(queryset=SwipedCard.objects.all()) 
+        form.fields['card_flavour'].queryset = forms.ModelChoiceField(queryset=SwipedCard.objects.all())
+        form.fields['card_flavour'].widget.attrs['disabled']  = True
+        form.fields['card_type'].widget.attrs['disabled']  = True
+        form.fields['upc_code'].widget.attrs['readonly']  = True
+        form.fields['amount'] = forms.CharField(required=True)
+                 
 
    
-class UpdateSwipedCardForm(ModelForm):
+class UpdateSwipedCardForm(forms.Form):
     card_type = forms.ChoiceField(choices=CARD_TYPES)
-    card_flavour = forms.ChoiceField(choices=CARD_FLAVOUR)
-    #card_flavour = forms.ChoiceField(widget = forms.Select(attrs = {
-     #       'onclick' : "cardModel(this)"}))
+    card_flavour =  forms.ModelChoiceField(queryset=gift_cards.objects.all())      
     
     def __init__(self, *args, **kwargs):
         super(UpdateSwipedCardForm, self).__init__(*args, **kwargs)                   
-        self.fields['card_number'].widget.attrs['readonly']  = True    
+        #self.fields['card_number'].widget.attrs['readonly']  = True
+        self.fields['card_flavour'].queryset = gift_cards.objects.filter(id=121)    
     
     class Meta:
         model = SwipedCard
         fields = ['card_type','card_flavour','amount','card_number', 'upc_code']
-
+        
+    #item_field = forms.ModelChoiceField(queryset=Item.objects.none())
     #def verify_card_length(self):
     #    if card_type:
     #        length = len(self.cleaned_data.get('card_number'))
