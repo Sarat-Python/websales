@@ -1,0 +1,206 @@
+.headerTop {
+background-image: url({{ STATIC_URL }}images/bg-top.png);
+background-repeat: repeat-x;
+width:600px;
+height:20px;
+margin-left:-420px;	
+}
+
+.nav-home{
+background-image: url({{ STATIC_URL }}images/bg-top.png);
+background-repeat: repeat-x;
+margin-top:-20px;
+}
+.nav-img{
+background-image: url({{ STATIC_URL }}images/bg-top.png);
+background-repeat: repeat-x;
+}
+.noemail{
+height:50px;
+width:600px;
+float:right;
+background-repeat:no-repeat;
+}	
+.usermessage{
+color:#DB3600;
+width:20px;
+text-align:right;
+}
+.useremail{
+color:white;
+margin-top:25px;
+padding-right:12px;
+}	
+.cartcount{
+color:white;
+margin-left:5px;
+background-color:orange;
+width:20px;
+text-align:center;
+margin-top:3px;
+}
+.cartlabel{
+color:#DB3600;
+margin-top:26px;
+text-indent:-25px;
+}	
+.logout{
+border-left:1px solid;
+padding: 5px 10px;
+}
+
+######### Batches Template Formatting #############
+
+.tablescroll{
+height:300px;
+overflow-y: scroll;
+}
+
+.totalsdiv{
+width:95%;
+}
+.servicecharges{
+float: right;
+border-top:1px solid #dddddd;
+width:400px;
+text-align:left;
+margin-top:10px;
+padding-left:121px;
+}
+
+#totalamount{
+font-family:arial;
+color:#A52A2A;
+font-size:16px;
+font-weight:bold;
+width:400px;
+}
+
+#servicecharge{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+width:400px;
+}
+
+#gst{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+width:400px;
+}
+
+.contain{
+clear:both;
+width: 90%;
+margin:auto
+}
+
+.proccedcheckout{
+margin-left:5px;
+}
+
+######### ShopCart Template Formatting #############
+
+.pagebox{
+min-height: 640px
+}
+
+.carttable{
+border-top:1px solid;
+border-bottom:1px solid;
+}
+
+.cartitems{
+border-top:1px solid;
+border-bottom:1px solid; 
+}
+
+.item-cardflavour{
+color:#6666FF;padding-bottom:32px;font-size:20px
+}
+
+.item-quantity{
+padding-bottom:30px;
+font-size:13px
+}
+
+.item-total{
+margin-top:40px;
+}
+
+#item-amnt{
+font-size:25px;
+padding-bottom:25px;
+}
+
+.totaltab-contain{
+width:95%;
+}
+
+.totalstab{
+float: right;
+border-top:1px solid #dddddd;
+width:400px;
+text-align:right;
+margin-top:10px;
+}
+
+#ptotal-amnt{
+font-family:arial;
+color:#A52A2A;
+font-size:16px;
+font-weight:bold;
+}
+
+#p-service-chrge{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+}
+
+#p-gst{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+}
+
+.p-checkout{
+margin-left:5px;
+}
+
+.shop-cont{
+width:95%;
+}
+
+.cart-empty{
+width:400px;
+text-align:center;
+margin-top:10px;
+margin-left:400px;
+}
+
+######### WebPurchase Template Formatting #############
+
+.contains{
+min-height: 640px;
+}
+
+.messages{
+color:red;
+text-align:left;
+}
+
+.addcard-alignmnt{
+margin-top:20px;
+}
+
+######### UpdateCart Template Formatting #############
+
+.contup{
+min-height: 640px;
+}
