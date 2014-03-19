@@ -15,7 +15,7 @@
     border-color: ButtonShadow ButtonHighlight ButtonHighlight ButtonShadow;
 }
 </style>
-    <div class="container" style="min-height: 640px">
+    <div class="container pagebox">
         <div class="row" >
             <div class="col-lg-6">
                 <h3>
@@ -24,98 +24,75 @@
         </div>
         
         <form action="bulk/add_cart/" method="POST">
-            <p>
-              <div class="row" style="overflow-y: scroll; height: 500px;padding-right:40px;">
-              
-<table style="border-top:1px solid; border-bottom:1px solid; overflow-y: scroll;" cellpadding="10px" cellspacing="10px" align="center" id="cartTable">
+                      
+{% if request.session.cartcount != 0  %}    
+	<div class="row" style="overflow-y: scroll; height: 500px;padding-right:40px;">          
+	<table class="carttable cartitems" style="overflow-y: scroll;" cellpadding="10px" cellspacing="10px" align="center" id="cartTable">
 
-{% for cart in cart_items %}
-<tr id="tr_{{forloop.counter }}" style="border-top:1px solid; border-bottom:1px solid; overflow-y: scroll;">
+	{% for cart in cart_items %}
+	<tr id="tr_{{forloop.counter }}" style="overflow-y: scroll;">
 	
-	{% for items in cart %}
+		{% for items in cart %}
 	    <td>
-	    		<b>Item  {{forloop.parentloop.counter}}</b> <br><img src="{{ STATIC_URL }}images/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" height="100" width="142">
-	    		   <input type="hidden" id="ctype_{{forloop.parentloop.counter}}" name="ctype" value="{{ items.card_type }}">  
-  					<input type="hidden" id="batchid_{{forloop.parentloop.counter}}" name="batchid" value="{{ items.activate_card_batch_id }}"> 
-	    </td><td></td>
-	    <td style="color:#6666FF;padding-bottom:32px;font-size:20px">
+    		<b>Item  {{forloop.parentloop.counter}}</b> <br>
+			<img src="{{ STATIC_URL }}images/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" height="100" width="142">
+			<input type="hidden" id="ctype_{{forloop.parentloop.counter}}" name="ctype" value="{{ items.card_type }}">  
+			<input type="hidden" id="batchid_{{forloop.parentloop.counter}}" name="batchid" value="{{ items.activate_card_batch_id }}"> 
+	    </td>
+		<td></td>
+	    <td class="item-cardflavour">
 	    		{{ items.card_flavour }}  
 	    		<input type="hidden" id="cflavour_{{forloop.parentloop.counter }}" name="cflavour" value="{{ items.card_flavour }}">
-	    </td><td></td><td></td><td></td>
-	    <td style="padding-bottom:30px;font-size:13px">
-	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='javascript:void(0);)'>{{ items.quantity }} </a>
+	    </td>
+		<td></td>
+		<td></td>
+		<td></td>
+	    <td class="item-quantity">
+	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='javascript:void(0);)'><input type="text" readonly size=2 value="{{ items.quantity }}" > </a>
 	    </td>
 	    <td>
-			<table style="margin-top:40px;">
-                                <tr>
-                                        <td></td>
-					<td colspan="2" style="font-size:25px;padding-bottom:25px;">{{ items.total_amount }}</td></tr><tr>
-					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove </a>| </td><td><a href="#"> Update </a> </td>
+			<table class="item-total">
+				<tr>
+					<td></td>
+					<td colspan="2" id="item-amnt">$ {{ items.total_amount }}</td></tr><tr>
+					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove </a>
+					|</td><td><a href="#" onclick="javascript:updateCartItems({{ forloop.parentloop.counter }})"> Update </a> </td>
 				</tr>
-                        </table>
-	   		 <br>
+			</table>
+ 		<br>
 	    </td>
-	<!--	<td>
-	   		GST : {{ items.total_gst__sum }}
-	    </td>
-		<td>
-	   		Service Charge : {{ items.total_service_charge__sum }}
-	    </td>   -->
-  {% endfor %}
- </tr>
-{% endfor %}
+  	{% endfor %}
+	</tr>
+	{% endfor %}
 </table>
 </div>
-<div style="width:95%;">
-<div style="float: right;border-top:1px solid #dddddd;width:400px;text-align:right;margin-top:10px;">
-{% if main_total %}
-	<p style="font-family:arial;color:#A52A2A;font-size:16px;font-weight:bold;">Total Card(s) Amount : AUD  {{ batch_total }} </p>
- 	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">Service Charge : AUD  {{ service_charge_total }} </p>
-	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">GST Amount : AUD  {{ gst_total }} </p>
-	<hr>
-	<h3>Total Amount: AUD {{ main_total }} </h3>
-{% endif %}
-<ul class="pagination">
-<li>
-                <a href="../purchase/" class="btn btn-primary">Continue Shopping</a>
-            </li>
-            <li style="margin-left:5px;">
-                <a href="#" class="btn btn-primary" >Proceed To Checkout</a>
-            </li>
-</ul>
+	<div class="totaltab-contain">
+	<div class="totalstab">
+		{% if main_total %}
+			<p id="ptotal-amnt">Total Card(s) Amount : AUD  {{ batch_total }} </p>
+			<p id="p-service-chrge">Service Charge : AUD  {{ service_charge_total }} </p>
+			<p id="p-gst">GST Amount : AUD  {{ gst_total }} </p>
+			<hr>
+			<h3>Total Amount: AUD {{ main_total }} </h3>
+
+			<ul class="pagination">
+				<li><a href="../purchase/" class="btn btn-primary">Continue Shopping</a></li>
+				<li class="p-checkout"><a href="#" class="btn btn-primary" >Proceed To Checkout</a>
+				</li>
+			</ul>
+		{% endif %}{% else %}
+	<div class="shop-cont">
+		<div class="cart-empty">
+			<ul class="pagination">
+				<li><h3>Your cart is Empty</h3></li>
+				<li><a href="../purchase/" class="btn btn-primary">Continue Shopping</a> </li>
+			</ul>
+		{% endif %}
+		</div>
+	</div>
+               
+</form>        
 </div>
-</div>
-            </p>
-               	{% if request.session.cartcount != 0  %}                
-                	 <!--p>
-                <div class="row">
-                    <div class="col-lg-8" style="float:right;margin-right:240px;">
-                        <div style="float:right">                             
-                           
-                            <a href="../purchase/" class="btn btn-primary">Continue Shopping</a>
-                            <a href="#" class="btn btn-primary" >Proceed To Checkout</a>
-                            
-                        </div>
-                    </div>
-                </div>
-               </p-->
-		{% else %}
-		    <p>
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div style="float:right">                             
-                            <span >You have no Items in Cart... </span>
-                            <a href="../purchase/" class="likeabutton">Continue Shopping</a>
-                            
-                            
-                        </div>
-                    </div>
-                </div>
-               </p>
-		
-	       {% endif %}  
-               </form>        
-    </div>
     
 <script src="{{ STATIC_URL }}js/vendor/jquery/1.10.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
@@ -126,10 +103,7 @@ function removeCartItems(counter) {
         var ctype = $( "#ctype_"+counter ).val();
         var batchid = $( "#batchid_"+counter ).val();
         var cflavour = $( "#cflavour_"+counter ).val();
-        
-        //alert(ctype);
-        //alert(batchid);
-        //alert(cflavour);
+       
         $.ajax({
         	 type: "POST",
        	 url: "../del_cart/",
@@ -141,7 +115,6 @@ function removeCartItems(counter) {
        	success: function(data) {
        		$( "#tr_"+counter ).remove();
        			window.location.reload();
-            //alert("Item Deleted Successfully");
         	},
         	error: function(xhr, textStatus, errorThrown) {
             alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
@@ -150,25 +123,30 @@ function removeCartItems(counter) {
 	  		 
 }
 
-/*
-function continueShop(){
-	$.ajax({
-	
-        	type: "POST",
-       	url: "../continue_cart/",
-        	data: {
-          continue_shop = 'true'
+function updateCartItems(counter) {
+
+        var ctype = $( "#ctype_"+counter ).val();
+        var batchid = $( "#batchid_"+counter ).val();
+        var cflavour = $( "#cflavour_"+counter ).val();
+       
+        $.ajax({
+        	 type: "POST",
+       	 url: "../update/",
+        	 data: {
+            batchid: batchid,
+            ctype : ctype,
+            cflavour : cflavour,
+            action : 'updatecart',
          },
        	success: function(data) {
-         
+       				 window.location.href = '../update/'
         	},
         	error: function(xhr, textStatus, errorThrown) {
             alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
         	}
-  }); 
+    	   });
+	  		 
 }
-*/
-
 </script>
 {% endblock %}
 
