@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+  Itr        Def/Req               Userid      Date           Description
+  -----     --------               --------  --------       -------------------------------
+  Sprint     Bug 8,9,10,11,12      NaveeN    19/03/2014       Added Shopcart Functionality
+ End Change Log ***************************************************************************
 '''
 
 from django.db import models
@@ -103,7 +103,8 @@ class SwipedCard(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
     deleted = models.BooleanField(default=False)
     gst = models.FloatField()
-    service_charge = models.FloatField()    
+    service_charge = models.FloatField()
+    cart_status = models.CharField(max_length=1)    
     def __unicode__(self):
         return self.card_number
    
