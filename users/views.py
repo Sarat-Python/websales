@@ -13,12 +13,13 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+  Itr        Def/Req     Userid      Date           Description
+  -----     --------     --------  --------       -------------------------------
+  Story1     Bug 7       NaveeN    19/03/2014       Modified User Registraion functionality
+
+End Change Log ***************************************************************************
 '''
 
 from django.http import HttpResponseRedirect
@@ -33,6 +34,7 @@ from django.conf import settings
 from recaptcha.client import captcha
 
 from users.models import WebUser
+from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 from users.forms import WebUserCreationForm, WebUserChangeForm, WebPasswordChangeForm
 from users.forms import ActivationForm
 from users.utils import helpers
@@ -62,7 +64,9 @@ def login(request):
 	return render(request, 'login.html')
 
 
-def logout(request):				
+def logout(request):
+	del_cards = SwipedCard.objects.filter(batch_id=request.session['batchid'])
+	del_cards.delete()
 	dj_logout(request)
 	return HttpResponseRedirect('/')
 
