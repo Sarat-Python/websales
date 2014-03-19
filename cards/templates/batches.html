@@ -2,115 +2,136 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% if table.page %} 
-<div class="table-container" style="clear:both;width: 90%;margin:auto">
+	<div class="table-container contain">
 {% endif %}
 {% block table %}
-    <form class="form" action="/cards/bulk/update/" method="post">{% csrf_token %}
-<div style="overflow-y: scroll;height:440px;" >
-<table {% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
-    {% nospaceless %}
-    {% block table.thead %}
-    <thead>
-        <tr>
-        {% for column in table.columns %}
-            {% if column.orderable %}
-            <th {{ column.attrs.th.as_html }}> <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a></th>
-            {% else %}
-            <th {{ column.attrs.th.as_html }}> {{ column.header }}</th>
-            {% endif %}
-        {% endfor %}
-        </tr>
-    </thead>
-    {% endblock table.thead %}
-    {% block table.tbody %}
-    <tbody>
-        {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
-        {% block table.tbody.row %}
-        <tr class="{{ forloop.counter|divisibleby:2|yesno:"even,odd" }}"> {# avoid cycle for Django 1.2-1.6 compatibility #}
-            {% for column, cell in row.items %}
-                <td {{ column.attrs.td.as_html }}>{% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
-            {% endfor %}
-        </tr>
-        {% endblock table.tbody.row %}
-        {% empty %}
-        {% if table.empty_text %}
-        {% block table.tbody.empty_text %}
-        <tr><td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td></tr>
-        {% endblock table.tbody.empty_text %}
-        {% endif %}
-        {% endfor %}
-    </tbody>
-    {% endblock table.tbody %}
-    {% block table.tfoot %}
-    <tfoot>
-    </tfoot>
-    {% endblock table.tfoot %}
-    {% endnospaceless %}
-</table>
-</div>
+	<form class="form" action="/cards/bulk/update/" method="post">{% csrf_token %}
+	<div style="overflow-y: scroll;height:300px;" >
+	<table {% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+	{% nospaceless %}
+	{% block table.thead %}
+		<thead>
+			<tr>
+				{% for column in table.columns %}
+					{% if column.orderable %}
+						<th {{ column.attrs.th.as_html }}> 
+							<a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a>
+						</th>
+					{% else %}
+						<th {{ column.attrs.th.as_html }}> {{ column.header }}</th>
+					{% endif %}
+				{% endfor %}
+			</tr>
+		</thead>
+	{% endblock table.thead %}
+	{% block table.tbody %}
+		<tbody>
+		{% for row in table.page.object_list|default:table.rows %} {# support pagination #}
+			{% block table.tbody.row %}
+				<tr class="{{ forloop.counter|divisibleby:2|yesno:"even,odd" }}"> {# avoid cycle for Django 1.2-1.6 compatibility #}
+					{% for column, cell in row.items %}
+						<td {{ column.attrs.td.as_html }}>
+							{% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}
+							{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}
+						</td>
+					{% endfor %}
+				</tr>
+			{% endblock table.tbody.row %}
+				{% empty %}
+			{% if table.empty_text %}
+				{% block table.tbody.empty_text %}
+					<tr><td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td></tr>
+				{% endblock table.tbody.empty_text %}
+			{% endif %}
+		{% endfor %}
+		</tbody>
+	{% endblock table.tbody %}
+	{% block table.tfoot %}
+		<tfoot>
+		</tfoot>
+	{% endblock table.tfoot %}
+	{% endnospaceless %}
+	</table>
+	</div>
 {% endblock table %}
-<ul class="pagination">
-  
-{% if table.page %}
-{% with table.page.paginator.count as total %}
-{% with table.page.object_list|length as count %}
-{% block pagination %}
+	<ul class="pagination">
 
-    {% if table.page.has_previous %} 
-    {% nospaceless %}{% block pagination.previous %}<li class="previous"><a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">{% trans "Previous" %}</a></li>{% endblock pagination.previous %}{% endnospaceless %}
-    {% endif %}
+	{% if table.page %}
+	{% with table.page.paginator.count as total %}
+	{% with table.page.object_list|length as count %}
+	{% block pagination %}
 
-    {% if table.page.has_previous or table.page.has_next %}
-    {% nospaceless %}{% block pagination.current %}<li class="current">{% blocktrans with table.page.number as current and table.paginator.num_pages as total %}&nbsp; | Page {{ current }} of {{ total }} | {% endblocktrans %}</li>{% endblock pagination.current %}{% endnospaceless %}
-    {% endif %}
+		{% if table.page.has_previous %} 
+			{% nospaceless %}{% block pagination.previous %}
+				<li class="previous"><a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">
+				{% trans "Previous" %}</a></li>
+			{% endblock pagination.previous %}{% endnospaceless %}
+		{% endif %}
 
-    {% if table.page.has_next %}
-    {% nospaceless %}{% block pagination.next %}<li class="next"><a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}">{% trans "Next" %}</a></li>{% endblock pagination.next %}{% endnospaceless %}
-    {% endif %}
+		{% if table.page.has_previous or table.page.has_next %}
+			{% nospaceless %}{% block pagination.current %}<li class="current">
+				{% blocktrans with table.page.number as current and table.paginator.num_pages as total %}
+					&nbsp; | Page {{ current }} of {{ total }} | {% endblocktrans %}</li>
+				{% endblock pagination.current %}{% endnospaceless %}
+		{% endif %}
 
-    {% nospaceless %}{% block pagination.cardinality %}<li class="cardinality">{% if total != count %}{% blocktrans %} {{ count }} of {{ total }} {% endblocktrans %}{% else %}Cards: {{ total }}{% endif %}  <!--{% if total == 1 %}{{ table.data.verbose_name }}{% else %}{{ table.data.verbose_name_plural }}{% endif %}--></li>{% endblock pagination.cardinality %}{% endnospaceless %}
-    {% nospaceless %}
-        {%if table %}
-            <li>
-                <button type="submit" class="btn btn-primary" name="action" value="edit">Update</button>    
-            </li>
-            <li>
-                <button type="submit" class="btn btn-primary" name="action" value="delete">Delete</button>    
-            </li>
-        {% endif %}
-    {% endnospaceless %}
-{% endblock pagination %}
-{% endwith %}
-{% endwith %}
-  
-</ul>
+		{% if table.page.has_next %}
+			{% nospaceless %}{% block pagination.next %}
+				<li class="next"><a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}">{% trans "Next" %}</a></li>
+			{% endblock pagination.next %}{% endnospaceless %}
+		{% endif %}
+
+		{% nospaceless %}
+		{% block pagination.cardinality %}
+			<li class="cardinality">{% if total != count %}{% blocktrans %} {{ count }} of {{ total }} {% endblocktrans %}{% else %}
+			Cards: {{ total }}{% endif %} </li>{% endblock pagination.cardinality %}{% endnospaceless %}
+		{% nospaceless %}
+	{%if table %}
+	<li>
+		<button type="submit" class="btn btn-primary" name="action" value="edit">Update</button>    
+	</li>
+	<li>
+		<button type="submit" class="btn btn-primary" name="action" value="delete">Delete</button>    
+	</li>
+		{% endif %}
+		{% endnospaceless %}
+		{% endblock pagination %}
+		{% endwith %}
+		{% endwith %}
+
+	</ul>
 
 </form>
 </div>
-<div style="width:95%;">
-<div style="float: right;border-top:1px solid #dddddd;width:400px;text-align:right;margin-top:10px;">
-{% if batch_total %}
-	<p style="font-family:arial;color:#A52A2A;font-size:16px;font-weight:bold;">Total Card(s) Amount : AUD  {{ batch_total }} </p>
- 	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">Service Charge : AUD  {{ service_charge_total }} </p>
-	<p style="font-family:arial;color:#C0C0C0;font-size:16px;font-weight:bold;">GST Amount : AUD  {{ gst_total }} </p>
-	<hr>
-	<h3>Total Amount: AUD {{ main_total }} </h3>
-{% endif %}
-<ul class="pagination">
-<li>
-                <button type="submit" class="btn btn-primary" value="add" name="cart" onclick="gotoCart();">Add to cart</button>    
-            </li>
-            <li style="margin-left:5px;">
-                <button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout">Proceed to checkout</button>    
-            </li>
-</ul>
-</div>
+<div class="totalsdiv">
+	<div class="servicecharges">
+	{% if batch_total %}
+		<div id="totalamount">
+			Total Card(s) Amount : AUD  {{ batch_total }}
+		</div>
+		<div id="servicecharge">
+			Service Charge <span style="margin-left:47px;">: AUD</span>  {{ service_charge_total }}
+		 </div>
+		<div id="gst">
+			GST Amount <span style="margin-left:66px;">: AUD</span>  {{ gst_total }}
+		</div>
+		<hr>
+		<h3>Total Amount: AUD {{ main_total }} </h3>
+	{% endif %}
+	<ul class="pagination">
+		<li>
+			<button type="submit" class="btn btn-primary" value="add" name="cart" onclick="gotoCart();">Add to cart</button>    
+		</li>
+		<li class="proccedcheckout">
+			<button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout">Proceed to checkout</button>    
+		</li>
+	</ul>
 </div>
 <script>
-function gotoCart()
-{
-	window.location="../add_cart/";
-}
+	function gotoCart()
+	{
+		window.location="../add_cart/";
+	}
 </script>
 
 {% endif %}
