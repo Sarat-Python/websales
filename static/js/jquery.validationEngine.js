@@ -25,7 +25,7 @@
 			 if (!form.data('jqv') || form.data('jqv') == null ) {
 				 options = methods._saveOptions(form, options);
 				 // bind all formError elements to close on click
-				 $(".formError").live("click", function() {
+				 $(".formError").on("click", function() {
 					 $(this).fadeOut(150, function() {
 						 // remove prompt once invisible
 						 $(this).parent('.formErrorOuter').remove();
@@ -179,6 +179,7 @@
 		* Closes form error prompts, CAN be invidual
 		*/
 		hide: function() {
+		
 			 var form = $(this).closest('form');
 			 if(form.length == 0)
 			 	return this;
@@ -1547,7 +1548,7 @@
 		// Name of the event triggering field validation
 		validationEventTrigger: "blur",
 		// Automatically scroll viewport to the first error
-		scroll: true,
+		scroll: false,
 		// Focus on the first input
 		focusFirstField:true,
 		// Opening box position, possible locations are: topLeft,
