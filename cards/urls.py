@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log ***********************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+ Itr    Def/Req  Userid    Date        Description
+ -----  -------- --------  --------    -----------------------------------
+ 0.9    339      NaveeN    20/03/2014  Added Cart Url for update Quantity
+ End Change Log ************************************************************
 '''
 
 from django.conf.urls import patterns, include, url
@@ -31,9 +31,7 @@ urlpatterns = patterns('',
     url(r'^bulk/update/$', 'cards.views.update'),
     url(r'^bulk/add_cart/$', 'cards.views.add_cart'),
     url(r'^bulk/del_cart/$', 'cards.views.del_cart'),
-    url(r'^purchase/$', 'cards.views.purchase'),
-
-   
+    url(r'^bulk/(?P<cart>\w+)/$', 'cards.views.bulk'),
 )
 
 
