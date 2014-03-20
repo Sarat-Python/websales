@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log **************************************************************************
+Begin Change Log *************************************************************
                                                                       
-  Itr        Def/Req               Userid      Date           Description
-  -----     --------               --------  --------       -------------------------------
-  Sprint     Bug 8,9,10,11,12      NaveeN    19/03/2014       Added Shopcart Functionality
- End Change Log ***************************************************************************
+  Itr        Def/Req          Userid      Date           Description
+  -----     --------          --------  --------       ------------------
+  Sprint     Bug 8,9,10,11,12 NaveeN    20/03/2014     Added Code formatting
+ End Change Log **************************************************************
 '''
 
 from django.db import models
@@ -27,6 +27,7 @@ from users.models import WebUser
 from cards.card_utils import verify_card_length
 from cards.card_info import CARD_TYPES
 # Create your models here.
+
 
 class shopcart(models.Model):
     shopcart_id = models.CharField( max_length=100)
@@ -42,7 +43,7 @@ class shopcart(models.Model):
     createdby = models.ForeignKey(WebUser, related_name='createdby')
     total_gst = models.FloatField()
     total_service_charge = models.FloatField()
-    
+
 
 class Batch(models.Model):
     batch_number = models.CharField(max_length=100)
@@ -60,7 +61,7 @@ class Batch(models.Model):
     
     class Meta:
         unique_together = ('batch_number','assigned_to')
-     
+
 
 class EnumField(models.Field):
 
@@ -72,12 +73,14 @@ class EnumField(models.Field):
     def db_type(self):
         return "enum(%s)" % ','.join("'%s'" % k for (k, _) in self.choices)
 
+
 CARD_TYPE1 = 'WLWRTH'
 CARD_TYPE2 = 'BLKHWK'
 CARD_CHOICES = (
     (CARD_TYPE1, 'WLWRTH'),
     (CARD_TYPE2, 'BLKHWK'),
 )
+
 
 class gift_cards(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -90,6 +93,7 @@ class gift_cards(models.Model):
     gst = models.CharField(max_length=150)
     class Meta:
        db_table = 'gift_cards'
+
 
 class SwipedCard(models.Model):
     card_number = models.CharField( max_length=100)
@@ -107,6 +111,3 @@ class SwipedCard(models.Model):
     cart_status = models.CharField(max_length=1)    
     def __unicode__(self):
         return self.card_number
-   
-
-
