@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log **************************************************************************
+Begin Change Log *************************************************************
                                                                       
-  Itr        Def/Req               Userid      Date           Description
-  -----     --------               --------  --------       -------------------------------
-  Sprint     Bug 8,9,10,11,12      NaveeN    19/03/2014       Added Shopcart Functionality
- End Change Log ***************************************************************************
+  Itr        Def/Req          Userid      Date           Description
+  -----     --------          --------  --------       ------------------
+  Sprint     Bug 8,9,10,11,12 NaveeN    20/03/2014     Added Code formatting
+ End Change Log **************************************************************
 '''
 
 import django_tables2 as tables
@@ -27,14 +27,17 @@ from cards.models import SwipedCard
 
 class SwipedCardTable(tables.Table):
     selection = tables.CheckBoxColumn(accessor="pk", attrs = { "th__input":
-                                        {"onclick": "toggle(this)",'width':'20px'}},
+                                        {"onclick": "toggle(this)"
+                                         ,'width':'20px'}},
                                         orderable=False)  
 
     class Meta:
         model = SwipedCard
         attrs = {'class': 'table'}
-        fields = ('card_number', 'upc_code', 'amount',  'card_type', 'Activated', 'created_on')
-        sequence = ('selection', 'card_type', 'card_number', 'upc_code', 'amount', 'Activated', 'created_on')
+        fields = ('card_number', 'upc_code', 'amount',  'card_type',
+                   'Activated', 'created_on')
+        sequence = ('selection', 'card_type', 'card_number', 'upc_code',
+                     'amount', 'Activated', 'created_on')
         
         
 #class BulkCardTable(tables.Table):
