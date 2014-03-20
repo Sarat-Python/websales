@@ -16,9 +16,9 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 Begin Change Log *************************************************************
                                                                       
-  Itr        Def/Req          Userid      Date           Description
-  -----     --------          --------  --------       ------------------
-  Sprint     Bug 8,9,10,11,12 NaveeN    20/03/2014     Added Code formatting
+  Itr     Def/Req          Userid     Date      Description
+  -----  --------          -------- --------    ------------------
+  Sprint Bug 8,9,10,11,12 NaveeN   20/03/2014  Updated Tooltip Dynamic message
  End Change Log **************************************************************
 '''
 
@@ -43,10 +43,10 @@ class SwipedCardForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SwipedCardForm, self).__init__(*args, **kwargs)       
         self.fields['amount'].widget.attrs = {'class':
-                             'styled validate[required,custom[number]]'
+                             'styled validate[required, custom[amount]]'
                              ,'size':5,'maxlength':5}
         self.fields['card_number'].widget.attrs = {'class':
-                     'styled validate[required]','size':40}
+                     'styledvalidate[required, custom[cnumber]]','size':40}
    
     class Meta:
         model = SwipedCard
