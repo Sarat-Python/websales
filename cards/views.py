@@ -17,7 +17,7 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   -----------------------------------
-  0.9    339      NaveeN  20/03/2014     Added Shopcart update functionaltiy
+  0.9    339      NaveeN  20/03/2014     Updated login decorator 
  End Change Log ************************************************************
 '''
 # Create your views here.
@@ -180,7 +180,6 @@ def bulk(request, cart=''):
 @param   d1, d2 are the two input dict
 @return  sum of the final dic     
 '''
-@login_required
 def sum_dict(d1, d2):
     for key, value in d1.items():
         d1[key] = value + d2.get(key, 0)
@@ -192,7 +191,6 @@ def sum_dict(d1, d2):
 @param   card_number, card_type from swiped card
 @return  sum of the final dict     
 '''    
-@login_required
 def verify_card_number(card_type, card_number):
     valid = verify_card_length(card_type, card_number)
     card = SwipedCard.objects.filter(card_number=card_number)
@@ -291,7 +289,6 @@ def update(request):
 
 @return  list of the formatted selected list
 '''
-@login_required
 def formatList(cartList):
     snos = []
     for k in cartList:
@@ -300,7 +297,6 @@ def formatList(cartList):
     return cart_selected
 
 
-@login_required   
 def purchase(request):
     if request.method == 'POST':
         pass
@@ -483,7 +479,6 @@ def del_cart(request):
 @params : batch id, amount for deleted items
 @return  success status after batch total update.
 '''
-@login_required        
 def update_batch_total(batch_id,deleted_amount):
        success = False
        batch_update = Batch.objects.values('total_cost').filter(id=batch_id)
@@ -501,7 +496,6 @@ def update_batch_total(batch_id,deleted_amount):
 @params : batch_id,gst_total,service_charge_total
 @return  returns status after updating gst & service charge total.
 '''   
-@login_required        
 def update_gst_total(batch_id,gst_total,service_charge_total):
        success = False
        batch_update = Batch.objects.values('total_gst',
