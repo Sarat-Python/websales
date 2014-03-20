@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %} <title>Pitstop | Shop Cart </title>{% endblock %}
 {% block child %}
 {% load filters %}
 {% load render_table from django_tables2 %}
@@ -48,15 +49,15 @@
 		<td></td>
 		<td></td>
 	    <td class="item-quantity">
-	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='javascript:void(0);)'><input type="text" readonly size=2 value="{{ items.quantity }}" > </a>
+	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='#'><input type="text" class="text-center" readonly size=2 value="{{ items.quantity }}" > </a>
 	    </td>
 	    <td>
 			<table class="item-total">
 				<tr>
 					<td></td>
 					<td colspan="2" id="item-amnt">$ {{ items.total_amount }}</td></tr><tr>
-					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove </a>
-					|</td><td><a href="#" onclick="javascript:updateCartItems({{ forloop.parentloop.counter }})"> Update </a> </td>
+					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove  </a>
+					|&nbsp;</td><td><a href="#" onclick="javascript:updateCartItems({{ forloop.parentloop.counter }})">  Update </a> </td>
 				</tr>
 			</table>
  		<br>
@@ -99,8 +100,9 @@
 <script type="text/javascript">
 
 function removeCartItems(counter) {
-
-        var ctype = $( "#ctype_"+counter ).val();
+	if (confirm('Are you sure you want to delete items from cart')) {
+	   
+ 	var ctype = $( "#ctype_"+counter ).val();
         var batchid = $( "#batchid_"+counter ).val();
         var cflavour = $( "#cflavour_"+counter ).val();
        
@@ -119,33 +121,37 @@ function removeCartItems(counter) {
         	error: function(xhr, textStatus, errorThrown) {
             alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
         	}
-    	   });
+    	   }); 
+	} else {
+	    return false;
+	}
+       
 	  		 
 }
 
 function updateCartItems(counter) {
-
+	window.location.href = '../cart/';
+/*
         var ctype = $( "#ctype_"+counter ).val();
         var batchid = $( "#batchid_"+counter ).val();
         var cflavour = $( "#cflavour_"+counter ).val();
-       
         $.ajax({
         	 type: "POST",
-       	 url: "../update/",
+       	 url: "../purchase/",
         	 data: {
             batchid: batchid,
             ctype : ctype,
             cflavour : cflavour,
-            action : 'updatecart',
+            action : 'cartupdate',
          },
        	success: function(data) {
-       				 window.location.href = '../update/'
-        	},
-        	error: function(xhr, textStatus, errorThrown) {
-            alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
-        	}
-    	   });
-	  		 
+		 window.location.href = '../purchase/'
+       	},
+       	error: function(xhr, textStatus, errorThrown) {
+	           alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
+       	}
+   });
+*/	  		 
 }
 </script>
 {% endblock %}
