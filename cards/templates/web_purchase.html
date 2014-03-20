@@ -71,7 +71,7 @@ function movetoNext(current, nextFieldID) {
 		<div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
 		{{ a }}
 		{% endfor %}</b>
-			<select class="form-control styled validate[required]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
+			<select class="form-control styled validate[required, custom[ctype]]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
 				<option value="">Select Card Type</option>
 				<option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolworths</option>
 				<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
@@ -79,7 +79,7 @@ function movetoNext(current, nextFieldID) {
 		</div>
 	<div class="col-lg-2">
 		<b>Card Flavour</b>
-		<select name="cardflavour_dropdown" class="form-control styled validate[required]" id="cardflavour_dropdown" onchange="debug_test();">
+		<select name="cardflavour_dropdown" class="form-control styled validate[required, custom[flavour]]" id="cardflavour_dropdown" onchange="debug_test();">
 			<option value="">Select Card Flavour</option>
 			{% for card in request.session.card_flv %}
 			<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" 
@@ -141,7 +141,7 @@ $(document).ready(function(e) {
 
 	$("#formSubmit").validationEngine();
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
-	$("#cardflavour_dropdown_msdd").addClass('validate[required]')
+	$("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]')
 	
 	if ($("#card_type").val() == "")
 		$("#card_type").focus()
@@ -153,8 +153,8 @@ $(document).ready(function(e) {
  		$("#id_card_number").focus()
         
 	if ($('#cardflavour_dropdown').length > 0) {
-      if  ($("#cardflavour_dropdown").hasClass('validate[required]')){
-         $("#cardflavour_dropdown_msdd").addClass('validate[required]') 
+      if  ($("#cardflavour_dropdown").hasClass('validate[required, custom[flavour]]')){
+         $("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]') 
 		}			
     }         
 });
