@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% block title %} <title>Pitstop | Swiped Cards </title>{% endblock %}
+
 {% block child %}
 {% load filters %}
 {% load render_table from django_tables2 %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/validationEngine.jquery.css" type="text/css" media="screen" title="no title"
 charset="utf-8" />
+
 <script>
 function PopulateCardFlavour(){
 	card_type = document.getElementById('card_type').value;
@@ -49,6 +52,7 @@ function movetoNext(current, nextFieldID) {
 <script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/skin2.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
+
    <div class="container contains">
         <div class="row">
             <div class="col-lg-6"><br>
@@ -145,10 +149,12 @@ $(document).ready(function(e) {
 		$("#cardflavour_dropdown").focus()
 	else if($("#id_amount").val() == "")
  		$("#id_amount").focus()
-    
+        else if($("#id_card_number").val() == "")
+ 		$("#id_card_number").focus()
+        
 	if ($('#cardflavour_dropdown').length > 0) {
       if  ($("#cardflavour_dropdown").hasClass('validate[required]')){
-         $("#cardflavour_dropdown_msdd").addClass('validate[required]')
+         $("#cardflavour_dropdown_msdd").addClass('validate[required]') 
 		}			
     }         
 });
@@ -172,6 +178,15 @@ $('#cardflavour_dropdown').on('change', function(){
 $('#cardflavour_dropdown').on('blur', function(){ 
 	AttachCardFlavourValidation();
 })	
-
+   function CheckSelection()
+        {
+	    var n = $( "input:checked" ).length;
+            if(n===0){
+		alert('Please select the card(s)');
+                return false;
+	    }else{
+		return true;
+            }   
+         }
 </script>
 {% endblock %}
