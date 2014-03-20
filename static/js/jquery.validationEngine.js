@@ -695,8 +695,11 @@
 			}
 			var pattern = new RegExp(ex);
 
-			if (!pattern.test(field.val()))
-				return options.allrules[customRule].alertText;
+			if (field.val()===''){
+			    //alert(field.val());	
+			    return options.allrules[customRule].alertText;
+                                 
+			}
 		},
 		/**
 		* Validate custom function outside of the engine scope
