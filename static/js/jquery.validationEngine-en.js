@@ -56,6 +56,10 @@
                     "alertText": "Swipe the Card(s) "
                 },
 
+		"fname": {
+                    "regex": "none",
+                    "alertText": "This field is required "
+                },
                 "max": {
                     "regex": "none",
                     "alertText": "* Maximum value is "
@@ -100,11 +104,17 @@
                     "regex": /^[\-\+]?\d+$/,
                     "alertText": "* Not a valid integer"
                 },
-                "number": {
+                
+		"number": {
                     // Number, including positive, negative, and floating decimal. credit: orefalo
                     "regex": /^[\+]?(([0-9]+)([\.,]([0-9]+))?|([\.,]([0-9]+))?)$/,
-                    "alertText": "Please enter valid Amount"
+		    "alertText": "Please enter valid Amount",         
                 },
+
+
+
+
+
                 "date": {
                     "regex": /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/,
                     "alertText": "* Invalid date, must be in YYYY-MM-DD format"
