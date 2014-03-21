@@ -17,7 +17,7 @@ Begin Change Log ***********************************************************
                                                                       
  Itr    Def/Req  Userid    Date        Description
  -----  -------- --------  --------    -----------------------------------
- 0.9    339      NaveeN    20/03/2014  Added Cart Url for update Quantity
+ 0.9    339      NaveeN    21/03/2014  Added cart order page from static pages
  End Change Log ************************************************************
 '''
 
@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     url(r'^bulk/load_flavours/$', 'cards.views.load_flavours'),
     url(r'^bulk/purchase/$', 'cards.views.bulk'),
     url(r'^bulk/update/$', 'cards.views.update'),
-    url(r'^bulk/add_cart/$', 'cards.views.add_cart'),
+    url(r'^bulk/add_cart/$', 'cards.views.add_cart', name="add_cart"),
     url(r'^bulk/del_cart/$', 'cards.views.del_cart'),
     url(r'^bulk/(?P<cart>\w+)/$', 'cards.views.bulk'),
 )
