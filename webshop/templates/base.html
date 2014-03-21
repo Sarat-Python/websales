@@ -22,6 +22,10 @@
         <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}css/pitstop.css">
 
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/960.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/defaultTheme.css" media="screen">
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/myTheme.css" media="screen">
+      
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>	
     </head>
     <body>
@@ -56,7 +60,7 @@
 {% if request.session.email == None %}
 <div class="noemail">
 {% else %}
-<div style="background-image: url({{ STATIC_URL }}images/topbar.png);height:50px;width:400px;float:right;background-repeat:no-repeat;">
+<div style="background-image: url({{ STATIC_URL }}images/topbar.png);height:50px;width:500px;float:right;background-repeat:no-repeat;">
 {% endif %}
 	  {% if request.session.email == None %}
 		<form class="navbar-form navbar-right" action="/user/login/" method="POST">{% csrf_token %}
@@ -71,19 +75,21 @@
 		</form>
 	  {% else %}
 		<form class="navbar-form navbar-right" action="/user/logout/" method="POST">{% csrf_token %}
-			<ul class="nav navbar-nav" style="margin-top:-10px;height:50px;">
+			<ul class="nav navbar-nav" style="margin-top:-10px;height:44px;border-left:1px double black;">
 
-				<li class="usermessage">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WELCOME</li>
+				<li class="usermessage"><span>WELCOME</span></li>
 				<li class="useremail"><span style="">{{request.session.email}}</span></li>
-				<li><img src="{{ STATIC_URL }}images/Bulk_Purchase.png" style="height:45px;"></li>
+				<li style="border-left:1px double black;">
+				<img src="{{ STATIC_URL }}images/Bulk_Purchase.png" style="height:45px;"></li>
 				{% if request.session.cartcount  %}
 				<li class="cartcount">
-					<label id="cart_count"><a href="../add_cart/">{{ request.session.cartcount }}</a></label> 
+				<label id="cart_count"><a href="../add_cart/">{{ request.session.cartcount }}</a></label> 
 				</li>
 				<li class="cartlabel">Cart</li>  
 				{% endif %}
-				<li class="logout"> <button type="submit" value="login" name="submit" class="btn btn-success">logout</button>
-				</li>
+                                <li  class="logout" style="height:45px;"><a href="/user/logout/">
+                                </a></li>   
+                                <li class="logoutlabel">logout</li>
 				<li style="margin-right:-60px;"><img src="{{ STATIC_URL }}images/curveR.png" style="height:45px;"></li>
 			</ul>
 		</form>
@@ -111,6 +117,10 @@
 <script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
         <script src="{{ STATIC_URL }}js/plugins.js"></script>
         <script src="{{ STATIC_URL }}js/main.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.fixedheadertable.js"></script>
+	<script src="{{ STATIC_URL }}js/demo.js"></script>
+	<script src="{{ STATIC_URL }}js/jquery.numeric.js"></script>
+       
 		<!--
         <script>
             var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
