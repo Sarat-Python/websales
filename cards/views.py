@@ -17,7 +17,7 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   -----------------------------------
-  0.9    339      NaveeN  20/03/2014     Updated login decorator 
+  0.9    339      NaveeN  21/03/2014     Added swiped card validations
  End Change Log ************************************************************
 '''
 # Create your views here.
@@ -128,8 +128,8 @@ def bulk(request, cart=''):
                      else:
                           msgs = 'Card Number already added!!'
                 else:
-                        msgs = 'You have selected %s Flavour,\
-                         Please select proper card flavour' % card_flv_name          
+                        msgs = 'Selected Card Flavour does '\
+				'not match with the Card Swiped'          
             else: 
                 msgs = 'Please enter all the fields'
 
@@ -168,7 +168,7 @@ def bulk(request, cart=''):
             response_dict.update({'batch_total':batch.total_cost})
         
         table = tables.SwipedCardTable(new_cards)
-        RequestConfig(request,paginate={"per_page": 10}).configure(table)    
+        RequestConfig(request,paginate={"per_page": 100}).configure(table)    
         response_dict.update({'table':table,
                               'msgs':msgs,'cflavour':card_flv_name})
     
@@ -310,7 +310,7 @@ def purchase(request):
 
 @return  redirets to shop cart page
 '''
-@login_required     
+@login_required(login_url='/')
 def add_cart(request):
     response_dict = []
     cart_items = []
