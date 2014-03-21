@@ -1472,7 +1472,7 @@
 
 			return {
 				"callerTopPosition": promptTopPosition + "px",
-				"callerleftPosition": promptleftPosition + "px",
+                                "callerleftPosition": promptleftPosition + "px",
 				"marginTopSize": marginTopSize + "px"
 			};
 		},
