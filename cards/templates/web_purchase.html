@@ -140,7 +140,8 @@ function movetoNext(current, nextFieldID) {
 $(document).ready(function(e) {	
 
 	$("#formSubmit").validationEngine();
-	$("#cardflavour_dropdown").msDropdown({roundedBorder:false});
+	$(".positive").numeric({ negative: false }, function() { alert("No negative values"); this.value = ""; this.focus(); });
+	$("#cardflavour_dropdown").msDropdown({roundedBorder:true});
 	$("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]')
 	
 	if ($("#card_type").val() == "")
