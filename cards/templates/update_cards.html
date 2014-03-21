@@ -69,12 +69,27 @@ charset="utf-8" />
 <script>
 $(document).ready(function(e) {	
 
-	$("#formUpdate").validationEngine();			        
+	$("#formUpdate").validationEngine();
+	$(".positive").numeric({ negative: false }, function() { alert("No negative values"); this.value = ""; this.focus(); });			        
 });
 
 function doCancel(){
 	window.location.href = '../cart/';
 }
+
+
+function validateamount(clicked_id){
+   var float_val = $('#'+clicked_id).val();	
+   var valid = (float_val.match(/^-?\d*(\.\d+)?$/));
+   if(valid!=null){
+	return true;
+   }else{
+	alert("Please enter valid amount");
+	return false;
+  }
+  
+}
+
 </script>
 
 {% endblock %}
