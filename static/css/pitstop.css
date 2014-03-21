@@ -25,7 +25,14 @@ background-repeat:no-repeat;
 color:#DB3600;
 width:20px;
 text-align:right;
+text-indent:40px;
 }
+.usermessagehic{
+color:#DB3600;
+width:20px;
+text-align:right;
+}
+
 .useremail{
 color:white;
 margin-top:25px;
@@ -40,15 +47,30 @@ text-align:center;
 margin-top:3px;
 }
 .cartlabel{
-color:#DB3600;
+color:white;
 margin-top:26px;
 text-indent:-25px;
 }	
-.logout{
-border-left:1px solid;
-padding: 5px 10px;
+.logout {
+    background-image: url("../images/logout1.png");
+    background-repeat: no-repeat;
+    margin-left: 13px;
+    margin-top: 7px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
-
+.logout:hover{
+background-image: url('../images/logouthover.png');
+background-repeat: no-repeat;
+padding: 5px 10px;
+margin-top: 7px;
+}
+.logoutlabel{
+color: gray;
+margin-top:22px;
+text-indent:-55px;
+}
 ######### Batches Template Formatting #############
 
 .tablescroll{
@@ -182,6 +204,41 @@ width:400px;
 text-align:center;
 margin-top:10px;
 margin-left:400px;
+}
+
+#totalamounts{
+font-family:arial;
+color:#A52A2A;
+font-size:16px;
+font-weight:bold;
+width:400px;
+}
+
+
+#servicecharges{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+width:400px;
+}
+
+#servicechargescart{
+float: right;
+border-top:1px solid #dddddd;
+width:400px;
+text-align:left;
+margin-top:10px;
+padding-left:40px;
+}
+
+
+#gsts{
+font-family:arial;
+color:#BDBCBC;
+font-size:16px;
+font-weight:bold;
+width:400px;
 }
 
 ######### WebPurchase Template Formatting #############
