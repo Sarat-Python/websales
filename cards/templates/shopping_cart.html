@@ -49,7 +49,7 @@
 		<td></td>
 		<td></td>
 	    <td class="item-quantity">
-	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}Card Number: {{ cn.card_number }} {% endif %} {% endfor %}{% endfor %}" href='#'><input type="text" class="text-center" readonly size=2 value="{{ items.quantity }}" > </a>
+	    		Quantity : <a title="{% for a in card_numbers %}{% for cn in a %}{% if items.card_flavour ==  cn.card_flavour %}{% spaceless %}Card Number:{{ cn.card_number }}&#013;{% endspaceless %}{% endif %} {% endfor %}{% endfor %}" href='#'><input type="text" class="text-center" readonly size=2 value="{{ items.quantity }}" > </a>
 	    </td>
 	    <td>
 			<table class="item-total">
@@ -70,12 +70,23 @@
 	<div class="totaltab-contain">
 	<div class="totalstab">
 		{% if main_total %}
-			<p id="ptotal-amnt">Total Card(s) Amount : AUD  {{ batch_total }} </p>
-			<p id="p-service-chrge">Service Charge : AUD  {{ service_charge_total }} </p>
-			<p id="p-gst">GST Amount : AUD  {{ gst_total }} </p>
-			<hr>
-			<h3>Total Amount: AUD {{ main_total }} </h3>
-
+	<div id="totalamounts">
+			Total Card(s) amount <span style="margin-left:4px;">:</span> 
+			<span span style="margin-left:4px;">AUD</span>  
+			<span style="margin-left:20px;">{{ batch_total }}</span>
+		</div>
+		<div id="servicecharges">
+			Service Charge <span style="margin-left:47px;">:</span>
+			<span style="margin-left:4px;">AUD</span>
+			<span style="margin-left:29px;">{{ service_charge_total }}</span>
+		 </div>
+		<div id="gsts">
+			GST Amount <span style="margin-left:66px;">:</span>
+			<span style="margin-left:4px;">AUD</span>
+			<span style="margin-left:29px;">{{ gst_total }}</span>
+		</div>
+		<hr>
+		<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span style="margin-left:40px;">:</span> AUD 			<span style="margin-left:10px;">{{ main_total }}</span> </div>
 			<ul class="pagination">
 				<li><a href="../purchase/" class="btn btn-primary">Continue Shopping</a></li>
 				<li class="p-checkout"><a href="#" class="btn btn-primary" >Proceed To Checkout</a>
