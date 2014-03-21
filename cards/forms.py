@@ -43,10 +43,10 @@ class SwipedCardForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SwipedCardForm, self).__init__(*args, **kwargs)       
         self.fields['amount'].widget.attrs = {'class':
-                             'styled validate[required, custom[amount]]'
+                             'styled positive validate[required, custom[amount]]'
                              ,'size':5,'maxlength':5}
         self.fields['card_number'].widget.attrs = {'class':
-                     'styledvalidate[required, custom[cnumber]]','size':40}
+                     'styled validate[required, custom[cnumber]]','size':40,'maxlength':60}
    
     class Meta:
         model = SwipedCard
@@ -73,7 +73,7 @@ class UpdateFormSet(UpdateSetBase):
         form.fields['upc_code'].widget.attrs['readonly']  = True
         form.fields['amount'] = forms.CharField(required=True)
         form.fields['amount'].widget.attrs = {
-            'class':'styled form-control validate[required,custom[number]]'
+            'class':'styled form-control positive validate[required, custom[amount]]'
                         ,'size':5,'maxlength':5}
 
 
