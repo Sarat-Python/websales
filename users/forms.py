@@ -17,7 +17,7 @@ Begin Change Log ***************************************************************
                                                                       
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
+  0.9    339      NaveeN  21/03/2014  Added form validation rules
  End Change Log ****************************************************************
 '''
 
@@ -61,7 +61,13 @@ class WebUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kargs):
         super(WebUserCreationForm, self).__init__(*args, **kargs)
         del self.fields['username']
-        #del self.fields['password1']
+        #del self.fields['password1'].
+	self.fields['first_name'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':30}
+        self.fields['last_name'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':30}
+        self.fields['email'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
+        self.fields['password1'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
+        self.fields['password2'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
+        self.fields['mobile'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':20} 
         
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -155,7 +161,9 @@ class ActivationForm(forms.Form):
     def __init__(self, *args, **kwargs):            
         super(ActivationForm, self).__init__(*args, **kwargs)
         self.fields['email'].widget.attrs['placeholder'] = u'Registered Email'
+	self.fields['email'].widget.attrs = {'class':'styled form-control validate[required,custom[email]]'}
         self.fields['activation_code'].widget.attrs['placeholder'] = u'example: a0bf7f'
+ 	self.fields['activation_code'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'} 
     
     def clean_email(self):
         email = self.cleaned_data['email']        
