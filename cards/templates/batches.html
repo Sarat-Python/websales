@@ -6,8 +6,9 @@
 {% endif %}
 {% block table %}
 	<form class="form" name="batchfrm" action="/cards/bulk/update/" method="post">{% csrf_token %}
-	<div style="overflow-y: scroll;height:300px;" >
-	<table {% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+	
+	<div>
+    	<table class="fancyTable" id="myTable02" cellpadding="0" cellspacing="0">
 	{% nospaceless %}
 	{% block table.thead %}
 		<thead>
@@ -53,7 +54,7 @@
 	{% endnospaceless %}
 	</table>
 	</div>
-{% endblock table %}
+	{% endblock table %}
 	<ul class="pagination">
 
 	{% if table.page %}
@@ -107,16 +108,22 @@
 	<div class="servicecharges">
 	{% if batch_total %}
 		<div id="totalamount">
-			Total Card(s) Amount : AUD  {{ batch_total }}
+			Total Card(s) amount <span style="margin-left:4px;">:</span>
+			<span style="margin-left:4px;"> AUD</span>  
+			<span style="margin-left:20px;">{{ batch_total }}</span>
 		</div>
 		<div id="servicecharge">
-			Service Charge <span style="margin-left:47px;">: AUD</span>  {{ service_charge_total }}
+			Service Charge <span style="margin-left:47px;">:</span>
+			<span style="margin-left:4px;"> AUD</span>
+			<span style="margin-left:25px;">{{ service_charge_total }}</span>
 		 </div>
 		<div id="gst">
-			GST Amount <span style="margin-left:66px;">: AUD</span>  {{ gst_total }}
+			GST Amount <span style="margin-left:66px;">:</span>
+			<span style="margin-left:8px;">AUD</span>
+			<span style="margin-left:25px;">{{ gst_total }}</span>
 		</div>
 		<hr>
-		<h3>Total Amount: AUD {{ main_total }} </h3>
+		<div id="totalamount" style="font-size:20px;color:black;">Total Amount<span style="margin-left:40px;">:</span> AUD <span style="margin-left:10px;">{{ main_total }}</span> </div>
 	{% endif %}
 	<ul class="pagination">
 		<li>
