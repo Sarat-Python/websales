@@ -19,6 +19,7 @@
         </style>
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-theme.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/pitstop.css">
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
@@ -26,6 +27,80 @@
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
+{% if user.is_authenticated %}
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+        	<img src="{{ STATIC_URL }}images/logo.png" class="navbar-brand" />
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+          
+        </div>
+{% if request.session.email == None %}
+<div></div>
+{% else %}
+<div class="headerTop"></div>
+{% endif %}
+<div class="nav-home">
+        <div class="navbar-collapse collapse" style="background-image: url({{ STATIC_URL }}images/bg-top.png);background-repeat: repeat-x;">
+          <ul class="nav navbar-nav">
+            <li ><a href="/home/">Home</a></li>
+            <li ><a href="/about/">About</a></li>
+            <li><a href="/contact/">Contact</a></li>
+          </ul>
+<!--   -->
+{% if request.session.email == None %}
+<div class="noemail">
+{% else %}
+<div style="background-image: url({{ STATIC_URL }}images/topbar.png);height:50px;width:500px;float:right;background-repeat:no-repeat;">
+{% endif %}
+	  {% if request.session.email == None %}
+		<form class="navbar-form navbar-right" action="/user/login/" method="POST">{% csrf_token %}
+		<div class="form-group">
+			<input type="text" name="email"  placeholder="Email" class="form-control" />
+		</div>
+		<div class="form-group">
+			<input type="password"  name="password" placeholder="Password" class="form-control"  />
+		</div>
+			<button type="submit" value="login" name="submit" class="btn btn-success">Sign in</button>
+			<button type="submit" value="register" name="submit" class="btn btn-success">Register</button>
+		</form>
+	  {% else %}
+		<form class="navbar-form navbar-right" action="/user/logout/" method="POST">{% csrf_token %}
+			<ul class="nav navbar-nav" style="margin-top:-10px;height:44px;border-left:1px double black;">
+
+				<li class="usermessagehic">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WELCOME</li>
+				<li class="useremail"><span style="">{{request.session.email}}</span></li>
+				<li style="border-left:1px double black;">
+				<img src="{{ STATIC_URL }}images/Bulk_Purchase.png" style="height:45px;"></li>
+				{% if request.session.cartcount  %}
+				<li class="cartcount">
+					<label id="cart_count"><a href="{% url "add_cart" %}">{{ request.session.cartcount }}</a></label> 
+				</li>
+				<li class="cartlabel">Cart</li>  
+				{% endif %}
+                                <li  class="logout" style="height:45px;"><a href="/user/logout/">
+                                </a></li>   
+                                <li class="logoutlabel">logout</li>
+				<li style="margin-right:-60px;"><img src="{{ STATIC_URL }}images/curveR.png" style="height:45px;"></li>
+			</ul>
+		</form>
+	  {% endif %}
+</div>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+</div>  
+
+   
+
+{% else %}
+
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -71,6 +146,7 @@
         </div><!--/.navbar-collapse -->
       </div>
     </div>
+{% endif %}
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
