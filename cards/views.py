@@ -17,7 +17,7 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   -----------------------------------
-  0.9    339      NaveeN  21/03/2014     Added swiped card validations
+  0.9    339      NaveeN  22/03/2014     Added swiped cards display based on giftcard
  End Change Log ************************************************************
 '''
 # Create your views here.
@@ -94,7 +94,6 @@ def bulk(request, cart=''):
             gift_card_id = request.POST.get('cardflavour_dropdown')
             amt = request.POST.get('amount')
 
-            print "sarat"
             cleaned_card = card_utils.extract_card_number(cnumber,
                                                           ctype)
             if gift_card_id:
@@ -137,18 +136,44 @@ def bulk(request, cart=''):
                                            'amount':amt,'card_focus':'on'})
             response_dict.update({'form':form})
 
-            
+        cart_status_id = [0,1]    
         if cart:
             cart_flag = 1
+            charge_list = SwipedCard.objects.values('id','cart_status').filter(
+                        batch_id=batch.id).filter(
+                        cart_status__in=cart_status_id).filter(
+                        gift_card_id=cart).annotate(
+                        Sum('gst')).annotate(
+                        Sum('service_charge')).annotate(Sum('amount'))
+            print charge_list.query
+
+
         else:
             cart_flag = 0
-            
-        charge_list = SwipedCard.objects.values('id','cart_status').filter(
+            charge_list = SwipedCard.objects.values('id','cart_status').filter(
                         batch_id=batch.id).filter(
                         cart_status=cart_flag).annotate(
                         Sum('gst')).annotate(
-                        Sum('service_charge')).annotate(Sum('amount'))
-        if charge_list:
+                        Sum('service_charge')).annotate(Sum('amount'))            
+
+        if charge_list and cart:
+            other_totals = reduce(sum_dict, charge_list)
+            gst_total = other_totals['gst__sum']
+            service_total = other_totals['service_charge__sum']
+            amount_sum = other_totals['amount__sum']
+            main_total = amount_sum + gst_total + service_total
+            
+            new_cards = SwipedCard.objects.filter(
+                                 cart_status__in=cart_status_id).filter(
+                                 batch_id=batch.id,
+                                 deleted=False, gift_card_id=cart)
+            print new_cards
+            print "naveen" 
+            response_dict.update({'batch_total':amount_sum,
+                                  'gst_total':gst_total,
+                                  'main_total': main_total, 
+                                  'service_charge_total': service_total})
+        elif charge_list:
             other_totals = reduce(sum_dict, charge_list)
             gst_total = other_totals['gst__sum']
             service_total = other_totals['service_charge__sum']
@@ -161,6 +186,8 @@ def bulk(request, cart=''):
                                   'gst_total':gst_total,
                                   'main_total': main_total, 
                                   'service_charge_total': service_total})
+
+
         else:
             
             new_cards = SwipedCard.objects.filter(batch_id=batch.id,
@@ -233,7 +260,7 @@ def load_flavours(request):
 def update(request):
     for_cart = request.POST.get('for_cart')
     action = request.POST.get('action')
-    #selected = [u'152', u'153', u'154', u'155', u'156', u'157', u'158', u'159']
+    
     if request.method == 'POST':
            form_set  = SwipedCardForm(request.POST or None)
            action = request.POST.get('action')
@@ -272,9 +299,16 @@ def update(request):
                       submitted.save()
                       batch.total_cost = batch.total_cost - submitted.amount
                       batch.save()
+                      gift_card_ids = SwipedCard.objects.values(
+                                                   'gift_card_id').filter(
+                                                    id__in=selected)
+                      
+                      for gift_card_id in gift_card_ids:
+                          gift_card_id = gift_card_id['gift_card_id']
                       del_cards = SwipedCard.objects.filter(id__in=selected)
                       del_cards.delete()
-               return HttpResponseRedirect('/cards/bulk/purchase/')
+                      gift_card_id = str(gift_card_id)
+               return HttpResponseRedirect('/cards/bulk/'+gift_card_id+'/')
             
     form_set = UpdateFormSet(queryset = SwipedCard.objects.filter(
                                             pk__in=selected, deleted=False))
@@ -385,7 +419,7 @@ def add_cart(request):
                                              'card_type','quantity',
                                              'activate_card_batch_id',
                                              'card_flavour_image_file',
-                                             'total_gst',
+                                             'total_gst','gift_card_id',
                                              'total_service_charge').filter(
                                             activate_card_batch_id = batch.id,
                                             card_flavour = cart['card_flavour'
