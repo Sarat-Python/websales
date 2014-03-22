@@ -26,31 +26,59 @@ color:#DB3600;
 width:20px;
 text-align:right;
 text-indent:40px;
+margin-top:-5px;
 }
+
 .usermessagehic{
 color:#DB3600;
 width:20px;
 text-align:right;
+text-indent:40px;
+margin-top:-5px;
 }
-
+.usermessageabt{
+color:#DB3600;
+width:20px;
+text-align:right;
+text-indent:40px;
+margin-top:-5px;
+}
 .useremail{
-color:white;
+color:gray;
 margin-top:25px;
 padding-right:12px;
+width:auto;
+margin-top:15px;
+}
+.leftline{
+border-left:1px double black;
+margin-top:0px;
+height:30px;
 }	
+.cart-image{
+height:45px;
+margin-top:-10px;
+}
 .cartcount{
 color:white;
 margin-left:5px;
 background-color:orange;
 width:20px;
+height:20px;
 text-align:center;
 margin-top:3px;
+margin-top:-5px;
 }
 .cartlabel{
 color:white;
 margin-top:26px;
 text-indent:-25px;
-}	
+}
+.cartlabelindex{
+color:white;
+margin-top:15px;
+text-indent:-25px;
+}
 .logout {
     background-image: url("../images/logout1.png");
     background-repeat: no-repeat;
@@ -59,18 +87,55 @@ text-indent:-25px;
     padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
+    height:45px;
+    margin-top:-5px;
+    position:fixed;
 }
 .logout:hover{
 background-image: url('../images/logouthover.png');
 background-repeat: no-repeat;
 padding: 5px 10px;
 margin-top: 7px;
+margin-top:-5px;
 }
 .logoutlabel{
 color: gray;
 margin-top:22px;
 text-indent:-55px;
 }
+.smallbar-lefttop{
+float:left;
+margin-top:-5px;
+width:80px;
+background-image: url('../images/bg-top.png');
+height:13px;
+margin-left:-250px;
+}
+.smallbar-righttop{
+float:right;
+margin-top:-5px;
+width:100px;
+background-image: url('../images/bg-top.png');
+height:13px;
+margin-right:-80px;
+}
+.smallbar-lefttop-index{
+float:left;
+margin-top:-5px;
+width:80px;
+background-image: url('../images/bg-top.png');
+height:13px;
+margin-left:-250px;
+}
+.smallbar-righttop-index{
+float:right;
+margin-top:-5px;
+width:100px;
+background-image: url('../images/bg-top.png');
+height:13px;
+margin-right:-80px;
+}
+
 ######### Batches Template Formatting #############
 
 .tablescroll{
