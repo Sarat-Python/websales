@@ -17,7 +17,7 @@ Begin Change Log ***********************************************************
                                                                       
  Itr    Def/Req  Userid    Date        Description
  -----  -------- --------  --------    -----------------------------------
- 0.9    339      NaveeN    21/03/2014  Added cart order page from static pages
+ 0.9    339      NaveeN    22/03/2014  Added gift card param
  End Change Log ************************************************************
 '''
 
@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     url(r'^bulk/add_cart/$', 'cards.views.add_cart', name="add_cart"),
     url(r'^bulk/del_cart/$', 'cards.views.del_cart'),
     url(r'^bulk/(?P<cart>\w+)/$', 'cards.views.bulk'),
+    
 )
 
 
