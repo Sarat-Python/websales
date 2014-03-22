@@ -13,7 +13,15 @@ charset="utf-8" />
 <script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/skin2.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
-
+<style>
+.center
+{
+margin:auto;
+width:90%;
+background-color:#b0e0e6;
+padding-left:60px;
+}
+</style>
     <div class="container contup">
         <div class="row">
             <div class="col-lg-6">
@@ -27,6 +35,9 @@ charset="utf-8" />
             {%for form in formset.forms %}
             {{ form.id }}
             <p>
+		
+
+
                <div class="row">
                     
                     <div class="col-lg-2">
@@ -45,6 +56,7 @@ charset="utf-8" />
                         {% if forloop.first %}{{ form.amount.label_tag }} {% endif %} {{ form.amount }}
                     </div>
                </div>
+            
             </p>
             
                {% endfor %}
@@ -54,7 +66,7 @@ charset="utf-8" />
                         <div style="float:right">                             
                             {{ formset.management_form }}
                             {% csrf_token %}
-                           <a href="../cart/" class="btn btn-primary">Cancel</a></li>
+                           <a class="btn btn-primary" onclick="parent.history.back();">Cancel</a></li>
                          
                             <button class="btn btn-primary" type="submit" name="action" value="save">Save Changes</button>
                         </div>
