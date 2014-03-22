@@ -2,7 +2,7 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% if table.page %} 
-	<div class="table-container contain">
+	
 {% endif %}
 {% block table %}
 	<form class="form" name="batchfrm" action="/cards/bulk/update/" method="post">{% csrf_token %}
