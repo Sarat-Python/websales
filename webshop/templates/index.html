@@ -44,6 +44,8 @@
 {% if request.session.email == None %}
 <div></div>
 {% else %}
+<div class="smallbar-lefttop-index"></div>
+<div class="smallbar-righttop-index"></div>
 <div class="headerTop"></div>
 {% endif %}
 <div class="nav-home">
@@ -72,22 +74,22 @@
 		</form>
 	  {% else %}
 		<form class="navbar-form navbar-right" action="/user/logout/" method="POST">{% csrf_token %}
-			<ul class="nav navbar-nav" style="margin-top:-10px;height:44px;border-left:1px double black;">
+			<ul class="nav navbar-nav" style="height:30px;border-left:1px double black;">
 
-				<li class="usermessagehic">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WELCOME</li>
-				<li class="useremail"><span style="">{{request.session.email}}</span></li>
-				<li style="border-left:1px double black;">
-				<img src="{{ STATIC_URL }}images/Bulk_Purchase.png" style="height:45px;"></li>
+				<li class="usermessagehic">WELCOME</li>
+				<li class="useremail">{{request.session.email}}</li>
+				<li class="leftline"><li>
+				<li><img src="{{ STATIC_URL }}images/Bulk_Purchase.png" class="cart-image"></li>
 				{% if request.session.cartcount  %}
 				<li class="cartcount">
 					<label id="cart_count"><a href="{% url "add_cart" %}">{{ request.session.cartcount }}</a></label> 
 				</li>
-				<li class="cartlabel">Cart</li>  
+				<li class="cartlabelindex">Cart</li>  
 				{% endif %}
-                                <li  class="logout" style="height:45px;"><a href="/user/logout/">
+                                <li  style="border-left:1px solid black;height:30px;margin-left:5px;"></li>
+                                <li  class="logout"><a href="/user/logout/" style="margin-left:-35px;color:gray;margin-top:2px;">logout
                                 </a></li>   
-                                <li class="logoutlabel">logout</li>
-				<li style="margin-right:-60px;"><img src="{{ STATIC_URL }}images/curveR.png" style="height:45px;"></li>
+				<li style="margin-right:-60px;margin-top:-10px;"><img src="{{ STATIC_URL }}images/curveR.png" style="height:45px;"></li>
 			</ul>
 		</form>
 	  {% endif %}
