@@ -120,7 +120,7 @@
 .fancyTable tfoot tr th, 
 .fancyTable tfoot tr td {
 	/* appearance */
-	background-color: #8ca9cf;
+	background-color: #CCCCCC;
 	background-image: -moz-linear-gradient(
 		top,
 		rgba(255,255,255,0.4) 0%,
