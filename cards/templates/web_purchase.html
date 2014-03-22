@@ -71,7 +71,7 @@ function movetoNext(current, nextFieldID) {
 		<div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
 		{{ a }}
 		{% endfor %}</b>
-			<select class="form-control styled validate[required, custom[ctype]]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)" value={{card.card_type}}>
+			<select class="form-control styled validate[required, custom[ctype]]" name="card_type"  id="card_type" onchange="PopulateCardFlavour(this)"  {% if from_cart %} disabled {%endif %} value={{card.card_type}}>
 				<option value="">Select Card Type</option>
 				<option value="WLWRTH" {% if request.session.card_selected = 'WLWRTH' %} selected="selected" {%endif %}>Woolworths</option>
 				<option value="BLKHWK" {% if request.session.card_selected = 'BLKHWK' %} selected="selected" {%endif %}>BlackHawk</option>
@@ -144,6 +144,7 @@ $(document).ready(function(e) {
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:true});
 	$("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]')
 	
+/*
 	if ($("#card_type").val() == "")
 		$("#card_type").focus()
 	else if($("#cardflavour_dropdown").val() == "")
@@ -152,7 +153,7 @@ $(document).ready(function(e) {
  		$("#id_amount").focus()
         else if($("#id_card_number").val() == "")
  		$("#id_card_number").focus()
-        
+  */      
 	if ($('#cardflavour_dropdown').length > 0) {
       if  ($("#cardflavour_dropdown").hasClass('validate[required, custom[flavour]]')){
          $("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]') 
