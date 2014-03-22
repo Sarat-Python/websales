@@ -17,7 +17,7 @@ Begin Change Log ***************************************************************
                                                                       
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
-  0.9    339      NaveeN  21/03/2014  Added form validation rules
+  0.9    339      NaveeN  22/03/2014   Added validation Rules form Activation Code
  End Change Log ****************************************************************
 '''
 
@@ -161,9 +161,9 @@ class ActivationForm(forms.Form):
     def __init__(self, *args, **kwargs):            
         super(ActivationForm, self).__init__(*args, **kwargs)
         self.fields['email'].widget.attrs['placeholder'] = u'Registered Email'
-	self.fields['email'].widget.attrs = {'class':'styled form-control validate[required,custom[email]]'}
         self.fields['activation_code'].widget.attrs['placeholder'] = u'example: a0bf7f'
- 	self.fields['activation_code'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'} 
+        self.fields['activation_code'].widget.attrs['class'] = 'styled form-control validate[required,custom[fname]]'
+        self.fields['email'].widget.attrs['class'] = 'styled form-control validate[required,custom[email]]'
     
     def clean_email(self):
         email = self.cleaned_data['email']        
