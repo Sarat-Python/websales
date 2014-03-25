@@ -10,6 +10,17 @@ charset="utf-8" />
 <script>
 function PopulateCardFlavour(){
 	card_type = document.getElementById('card_type').value;
+	var currentPath = window.location.href;
+	currentPath = currentPath.substring(0, '/cards');
+        if(card_type!=''){
+
+		window.location.href = currentPath + '/cards/bulk/' +card_type;
+	}else{
+		window.location.href = currentPath +'/cards/bulk/purchase';
+	}
+		
+
+	/*
 	$.ajax({
 		type: "POST",
 		url: "../load_flavours/",
@@ -22,7 +33,7 @@ function PopulateCardFlavour(){
 	error: function(xhr, textStatus, errorThrown) {
 		alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
 		}
-	});
+	}); */
 }
 
 function debug_test(){
@@ -67,6 +78,7 @@ function movetoNext(current, nextFieldID) {
 		<input type="hidden" id="woolsworth" name="Language" value= "{% autoescape off %}{% for card in cardsjson %}{% if card.card_type = 'BLKHWK' %}{{card.id}}^^{{card.name}}^^{{card.small_image_file}}**{% endif %}{% endfor %}{% endautoescape %} ">
 		<input type="hidden" id="cardsjson" name="Language" value= "" >
 	<form class="form-inline" action="" id="formSubmit" method="POST">{% csrf_token %}
+
 		<div class="row">
 		<div class="col-lg-2"><b>Card Type {% for a in cart_flv %}
 		{{ a }}
@@ -81,10 +93,11 @@ function movetoNext(current, nextFieldID) {
 		<b>Card Flavour</b>
 		<select name="cardflavour_dropdown" class="form-control styled validate[required, custom[flavour]]" id="cardflavour_dropdown" onchange="debug_test();">
 			<option value="">Select Card Flavour</option>
-			{% for card in request.session.card_flv %}
-			<option value= {{card.id}} data-image="{{STATIC_URL}}images/{{card.small_image_file}}" data-description="{{card.name}}" 
-			{% if cflavour = card.name %}selected="selected" {% elif card_flv_name == card.name %} selected="selected" {% endif%}></option>
-			{% endfor%}       
+			{% for card in request.session.card_flv %} 
+			<option value= {{card.id}} data-image="{% if request.session.card_selected = 'WLWRTH' %}  {{STATIC_URL}}images/gift_cards/Woolworths/{{card.small_image_file}} {%else%} {{STATIC_URL}}images/gift_cards/Blackhawk/{{card.small_image_file}}{%endif %}" data-description="{{card.name}}" 
+	
+			{% if cflavour = card.name %}selected="selected" {% elif request.session.selectd_flv_name == card.name %} selected="selected" {% endif%}></option>
+			{% endfor%}     
 		</select>  
 	</div>
 	<div class="col-lg-1" >
@@ -144,16 +157,25 @@ $(document).ready(function(e) {
 	$("#cardflavour_dropdown").msDropdown({roundedBorder:true});
 	$("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]')
 	
-/*
-	if ($("#card_type").val() == "")
-		$("#card_type").focus()
-	else if($("#cardflavour_dropdown").val() == "")
-		$("#cardflavour_dropdown").focus()
-	else if($("#id_amount").val() == "")
- 		$("#id_amount").focus()
-        else if($("#id_card_number").val() == "")
- 		$("#id_card_number").focus()
-  */      
+	if ($("#card_type").val() != "" && $("#cardflavour_dropdown").val() != "" && $("#id_amount").val() != "")
+		$("#id_card_number").focus()
+	
+	$( "#id_card_number" ).focus(function() {
+		if ($("#card_type").val() == "")
+		{
+			$("#card_type").validationEngine('validate')	
+		}
+		if ($("#cardflavour_dropdown").val() == "")
+		{
+			AttachCardFlavourValidation();
+		}
+		if ($("#id_amount").val() == "")
+		{
+			$("#id_amount").validationEngine('validate')	
+		}	  
+	});
+
+
 	if ($('#cardflavour_dropdown').length > 0) {
       if  ($("#cardflavour_dropdown").hasClass('validate[required, custom[flavour]]')){
          $("#cardflavour_dropdown_msdd").addClass('validate[required, custom[flavour]]') 
@@ -173,13 +195,23 @@ function AttachCardFlavourValidation()
 	}
 }
 
+function CardTypeValidation()
+{
+ $("#id_card_number").validationEngine('hide')
+
+} 
+
 $('#cardflavour_dropdown').on('change', function(){ 
 	AttachCardFlavourValidation();
 })	
 
 $('#cardflavour_dropdown').on('blur', function(){ 
 	AttachCardFlavourValidation();
+})
+$('#id_card_number').on('blur', function(){ 
+	CardTypeValidation();
 })	
+
    function CheckSelection()
         {
 	    var n = $( "input:checked" ).length;
