@@ -17,7 +17,8 @@ Begin Change Log *************************************************************
                                                                       
   Itr        Def/Req          Userid      Date           Description
   -----     --------          --------  --------       ------------------
-  Sprint     Bug 8,9,10,11,12 NaveeN    20/03/2014     Added Code formatting
+  Sprint2     Bug #18         NaveeN    25/03/2014     Added is_deleted field
+                                                       for gift_cards table
  End Change Log **************************************************************
 '''
 
@@ -91,6 +92,7 @@ class gift_cards(models.Model):
     normal_image_file = models.CharField(max_length=150)
     service_charge = models.CharField(max_length=150)
     gst = models.CharField(max_length=150)
+    is_deleted = models.IntegerField(max_length=4)	
     class Meta:
        db_table = 'gift_cards'
 
