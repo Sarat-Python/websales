@@ -15,9 +15,10 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 '''
 Begin Change Log ***********************************************************
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   -----------------------------------
-  0.9    339      NaveeN  22/03/2014     Added swiped cards display based on giftcard
+  Itr         Def/Req      Userid      Date           Description
+  -----     --------       --------    --------   ------------------------------
+  Sprint2     Bug #18,15,   NaveeN      25/03/2014     Added gift card id filter 
+                                                  for card flavour display.
  End Change Log ************************************************************
 '''
 # Create your views here.
@@ -45,23 +46,26 @@ from django.utils import simplejson
 from cards.card_utils import verify_card_length
 from pprint import pprint
 
-
 '''
 @brief : Method to store swiped cards details based
          on card type and card flavour validations
-@param   cart is to check if user comes from cart update page
+@param   from_cart is to check if user comes selectes, 
+         cart is to check if any card selected before card swipe
 @return  list of swiped card details in the datatables grid format    
+
 '''
 @login_required
 @csrf_exempt
-def bulk(request, cart=''):
+def bulk(request, cart='', from_cart=''):
+    
     form = SwipedCardForm(request.POST or None)
     response_dict = {'form':form}
     batch_number = request.session.get('batch_number', False)
     card_flv_name = ''
     email = request.user
-    gst_total, service_total = 0.00, 0.00        
+    gst_total, service_total = 0.00, 0.00    
     msgs=''
+    gift_card_id = 0
     
     if not batch_number:
         batch_number = datetime.now().isoformat()
@@ -86,8 +90,32 @@ def bulk(request, cart=''):
                                     activate_card_batch_id=batch.id)
             to_delete_cart.delete()
     else:
+
         batch = Batch.objects.get(batch_number = batch_number)
         request.session['batchid'] = batch.id
+        
+        if cart:
+            flavours_data = []
+            form = SwipedCardForm(request.POST or None)
+            response_dict = {'form':form}
+            query = "select id,name,upc_code,small_image_file,\
+                card_type from gift_cards where card_type='"+cart+"'\
+                                                   and is_deleted=0"
+            card_flavours = gift_cards.objects.raw(query)
+            for flavours in card_flavours:
+                flavours_data.append(flavours)
+            request.session['card_flv'] = flavours_data
+            request.session['card_selected'] = cart
+        else:
+            request.session['card_selected'] = ''
+            request.session['card_flv'] = ''
+
+        if from_cart:
+            c_flavour = gift_cards.objects.filter(id=from_cart)
+            for card_flavour_name in c_flavour:         
+                request.session['selectd_flv_name'] = card_flavour_name.name
+                request.session['from_cart'] = from_cart
+
         if request.method == 'POST':
             ctype = request.POST.get('card_type')
             cnumber = request.POST.get('card_number')
@@ -101,6 +129,7 @@ def bulk(request, cart=''):
 
                 for card_flavour_name in card_flavour:
                     card_flv_name = card_flavour_name.name
+                    request.session['selectd_flv_name'] = card_flv_name
                     upc_code = card_flavour_name.upc_code
                     gst = card_flavour_name.gst
                     service_charge = card_flavour_name.service_charge
@@ -108,7 +137,6 @@ def bulk(request, cart=''):
                     
 
             if  ctype and cnumber and amt and gift_card_id:
-                
                 if check_card_flavor != -1:
                      if verify_card_number(ctype, cleaned_card): 
                           batch1 = SwipedCard(card_number = cleaned_card,
@@ -136,18 +164,19 @@ def bulk(request, cart=''):
                                            'amount':amt,'card_focus':'on'})
             response_dict.update({'form':form})
 
-        cart_status_id = [0,1]    
+        cart_status_id = [0,1]
+        
         if cart:
-            cart_flag = 1
+            if from_cart:
+               gift_card_id = from_cart
+            
             charge_list = SwipedCard.objects.values('id','cart_status').filter(
                         batch_id=batch.id).filter(
-                        cart_status__in=cart_status_id).filter(
-                        gift_card_id=cart).annotate(
+                        cart_status__in=cart_status_id, gift_card_id = gift_card_id
+                        ).annotate(
                         Sum('gst')).annotate(
                         Sum('service_charge')).annotate(Sum('amount'))
-            print charge_list.query
-
-
+            
         else:
             cart_flag = 0
             charge_list = SwipedCard.objects.values('id','cart_status').filter(
@@ -166,9 +195,7 @@ def bulk(request, cart=''):
             new_cards = SwipedCard.objects.filter(
                                  cart_status__in=cart_status_id).filter(
                                  batch_id=batch.id,
-                                 deleted=False, gift_card_id=cart)
-            print new_cards
-            print "naveen" 
+                                 deleted=False, gift_card_id = gift_card_id) 
             response_dict.update({'batch_total':amount_sum,
                                   'gst_total':gst_total,
                                   'main_total': main_total, 
@@ -186,7 +213,6 @@ def bulk(request, cart=''):
                                   'gst_total':gst_total,
                                   'main_total': main_total, 
                                   'service_charge_total': service_total})
-
 
         else:
             
@@ -233,10 +259,12 @@ def verify_card_number(card_type, card_number):
 '''
 @login_required        
 @csrf_exempt
-def load_flavours(request):
-    response_dict = {}
+def load_flavours(request, card_type=''):
+    #response_dict = {}
     flavours_data = []
-    card_type = request.POST.get('card_type')
+    form = SwipedCardForm(request.POST or None)
+    response_dict = {'form':form}
+
     query = "select id,name,upc_code,small_image_file,\
                 card_type from gift_cards where card_type='"+card_type+"'"
     card_flavours = gift_cards.objects.raw(query)
@@ -257,7 +285,8 @@ def load_flavours(request):
 '''
 @login_required
 @csrf_exempt
-def update(request):
+def update(request,ctype=''):
+    print ctype
     for_cart = request.POST.get('for_cart')
     action = request.POST.get('action')
     
@@ -287,8 +316,19 @@ def update(request):
                           update = SwipedCard.objects.get(id=valid)
                           update.amount = amount
                           update.save()
-                  return HttpResponseRedirect('/cards/bulk/purchase/')
+                          gift_card_ids = SwipedCard.objects.values(
+                                                   'gift_card_id').filter(
+                                                    id=valid)
+                      
+                          for gift_card_id in gift_card_ids:
+                              gift_card_id = gift_card_id['gift_card_id']
+                              #card_type = gift_card_id['card_type']
+                              gift_card_id = str(gift_card_id)
+                  return HttpResponseRedirect('/cards/bulk/'+request.session['\
+                                          card_selected']+'/'+gift_card_id+'/')
+                  
            if action == 'delete':
+               
                batch_number = request.session['batch_number']
                batch = Batch.objects.get(batch_number = batch_number)
                form_set = UpdateFormSet(queryset = SwipedCard.objects.filter(
@@ -308,7 +348,8 @@ def update(request):
                       del_cards = SwipedCard.objects.filter(id__in=selected)
                       del_cards.delete()
                       gift_card_id = str(gift_card_id)
-               return HttpResponseRedirect('/cards/bulk/'+gift_card_id+'/')
+               return HttpResponseRedirect('/cards/bulk/'+request.session['\
+                                       card_selected']+'/'+gift_card_id+'/')
             
     form_set = UpdateFormSet(queryset = SwipedCard.objects.filter(
                                             pk__in=selected, deleted=False))
@@ -351,6 +392,7 @@ def add_cart(request):
     shop_cart = []
     card_numbers = []
     total_amount, gst_total, service_total = 0.00, 0.00, 0.00
+    request.session['selectd_flv_name'] = ''
     if request.session.get('batch_number', False):
         batch_number = request.session.get('batch_number', False)        
         batch = Batch.objects.get(batch_number = batch_number)
@@ -372,12 +414,12 @@ def add_cart(request):
     to_delete_cart.delete()
     
     for cart in cart_flavours:
-        gift_card_details = gift_cards.objects.values('id','normal_image_file',
+        gift_card_details = gift_cards.objects.values('id','small_image_file',
                             'service_charge','gst').filter(
                             id=cart['gift_card_id'])
         for details in gift_card_details:
-            if details['normal_image_file']:
-                image_name = details['normal_image_file']
+            if details['small_image_file']:
+                image_name = details['small_image_file']
             else:
                 image_name = 'noImage.png'
 
@@ -407,7 +449,6 @@ def add_cart(request):
             cart_flag = SwipedCard.objects.values('id','cart_status'
                                                   ).filter(batch_id=batch.id)
             for flag in cart_flag:
-                #print flag['id']
                 flag = SwipedCard.objects.get(id=flag['id'])
                 flag.cart_status = 1
                 flag.save()
@@ -526,7 +567,8 @@ def update_batch_total(batch_id,deleted_amount):
 
      
 '''
-@brief : Common function to calculate gst and service charge details on cart order page
+@brief : Common function to calculate gst and service charge 
+details on cart order page
 @params : batch_id,gst_total,service_charge_total
 @return  returns status after updating gst & service charge total.
 '''   
