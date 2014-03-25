@@ -36,7 +36,10 @@
 		{% for items in cart %}
 	    <td>
     		<b>Item  {{forloop.parentloop.counter}}</b> <br>
-			<img src="{{ STATIC_URL }}images/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" height="100" width="142">
+			{% if items.card_type = 'WLWRTH' %}<img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{ items.card_flavour_image_file }}" 			alt="{{ items.card_type }}" >
+		{%else%}
+		 <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{ items.card_flavour_image_file }}" alt="{{ items.card_type }}" 			>
+{% endif %}
 			<input type="hidden" id="ctype_{{forloop.parentloop.counter}}" name="ctype" value="{{ items.card_type }}">  
 			<input type="hidden" id="gift_id_{{forloop.parentloop.counter}}" name="ctype" value="{{ items.gift_card_id }}">  
 			<input type="hidden" id="batchid_{{forloop.parentloop.counter}}" name="batchid" value="{{ items.activate_card_batch_id }}"> 
@@ -89,7 +92,7 @@
 		<hr>
 		<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span style="margin-left:40px;">:</span> AUD 			<span style="margin-left:10px;">{{ main_total }}</span> </div>
 			<ul class="pagination">
-				<li><a href="../purchase/" class="btn btn-primary">Continue Shopping</a></li>
+				<li><a href="#" class="btn btn-primary" onclick="continueShop();">Continue Shopping</a></li>
 				<li class="p-checkout"><a href="#" class="btn btn-primary" >Proceed To Checkout</a>
 				</li>
 			</ul>
@@ -98,7 +101,7 @@
 		<div class="cart-empty">
 			<ul class="pagination">
 				<li><h3>Your cart is Empty</h3></li>
-				<li><a href="../purchase/" class="btn btn-primary">Continue Shopping</a> </li>
+				<li><a href="#" class="btn btn-primary" onclick="continueShop();">Continue Shopping</a> </li>
 			</ul>
 		{% endif %}
 		</div>
@@ -117,11 +120,11 @@ function removeCartItems(counter) {
  	var ctype = $( "#ctype_"+counter ).val();
         var batchid = $( "#batchid_"+counter ).val();
         var cflavour = $( "#cflavour_"+counter ).val();
-       
+        var removeURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/del_cart/";
         $.ajax({
         	 type: "POST",
-       	 url: "../del_cart/",
-        	 data: {
+       	 url: removeURL,
+        data: {
             batchid: batchid,
             ctype : ctype,
             cflavour : cflavour,
@@ -142,9 +145,10 @@ function removeCartItems(counter) {
 }
 
 function updateCartItems(counter) {
-	
+	var ctype = $( "#ctype_"+counter ).val();
         var cart = $( "#gift_id_"+counter ).val();
-	window.location.href = '../'+cart+'/';
+        var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/"+ctype+'/'+cart;
+	window.location.href = newURL;
 /*
         var ctype = $( "#ctype_"+counter ).val();
         var batchid = $( "#batchid_"+counter ).val();
@@ -166,6 +170,16 @@ function updateCartItems(counter) {
        	}
    });
 */	  		 
+}
+function continueShop()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/purchase";
+	window.location.href = newURL;
+}
+function removeShop()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/del_cart";
+	window.location.href = newURL;
 }
 </script>
 {% endblock %}
