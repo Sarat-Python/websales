@@ -17,7 +17,7 @@ Begin Change Log ***************************************************************
                                                                       
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  25/03/2014  Changed Static Folder Path
+  0.9    339      NaveeN  25/03/2014  Changed Static Folder Path
  End Change Log ****************************************************************
 '''
 
