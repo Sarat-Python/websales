@@ -13,13 +13,13 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log **************************************************************
+Begin Change Log *************************************************************
                                                                       
   Itr      Def/Req  Userid      Date      Description
   -----   --------  --------  --------    -------------------------------
-  Story1   Bug 7    NaveeN    22/03/2014  Modified message for Activation Page
+  Story1   Bug 7    NaveeN    25/03/2014  Modified Code Formatting
 
-End Change Log ****************************************************************
+End Change Log ***************************************************************
 '''
 from django.http import HttpResponseRedirect
 from django.shortcuts import render,redirect
@@ -161,8 +161,7 @@ def activate(request):
 			if inactive_user.activate(request_form.cleaned_data[
                                                          'activation_code']):
 				# auto authenticate
-				inactive_user.backend = "django.contrib.auth.\
-                                                         backends.ModelBackend"
+				inactive_user.backend = "django.contrib.auth.backends.ModelBackend"
 				dj_login(request, inactive_user)
 				request.session['email'] = inactive_user.email
 				return HttpResponseRedirect(
