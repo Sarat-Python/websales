@@ -6,7 +6,7 @@
             $.validationEngineLanguage.allRules = {
                 "required": { // Add your regex rules here, you can take telephone as an example
                     "regex": "none",
-                    "alertText": "* This field is required",
+                    //"alertText": " This field is required",
                     "alertTextCheckboxMultiple": "* Please select an option",
                     "alertTextCheckboxe": "* This checkbox is required",
                     "alertTextDateRange": "* Both date range fields are required"
@@ -31,13 +31,34 @@
                     "alertText": "* Maximum ",
                     "alertText2": " characters allowed"
                 },
-				"groupRequired": {
+		"groupRequired": {
                     "regex": "none",
                     "alertText": "* You must fill one of the following fields"
                 },
                 "min": {
                     "regex": "none",
                     "alertText": "* Minimum value is "
+                },
+                "ctype": {
+                    "regex": "none",
+                    "alertText": "Select Card Type "
+                },
+                "flavour": {
+                    "regex": "none",
+                    "alertText": "Select Card Flavour "
+                },
+                "amount": {
+                    "regex": "none",
+                    "alertText": "Select Amount "
+                },
+                "cnumber": {
+                    "regex": "none",
+                    "alertText": "Swipe the Card(s) "
+                },
+
+		"fname": {
+                    "regex": "none",
+                    "alertText": "This field is required "
                 },
                 "max": {
                     "regex": "none",
@@ -83,11 +104,17 @@
                     "regex": /^[\-\+]?\d+$/,
                     "alertText": "* Not a valid integer"
                 },
-                "number": {
+                
+		"number": {
                     // Number, including positive, negative, and floating decimal. credit: orefalo
-                    "regex": /^[\-\+]?(([0-9]+)([\.,]([0-9]+))?|([\.,]([0-9]+))?)$/,
-                    "alertText": "* Invalid floating decimal number"
+                    "regex": /^[\+]?(([0-9]+)([\.,]([0-9]+))?|([\.,]([0-9]+))?)$/,
+		    "alertText": "Please enter valid Amount",         
                 },
+
+
+
+
+
                 "date": {
                     "regex": /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])$/,
                     "alertText": "* Invalid date, must be in YYYY-MM-DD format"
