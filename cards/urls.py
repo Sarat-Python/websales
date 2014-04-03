@@ -15,9 +15,9 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 Begin Change Log ***********************************************************
                                                                       
- Itr    Def/Req  Userid    Date        Description
- -----  -------- --------  --------    -----------------------------------
- 0.9    339      NaveeN    25/03/2014  Added from_cart param 
+ Itr      Def/Req     Userid    Date        Description
+ -----   --------   --------   --------    ---------------------------------
+ Sprint3  Story#21    Sarat    04/04/2014  Added goto_cart param 
  End Change Log ************************************************************
 '''
 
@@ -31,9 +31,11 @@ urlpatterns = patterns('',
     url(r'^bulk/update/$', 'cards.views.update'),
     url(r'^bulk/add_cart/$', 'cards.views.add_cart', name="add_cart"),
     url(r'^shop/shop_cart/$', 'cards.views.add_cart', name="add_cart"),
+    url(r'^shop/goto_cart/$', 'cards.views.goto_cart', name="goto_cart"),
     url(r'^bulk/del_cart/$', 'cards.views.del_cart'),
     url(r'^bulk/(?P<cart>\w+)/$', 'cards.views.bulk'),
-    url(r'^bulk/(?P<cart>\w+)/(?P<from_cart>\w+)/$', 'cards.views.bulk'),   
+    url(r'^bulk/(?P<cart>\w+)/(?P<from_cart>\w+)/$', 'cards.views.bulk'),
+    #url(r'^bulk/(?P<cart>\w+)/(?P<from_cart>\w+)/(?P<changes>\w+)/$', 'cards.views.bulk'),   
 )
 
 
