@@ -17,7 +17,7 @@ background-repeat: repeat-x;
 }
 .noemail{
 height:50px;
-width:600px;
+width:628px;
 float:right;
 background-repeat:no-repeat;
 }	
@@ -25,7 +25,7 @@ background-repeat:no-repeat;
 color:#DB3600;
 width:20px;
 text-align:right;
-text-indent:80px;
+text-indent:40px;
 margin-top:-5px;
 }
 
@@ -33,14 +33,14 @@ margin-top:-5px;
 color:#DB3600;
 width:20px;
 text-align:right;
-text-indent:80px;
+text-indent:40px;
 margin-top:-5px;
 }
 .usermessageabt{
 color:#DB3600;
 width:20px;
 text-align:right;
-text-indent:80px;
+text-indent:40px;
 margin-top:-5px;
 }
 .useremail{
@@ -56,7 +56,7 @@ margin-top:0px;
 height:30px;
 }	
 .cart-image{
-height:45px;
+height:44px;
 margin-top:-10px;
 }
 .cartcount{
