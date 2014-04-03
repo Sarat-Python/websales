@@ -17,7 +17,7 @@ Begin Change Log *************************************************************
                                                                       
   Itr        Def/Req          Userid      Date           Description
   -----     --------          --------  --------       ------------------
-  Sprint2     Bug #18         NaveeN    25/03/2014     Added is_deleted field
+  Sprint3    Story#21         Sarat    25/03/2014     Added amount field
                                                        for gift_cards table
  End Change Log **************************************************************
 '''
@@ -86,6 +86,7 @@ CARD_CHOICES = (
 class gift_cards(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=250)
+    amount = models.CharField(max_length=250)
     small_image_file = models.CharField(max_length=150)
     upc_code =models.CharField(max_length=50)
     card_type = EnumField(choices=CARD_CHOICES)
