@@ -127,7 +127,7 @@
 	{% endif %}
 	<ul class="pagination">
 		<li>
-			<button type="submit" class="btn btn-primary" value="add" name="cart" onclick="gotoCart();">Add to cart</button>    
+			<button type="submit" class="btn btn-primary" value="add" name="cart" onclick="shopCart();">Add to cart</button>    
 		</li>
 		<li class="proccedcheckout">
 			<button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout">Proceed to checkout</button>    
@@ -135,7 +135,7 @@
 	</ul>
 </div>
 <script>
-	function gotoCart()
+	function shopCart()
 	{
 		window.location="../add_cart/";
                 var newURL = window.location.protocol + "//" + window.location.host + "/cards/shop/shop_cart";
