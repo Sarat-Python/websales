@@ -37,7 +37,7 @@ function PopulateCardFlavour(){
 function AmountValidation()
 {
     amnt= document.getElementById('amount').value;
-	if (amnt == 0.0)
+	if (amnt == 0.0 || amnt == 0.00)
 		{
 			alert("Please enter some Amount!!");
 			}
@@ -86,16 +86,32 @@ function movetoNext(current, nextFieldID) {
 	<form class="form-inline" action="" id="formSubmit" method="POST">{% csrf_token %}
 
 		<div class="row">
+		
+		<div class="col-lg-4"
+			{% if request.session.link_from == 'update' or request.session.link_from == 'delete' %}
+			 style="margin-left:5px;" 
+			   {% elif request.session.link_from == 'addcard' %}
+			    style="margin-left:5px;"
+			   {% else %}
+			  style=""
+			{% endif %} 
+		   <b>{{ form.card_number.label_tag }}</b>
+		 <input type="hidden" id="upc_code" name="upc_code" value=""> 
+		<input type="text" id="card_number" name="card_number" class="form-control validate[required,custom[cnumber]]" autofocus=on >
+	       </div>
+
 		<div class="col-lg-2"><b>Card Type</b><br>	
 		 <input type="hidden" name="card_type" value="{{ request.session.card_selected }}" >
-	          {% if request.session.card_selected == 'WLWRTH'%}	
-		    <lable>Woolworths</label>
-		   {% elif request.session.card_selected == 'BLKHWK' %}	
-		    <lable>BlackHawk</label>
-		   {% else %}	
-		    <lable></label>		
-		  {% endif %}
+		  {% if request.session.card_selected == 'WLWRTH'%}	
+		   <lable>Woolworths</label>
+		    {% elif request.session.card_selected == 'BLKHWK' %}	
+		   <lable>BlackHawk</label>
+		  {% else %}	
+		 <lable></label>		
+		 {% endif %}
 		</div>
+
+
 	<div class="col-lg-2">
 		<b>Card Flavour</b><br>
 		
@@ -105,56 +121,45 @@ function movetoNext(current, nextFieldID) {
 	     <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />
 	      <input type="hidden" name="gift_card_id" value={{details.id}}>
 		<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-		{% elif request.session.card_selected == 'BLKHWK' %}	
+		 {% elif request.session.card_selected == 'BLKHWK' %}	
 	        <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
-		<input type="hidden" name="gift_card_id" value={{details.id}}>
-		<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-		{% else %}
-		<img src="#" alt="noImage" class="navbar-brand" />
-		<input type="hidden" name="gift_card_id" value="">
-		<input type="hidden" name="flavour_image" value="">
-	   {% endif %}
-	</div>
-	<div class="col-lg-2" style="width:125px;">{{ form.amount.label_tag }}<br>
-	   {% if details.card_type == 'WLWRTH'%}
-             <input type="text" id="amount"  style="margin-left:5px;" readonly class="positive" name="amount" value="{{request.session.amt}}" size=5 onblur="AmountValidation();">
+	       <input type="hidden" name="gift_card_id" value={{details.id}}>
+	      <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 	     {% else %}
-	     <input type="text" name="amount" style="margin-left:5px;" readonly value="{{request.session.amt}}" size=5 style="border:none;">
-	   {% endif %}
-	  {% endfor %}
-	 {% else %}
+	    <img src="#" alt="noImage" class="navbar-brand" style="width:120px;"/>
+	   <input type="hidden" name="gift_card_id" value="">
+	  <input type="hidden" name="flavour_image" value="">
+	 {% endif %}
+	</div>
+		<div class="col-lg-2" style="width:125px;">{{ form.amount.label_tag }}<br>
+		 {% if details.card_type == 'WLWRTH'%}
+		  <input type="text" id="amount"  style="margin-left:5px;" class="positive" name="amount" value="" size=5 onblur="AmountValidation();">
+		   {% else %}
+		    <input type="text" name="amount" style="margin-left:5px;" readonly value="{{request.session.amt}}" size=5 >
+		   {% endif %}
+		  {% endfor %}
+		 {% else %}
 
 		{% if request.session.card_selected == 'WLWRTH'%}	
-		   <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />
-		  <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-		{% elif request.session.card_selected == 'BLKHWK' %}	
-		   <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
-		  <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-		{% else %}	
-		  <img src="#" alt="" class="navbar-brand" style="width:120px;height:1px;border:none;" />	
-		{% endif %}
+		   <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" style="width:125px;height:70px;"/>
+		    <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+		     {% elif request.session.card_selected == 'BLKHWK' %}	
+		    <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" style="width:125px;height:70px;" class="navbar-brand" />
+		   <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+	          {% else %}	
+		 <img src="#" alt="" class="navbar-brand" style="width:120px;height:1px;" />	
+	       {% endif %}
 
-        
-		<div class="col-lg-2 " style="margin-top:-20px;border:0px solid;margin-left:-10px;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
-		  <br><input type="text" id="amount" class="positive" name="amount" size="5" value="{{request.session.amt}}" style="margin-left:40px;">
-		</div>
-	   {% endif %}
-    </div>
-		<div class="col-lg-4"
- {% if request.session.link_from == 'update' or request.session.link_from == 'delete' %}
-  style="margin-left:130px;" 
- {% elif request.session.link_from == 'addcard' %}
-	style="margin-left:50px;"
- {% else %}
-   style="margin-left:103px;"
- {% endif %} 
-		   <b>{{ form.card_number.label_tag }}</b>
-		  <input type="hidden" id="upc_code" name="upc_code" value=""> 
-		 <input type="text" id="card_number" name="card_number" class="form-control validate[required,custom[cnumber]]" autofocus=on >
-	        </div>
+
+	<div class="col-lg-2 " style="margin-top:-20px;border:0px solid;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
+	 <br>
+	  <input type="text" id="amount" class="positive" name="amount" size="5" value="" style="margin-left:40px;">
+	   </div>
+	  {% endif %}
+	 </div>
 
 	<div class="col-lg-1 addcard-alignmnt">
-	  <input type="submit" class="btn btn-primary"  value="Add card" />
+	 <input type="submit" class="btn btn-primary"  value="Add card"  style="margin-left:80px;"/>
 	</div>	
 </div>
        </form>
