@@ -13,7 +13,9 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 
 '''
+
 '''
+
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
   -----     --------    --------   --------   ------------------------------
@@ -22,6 +24,7 @@ Begin Change Log ***********************************************************
                                                   flavour and amount
                                                   based on card number.
  End Change Log ************************************************************
+
 '''
 # Create your views here.
 from django.http import HttpResponseRedirect
@@ -127,6 +130,7 @@ def bulk(request, cart='', from_cart=''):
         if request.method == 'POST':
             cnumber = request.POST.get('card_number')
             gid = request.POST.get('gift_card_id')
+	    post_amt = request.POST.get('amount') 	
             request.session['link_from'] = 'addcard'
             if gid == None: 
                 gid = 0
@@ -141,7 +145,10 @@ def bulk(request, cart='', from_cart=''):
                 request.session['card_selected'] = ctype
                 name = details['name']
                 request.session['selectd_flv_name'] = name
-                amt = details['amount']
+                if ctype=="WLWRTH":
+                    amt = post_amt
+                else:
+                    amt = details['amount']    
                 request.session['amt'] = amt
                 gift_card_id = details['id']
                 small_image_file = details['small_image_file']
@@ -208,7 +215,7 @@ def bulk(request, cart='', from_cart=''):
                         msgs = 'Selected Card Flavour does '\
 				'not match with the Card Swiped'          
             else: 
-                msgs = 'Please enter all the fields'
+                msgs = 'Invalid Card Number'
 
             form = SwipedCardForm(initial={'card_type':ctype,
                                            'amount':amt,'card_focus':'on'})
@@ -374,7 +381,9 @@ def update(request,ctype=''):
                               gift_card_id = gift_card_id['gift_card_id']
                               request.session['link_from'] = 'update'
                               gift_card_id = str(gift_card_id)
+
                   return HttpResponseRedirect('/cards/bulk/'+request.session['card_selected']+'/'+gift_card_id+'/')
+
                   
            if action == 'delete':
                
@@ -398,8 +407,10 @@ def update(request,ctype=''):
                       del_cards = SwipedCard.objects.filter(id__in=selected)
                       del_cards.delete()
                       gift_card_id = str(gift_card_id)
+
                       request.session['link_from'] = 'delete'
                return HttpResponseRedirect('/cards/bulk/'+request.session['card_selected']+'/'+gift_card_id+'/')
+
             
     form_set = UpdateFormSet(queryset = SwipedCard.objects.filter(
                                             pk__in=selected, deleted=False))
