@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+  Itr       Def/Req  Userid     Date       Description
+  -----     -------- --------  --------   -------------------------------------
+  Story #27  Task#28  Sarat    04/04/2014  Added kiosk_venues Class
+ End Change Log ***************************************************************
 '''
 
 from django.db import models
@@ -33,7 +33,6 @@ from django.template import Context
 from django.conf import settings
 
 # Create your models here.	
-
 
 class WebUserManager(BaseUserManager):
 	def _create_user(self, email, password,
@@ -96,6 +95,7 @@ class WebUser(AbstractBaseUser, PermissionsMixin):
 	postcode = models.CharField(_('post code'), max_length = 10, blank = True)
 	interest = models.TextField(_('interest'), blank = True)
 	activation_code = models.CharField(max_length = 15, blank = True)
+        venue = models.CharField(_('venue'), max_length = 250, blank = False)
 	
 	is_staff = models.BooleanField(_('staff status'), default=False,
 		help_text=_('Designates whether the user can log into this admin '
@@ -133,7 +133,7 @@ class WebUser(AbstractBaseUser, PermissionsMixin):
 		return self.first_name
 		
 	#def send_activation_email(self):
-		
+
 	
 	def email_user(self, subject, message, from_email=None):
 		"""
@@ -170,5 +170,11 @@ class WebUser(AbstractBaseUser, PermissionsMixin):
 			else:
 				return False
 
+class kiosk_venues(models.Model):
+    name = models.CharField(max_length=250)
+    is_deleted = models.IntegerField(max_length=4)
+
+    class Meta:
+       db_table = 'kiosk_venues'
 
 
