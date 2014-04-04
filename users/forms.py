@@ -13,12 +13,13 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date       Description
-  -----  -------- --------    --------   --------------------------------------
-  0.9    339      NaveeN  22/03/2014   Added validation Rules form Activation Code
- End Change Log ****************************************************************
+  Itr          Def/Req    Userid      Date       Description
+  -----       --------    -------    --------   -------------------------------
+  Story #27    Task #28   Sarat      04/04/2014   Added Select Venue 
+                                                  during registration.
+ End Change Log ***************************************************************
 '''
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -28,8 +29,18 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.db import models
 from django.forms import ModelForm
-
+from users.models import WebUser,kiosk_venues
 from users.models import WebUser
+
+def populateVenues():
+	venue = []
+	choices=kiosk_venues.objects.values('id','name').filter(is_deleted=0)
+	for venues in choices:
+		venue.append((venues['id'],venues['name']))
+	return venue
+
+choices = populateVenues()
+venues = [('','         ')] + choices
 
 # can be used at both admin and shopping sites
 class WebUserCreationForm(UserCreationForm):
@@ -51,12 +62,14 @@ class WebUserCreationForm(UserCreationForm):
     postcode = forms.CharField(max_length= 30,required = False)
     interest = forms.CharField(required = False)
     terms = forms.BooleanField(required = True, initial = False)
+    venue = forms.ChoiceField(choices=venues, required=False)
+    #venue = forms.CharField(widget=forms.Select(choices=kiosk_venues.objects.values('name').filter(is_deleted=0).values_list('id','name')), required = True)
     
     class Meta:
         model = WebUser
         fields = ("email", "first_name",
                   "middle_name", "last_name", "mobile", "mobile_model",
-                  "unit", "street", "suburb", "postcode", "interest")
+                  "unit", "street", "suburb", "postcode", "interest","venue")
     
     def __init__(self, *args, **kargs):
         super(WebUserCreationForm, self).__init__(*args, **kargs)
@@ -67,7 +80,10 @@ class WebUserCreationForm(UserCreationForm):
         self.fields['email'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
         self.fields['password1'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
         self.fields['password2'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
-        self.fields['mobile'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':20} 
+        self.fields['mobile'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':20}
+	self.fields['venue'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
+	self.fields['venue'].label = "Select Venue"
+	#self.fields['venue'].choices.insert(0, ('','Select Venue' ) )
         
     def clean_email(self):
         email = self.cleaned_data['email']
