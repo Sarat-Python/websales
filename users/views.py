@@ -15,9 +15,10 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 Begin Change Log *************************************************************
                                                                       
-  Itr      Def/Req  Userid      Date      Description
-  -----   --------  --------  --------    -------------------------------
-  Story1   Bug 7    NaveeN    25/03/2014  Modified Code Formatting
+  Itr       Def/Req    Userid      Date        Description
+  -----    --------   --------    --------    -------------------------------
+  Story#27  Task #28    Sarat    04/04/2014    Added Select Venue during 
+                                               registration
 
 End Change Log ***************************************************************
 '''
@@ -32,7 +33,7 @@ from django.conf import settings
 
 from recaptcha.client import captcha
 
-from users.models import WebUser
+from users.models import WebUser,kiosk_venues
 from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 from users.forms import WebUserCreationForm, WebUserChangeForm
 from users.forms import WebPasswordChangeForm
@@ -87,6 +88,7 @@ def register(request):
 		return HttpResponseRedirect('/user/loggedin/')
 	captcha_public_key = settings.RECAPTCHA_PUBLIC_KEY
 	response_dict = {'cpkey':captcha_public_key}
+	kiosk = kiosk_venues.objects.values('name').filter(is_deleted=0)
 	if request.method == 'POST':		
 		webuser_form = WebUserCreationForm(request.POST)
 		#print(helpers.activation_code(request.POST.get('email')))
@@ -104,7 +106,7 @@ def register(request):
 		if not response.is_valid:
 			response_dict.update({'captcha_response': '\
                                              Please retry captcha input!'})
-			response_dict.update({'f':webuser_form})
+			response_dict.update({'f':webuser_form,'kiosk':kiosk})
 			print('invalid captcha')
 			return render(request, 'register.html', response_dict)
 		
@@ -129,13 +131,16 @@ def register(request):
 			return redirect('/user/register/activate', 
                                    {'aform':activation_form, 'just_registered\
                                                                      ':True})
+			print venue
 		else:
-			response_dict.update({'f':webuser_form})
+			response_dict.update({'f':webuser_form,'kiosk':kiosk})
 			return render(request, 'register.html', response_dict)
+			print venue
 	else:
 		register_form = WebUserCreationForm()
-		response_dict.update({'f':register_form})
+		response_dict.update({'f':register_form,'kiosk':kiosk})
 		return render(request, 'register.html',response_dict)
+		print venue
 
 def activate(request):
 	if request.user != None and request.user.is_authenticated():
