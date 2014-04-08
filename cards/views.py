@@ -19,7 +19,7 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
   -----     --------    --------   --------   ------------------------------
-  Sprint3   Story #21   Sarat      04/04/2014     Added logic to auto
+  Sprint3   Story #21   Sarat      08/04/2014     Updated logic to auto
                                                   populate card type,
                                                   flavour and amount
                                                   based on card number.
@@ -72,7 +72,7 @@ def bulk(request, cart='', from_cart=''):
     gst_total, service_total = 0.00, 0.00    
     msgs=''
     gift_card_id = 0
-    
+    is_different = True
     if not batch_number:
         batch_number = datetime.now().isoformat()
         try:
@@ -126,12 +126,15 @@ def bulk(request, cart='', from_cart=''):
                 request.session['from_cart'] = from_cart
                 request.session['amt'] = card_flavour_name.amount
                 request.session['link_from'] = 'shopcart'
+                request.session['small_image_file'] = card_flavour_name.small_image_file	
+                gift_card_id = from_cart 	
 
         if request.method == 'POST':
             cnumber = request.POST.get('card_number')
             gid = request.POST.get('gift_card_id')
 	    post_amt = request.POST.get('amount') 	
             request.session['link_from'] = 'addcard'
+
             if gid == None: 
                 gid = 0
                 gift_card_id = 0
@@ -142,6 +145,8 @@ def bulk(request, cart='', from_cart=''):
             card_details = gift_cards.objects.values('id','upc_code','card_type','name','amount','small_image_file').filter(upc_code=upc_code_res,is_deleted=0)
             for details in card_details:
                 ctype = details['card_type']
+                if request.session['card_selected']==ctype:
+                    is_different = False 
                 request.session['card_selected'] = ctype
                 name = details['name']
                 request.session['selectd_flv_name'] = name
@@ -165,8 +170,6 @@ def bulk(request, cart='', from_cart=''):
 	    gt_upc_code = card_utils.extract_upc_code(cnumber,ctype)
 
 
-	    
-	    #amt = 10
             if gift_card_id:
                 card_flavour = gift_cards.objects.filter(id=gift_card_id)
 
@@ -181,20 +184,22 @@ def bulk(request, cart='', from_cart=''):
                     
             cleaned_card = card_utils.extract_card_number(cnumber,
                                                           ctype)
-            if  ctype and cnumber and amt and gift_card_id:
+ 
+            if gift_card_id:
                 if int(gid) == 0:
                     is_new = True
+                    is_different = False
                 elif int(gid) != int(gift_card_id):
                     is_new = False
                     request.session['small_image_file'] = request.POST.get('flavour_image')
                     request.session['card_selected'] = request.POST.get('card_type')
                     request.session['amt'] = request.POST.get('amount')
+                    gift_card_id = gid
                 else:
                     is_new = True
-                    
-                
-                
-                if check_card_flavor != -1 and is_new != False :
+                    is_different = False
+
+                if check_card_flavor != -1 and is_new != False and is_different == False:
                      if verify_card_number(ctype, cleaned_card): 
 			  batch1 = SwipedCard(card_number = cleaned_card,
                           card_type = ctype,
@@ -215,11 +220,11 @@ def bulk(request, cart='', from_cart=''):
                         msgs = 'Selected Card Flavour does '\
 				'not match with the Card Swiped'          
             else: 
-                msgs = 'Invalid Card Number'
+                msgs = 'Please Select valid card'
 
             form = SwipedCardForm(initial={'card_type':ctype,
                                            'amount':amt,'card_focus':'on'})
-            response_dict.update({'form':form,'card_details':card_details})
+            response_dict.update({'form':form,'card_details':card_details,'gift_card_id':gift_card_id})
 
         cart_status_id = [0,1]
         
@@ -280,7 +285,7 @@ def bulk(request, cart='', from_cart=''):
         table = tables.SwipedCardTable(new_cards)
         RequestConfig(request,paginate={"per_page": 100}).configure(table)    
         response_dict.update({'table':table,
-                              'msgs':msgs,'cflavour':card_flv_name})
+                              'msgs':msgs,'cflavour':card_flv_name,'gift_card_id':gift_card_id})
     
     return render(request,'web_purchase.html', response_dict)
 
@@ -343,7 +348,6 @@ def load_flavours(request, card_type=''):
 @login_required
 @csrf_exempt
 def update(request,ctype=''):
-    print ctype
     for_cart = request.POST.get('for_cart')
     action = request.POST.get('action')
     
