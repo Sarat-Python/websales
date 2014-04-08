@@ -8,39 +8,31 @@
 charset="utf-8" />
 
 <script>
+function Validate(){
+	amnt = document.getElementById('amount').value;
+	if(amnt==' ')
+	{
+		alert("Please enter some Amount!!");
+	}
+}
 function PopulateCardFlavour(){
 	card_type = document.getElementById('card_type').value;
 	var currentPath = window.location.href;
 	currentPath = currentPath.substring(0, '/cards');
-        if(card_type!=''){
-
+	if(card_type!=''){
 		window.location.href = currentPath + '/cards/bulk/' +card_type;
 	}else{
 		window.location.href = currentPath +'/cards/bulk/purchase';
 	}
-	/*
-	$.ajax({
-		type: "POST",
-		url: "../load_flavours/",
-		data: {
-		card_type: card_type,
-		},
-	success: function(data) {
-		window.location.href = window.location.href
-		},
-	error: function(xhr, textStatus, errorThrown) {
-		alert("Please report this error: "+errorThrown+xhr.status+xhr.responseText);
-		}
-	}); */
 }
 
 function AmountValidation()
 {
     amnt= document.getElementById('amount').value;
-	if (amnt == 0.0 || amnt == 0.00)
-		{
-			alert("Please enter some Amount!!");
-			}
+if (amnt == 0.0 || amnt == 0.00)
+{
+alert("Please enter some Amount!!");
+}
 	
 }
 function debug_test(){
@@ -119,11 +111,11 @@ function movetoNext(current, nextFieldID) {
 	  {% for details in card_details %}
 	   {% if request.session.card_selected == 'WLWRTH'%}
 	     <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />
-	      <input type="hidden" name="gift_card_id" value={{details.id}}>
+	      <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 		<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 		 {% elif request.session.card_selected == 'BLKHWK' %}	
 	        <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
-	       <input type="hidden" name="gift_card_id" value={{details.id}}>
+	       <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 	      <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 	     {% else %}
 	    <img src="#" alt="noImage" class="navbar-brand" style="width:120px;"/>
@@ -133,33 +125,36 @@ function movetoNext(current, nextFieldID) {
 	</div>
 		<div class="col-lg-2" style="width:125px;">{{ form.amount.label_tag }}<br>
 		 {% if details.card_type == 'WLWRTH'%}
-		  <input type="text" id="amount"  style="margin-left:5px;" class="positive" name="amount" value="" size=5 onblur="AmountValidation();">
+		  <input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" value="{{request.session.amt}}" size=5 maxlength="5" onsubmit="AmountValidation();">
 		   {% else %}
-		    <input type="text" name="amount" style="margin-left:5px;" readonly value="{{request.session.amt}}" size=5 >
+		    <input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5>
 		   {% endif %}
 		  {% endfor %}
 		 {% else %}
 
 		{% if request.session.card_selected == 'WLWRTH'%}	
-		   <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" style="width:125px;height:70px;"/>
+		   <img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand"/>
 		    <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+ 			 <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 		     {% elif request.session.card_selected == 'BLKHWK' %}	
-		    <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" style="width:125px;height:70px;" class="navbar-brand" />
+		   <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}"  class="navbar-brand" />
 		   <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+			 <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
+
 	          {% else %}	
-		 <img src="#" alt="" class="navbar-brand" style="width:120px;height:1px;" />	
+		<img src="#" alt="noImage" class="navbar-brand" style="width:80px;height:1px;" />	
 	       {% endif %}
 
-
-	<div class="col-lg-2 " style="margin-top:-20px;border:0px solid;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
+	<div class="col-lg-2 " style="margin-top:-20px;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
 	 <br>
-	  <input type="text" id="amount" class="positive" name="amount" size="5" value="" style="margin-left:40px;">
+	  <input type="text" id="amount_start" class="positive " name="amount" 
+	    {% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amt}}"   style="margin-left:40px;">
 	   </div>
 	  {% endif %}
 	 </div>
 
 	<div class="col-lg-1 addcard-alignmnt">
-	 <input type="submit" class="btn btn-primary"  value="Add card"  style="margin-left:80px;"/>
+	 <input type="submit" class="btn btn-primary" value="Add card"  style="margin-left:40px;" onclick="ValidateNumber();"/>
 	</div>	
 </div>
        </form>
@@ -202,28 +197,32 @@ function movetoNext(current, nextFieldID) {
 		}
 		
 	}
+
 $(document).ready(function(e) {	
 
 	$("#formSubmit").validationEngine();
 	$(".positive").numeric({ negative: false }, function() { alert("No negative values"); this.value = ""; this.focus(); });
 	
-	if ($("#card_type").val() != "" && $("#cardflavour_dropdown").val() != "" && $("#id_amount").val() != "")
-		$("#id_card_number").focus()
-	
-	$( "#id_card_number" ).focus(function() {
-		if ($("#card_type").val() == "")
-		{
-			$("#card_type").validationEngine('validate')	
-		}
-		if ($("#cardflavour_dropdown").val() == "")
-		{
-			AttachCardFlavourValidation();
-		}
-		if ($("#id_amount").val() == "")
-		{
-			$("#id_amount").validationEngine('validate')	
-		}	  
-	});
+
+	if ($("#card_number").val() != "")
+  		$("#amount").focus()
+
+		if ($("#card_type").val() != "" && $("#cardflavour_dropdown").val() != "" && $("#id_amount").val() != "")
+			$("#id_card_number").focus()
+			 $( "#id_card_number" ).focus(function() {
+			  if ($("#card_type").val() == "")
+			    {
+					$("#card_type").validationEngine('validate')	
+			    }
+			  if ($("#cardflavour_dropdown").val() == "")
+			   {
+					AttachCardFlavourValidation();
+			   }
+			  if ($("#id_amount").val() == "")
+			   {
+					$("#id_amount").validationEngine('validate')	
+			   }	  
+		});
 
 
 	if ($('#cardflavour_dropdown').length > 0) {
@@ -232,6 +231,29 @@ $(document).ready(function(e) {
 		}			
     }         
 });
+
+function ValidateNumber(){
+card_number = document.getElementById('card_number').value;
+//var n = card_number.length;
+var subs = card_number.substring(0,2);
+
+if(subs == "%B" || subs== "07")
+	{
+		$("#amount_start").addStyle("positive");
+	}
+else{
+		$("#amount_start").addClass("positive validate[required,custom[amount]]");
+	}
+var amounts = document.getElementById('amount_start').value;
+
+if (amounts <= 0){
+
+	document.getElementById('amount_start').value = '';
+	$("#amount_start").addClass("positive validate[required,custom[amount]]");
+
+}
+
+}
 
 
    function CheckSelection()
@@ -244,6 +266,8 @@ $(document).ready(function(e) {
 		return true;
             }   
          }
+
+
 
 $('#formSubmit').submit(function(ev) {
     //ev.preventDefault(); // to stop the form from submitting
