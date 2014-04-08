@@ -17,10 +17,11 @@ Begin Change Log **************************************************************
                                                                       
   Itr       Def/Req         Userid        Date                Description
   -----     --------      --------      --------      -------------------------
-  Sprint 3    Story#21      Sarat       04/04/2014     Added Functions to
+  Sprint 3    Story#21      Sarat       08/04/2014     Added Functions to
                                                        extract Card Type,Card
                                                        Flavour and Upc Code
-                                                       from Card Number
+                                                       from Card Number for 
+                                                       Manual Entries
  End Change Log ***************************************************************
 '''
 
@@ -97,13 +98,21 @@ def extract_cnumber(cnumber):
     if spcl != -1:
        if (clean == "%B"):
            cleaned =  blackhawk_card_number(cnumber)
-           upc_code = get_blackhawk_upc_code(cleaned)  
+           upc_code = get_blackhawk_upc_code(cleaned)  	
            return upc_code
            
        else:
            cleaned =  woolworth_cnumber(cnumber)
            upc_code = get_woolworth_upc_code(cleaned)
            return upc_code
+    else:
+        if check== 19:
+	    upc_code = cnumber[:9]
+	    return upc_code
+	else:
+	    upc_code = cnumber[:11]
+	    return upc_code	
+	    
            
 def woolworth_cnumber(cnumber):
   number = cnumber[1:cnumber.find('=')]
