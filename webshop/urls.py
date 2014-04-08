@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***************************************************************
+Begin Change Log **************************************************************
                                                                       
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
-  0.9    339      prashanth  19/01/2014  Added copyright Info
- End Change Log ****************************************************************
+  0.9    339      NaveeN  08/04/2014  Added api url path
+ End Change Log ***************************************************************
 '''
 
 from django.conf.urls import patterns, include, url
@@ -56,4 +56,8 @@ urlpatterns = patterns('',
         
         # shopping module
         url(r'^shopping/', include('shopping.urls')),
+
+        # shopping module
+        url(r'^api/', include('api.urls')),
+
 )
