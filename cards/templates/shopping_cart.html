@@ -46,7 +46,7 @@
 	    </td>
 		<td></td>
 	    <td class="item-cardflavour">
-	    		{{ items.card_flavour }}  
+<a href="#" onclick="javascript:updateCartItems({{ forloop.parentloop.counter }})"> {{ items.card_flavour }} </a>
 	    		<input type="hidden" id="cflavour_{{forloop.parentloop.counter }}" name="cflavour" value="{{ items.card_flavour }}">
 	    </td>
 		<td></td>
@@ -93,7 +93,7 @@
 		<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span style="margin-left:40px;">:</span> AUD 			<span style="margin-left:10px;">{{ main_total }}</span> </div>
 			<ul class="pagination">
 				<li><a href="#" class="btn btn-primary" onclick="continueShop();">Continue Shopping</a></li>
-				<li class="p-checkout"><a href="#" class="btn btn-primary" >Proceed To Checkout</a>
+				<li class="p-checkout"><a href="#" class="btn btn-primary"  onclick="process_cart();">Proceed To Checkout</a>
 				</li>
 			</ul>
 		{% endif %}{% else %}
@@ -181,6 +181,12 @@ function removeShop()
 	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/del_cart";
 	window.location.href = newURL;
 }
+function process_cart()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/api/process_cart";
+	window.location.href = newURL;
+}
+
 </script>
 {% endblock %}
 
