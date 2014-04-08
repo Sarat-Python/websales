@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} <title>Pitstop | Swiped Cards </title>{% endblock %}
+{% block child %}
+<style>
+ .left { width:auto;float: left; marin:10px, 10px; padding:10px,10px; border:1px solid;}
+</style>
+
+<body>
+ <div class="container contains">
+        <div class="row">
+            <div class="col-lg-6"><br>
+                <h3>
+                    Card Activation Response Details
+                </h3>
+		<div id="loading-div-background">
+<br><br>
+<div style="width:980px;margin:auto;">
+	<table class="fancyTable"  style="width:900px;margin-left:100px;">
+	 <th>Status Code</th>
+	  <th>Description</th>
+	  <th>Card Number</th>
+	   
+       	    {% for details, status in response_details.items %} 
+			<tr>
+			{% for codes, values in status.items %} 
+				<td>{{values}}</td>
+	  		 {% endfor %}</tr>
+	    {% endfor %}
+	
+	</table>
+
+</div>
+
+</div>
+		
+</div>
+
+            </div>
+        </div>
+</div>
+</body>
+{% endblock %}
+
+
+
