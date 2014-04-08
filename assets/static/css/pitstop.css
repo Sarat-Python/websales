@@ -56,7 +56,7 @@ margin-top:0px;
 height:30px;
 }	
 .cart-image{
-height:44px;
+height:45px;
 margin-top:-10px;
 }
 .cartcount{
@@ -319,6 +319,8 @@ text-align:left;
 
 .addcard-alignmnt{
 margin-top:20px;
+margin-left:40px;
+
 }
 
 ######### UpdateCart Template Formatting #############
