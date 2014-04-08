@@ -21,6 +21,7 @@ Begin Change Log ***************************************************************
  End Change Log ****************************************************************
 '''
 
+
 # Django settings for webshop project.
 
 import os
@@ -164,6 +165,7 @@ INSTALLED_APPS = (
      'shopping',
      'south',
      'django_tables2',
+     'api',
 )
 
 AUTH_USER_MODEL = 'users.WebUser'
@@ -220,4 +222,3 @@ LOGGING = {
         },
     }
 }
-
