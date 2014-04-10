@@ -9,23 +9,63 @@
  <div class="container contains">
         <div class="row">
             <div class="col-lg-6"><br>
-                <h3>
-                    Card Activation Response Details
+	     <h3> <span style="color:#66afe9;"><b>This is end of your checkout process! </b></span></h3>	
+{% if txn_status == 0 %}
+<h3>
+    <span style="color:#33BE09"><b>Cards Activated Successfully </b></span>
+   <img src="{{ STATIC_URL }}images/tickmark.jpg" style="height:45px;">
+</h3>
+<h5>Your Transaction # is: <a href="#">{{ txn_id }}</a></h5>
+{% endif %}
+
+{% if txn_status == 1 %}
+ <h3>
+	<span style="color:red;"><b>Cards Not Activated</b></span>
+	<img src="{{ STATIC_URL }}images/close.jpg" style="height:45px;">
+	</h3>
+	<h5>Your Transaction # is: <a href="#">{{ txn_id }}</a> </h5>
+	<h5>
+	<span style="color:red;"><b>Please contact pitstop with above transaction number</b></span>
+	</h5>
+{% endif %}
+
+{% if txn_status == 2 %}
+<h3>
+                    <span style="color:#C99C4D;"><b>Some Cards failed to acivate</b></span>
+		   <img src="{{ STATIC_URL }}images/excalamate.jpg" style="height:45px;">
                 </h3>
+	      <h5>Your Transaction # is: <a href="#">{{ txn_id }}</a> </h5>
+	     <h5>
+		<span style="color:#C99C4D;"><b>Please contact pitstop </b></span>
+	     </h5>
+{% endif %}
+      	
 		<div id="loading-div-background">
 <br><br>
 <div style="width:980px;margin:auto;">
-	<table class="fancyTable"  style="width:900px;margin-left:100px;">
-	 <th>Status Code</th>
-	  <th>Description</th>
-	  <th>Card Number</th>
-	   
-       	    {% for details, status in response_details.items %} 
-			<tr>
-			{% for codes, values in status.items %} 
-				<td>{{values}}</td>
-	  		 {% endfor %}</tr>
+	<table class="fancyTable" >
+	 <th>Card Number</th>
+	  <th>Gift Card Name</th>
+	  <th>Expiry Date</th>
+	  <th>Activation Status</th>
+		
+	    {% for details, status in response_details.items %} <tr>
+			<td>{{ status.card_number }}</td>
+			<td>{{ status.card_flavour }}</td>
+			<td>{{ status.expiry }}</td>
+			<td>
+				{% if status.activation_status == "failure" %}
+					<img src="{{ STATIC_URL }}images/close.jpg" style="height:20px;">&nbsp;&nbsp;{{ status.ResultCode }}
+				{% elif status.activation_status == "success" %}
+					<img src="{{ STATIC_URL }}images/smalltick.jpg" style="height:20px;">&nbsp;&nbsp;{{ status.ResultCode }}
+				{% else %}
+					{{ status.ResultCode }}
+				{% endif %}
+			</td>
+			</tr>
 	    {% endfor %}
+
+       	   
 	
 	</table>
 
