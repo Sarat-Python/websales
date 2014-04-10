@@ -11,16 +11,19 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 * deposited with the Australian Copyright Office. 
 *
 PIT_STOP_RECHARGE_END_TAG
-'''
-'''
-Begin Change Log **************************************************************
-                                                                      
-  Itr    Def/Req  Userid      Date          Description
-  -----  -------- --------    --------    --------------------------------------
-  0.9    339      NaveeN      08/04/2014  Added functionality for Card Activation
- End Change Log ***************************************************************
+
 '''
 
+'''
+
+Begin Change Log ***********************************************************
+  Itr         Def/Req    Userid      Date           Description
+  -----     --------    --------   --------    -----------------------------
+  Sprint3   Story #38   NaveeN      10/04/2014     Modified Acknowledgment
+                                                  page dispaly.
+ End Change Log ************************************************************
+
+'''
 
 # Create your views here.
 
@@ -53,11 +56,62 @@ import blackhawkapi
 from blackhawkapi import generate_xml_request
 from xml.dom.minidom import parseString
 
+error_codes = {
+                '0': 'OK',
+                '101':'Invalid BalanceId',
+                '102':'Balance is not active',
+                '103':'Balance valid from date is in the future',
+                '104':'Balance valid to date (including grace period) is in the past',
+                '109':'insufficient balance',
+                '111':'Balance Not Available For Issue',
+                '113': 'The amount you have entered is above your maximum limit of $#',
+                '122': 'Invalid amount for this transaction',
+                '134': 'DeliveryDate cannot be in the past',
+                '135' : 'Invalid VoucherProductCode',
+                '200' : 'Invalid CredentialCode',
+                '201' : 'Invalid CredentialCode',
+                '201' : 'Invalid CredentialCode or Card Pin Number',
+                '204' : 'Invalid CredentialCode or ExpiryDate YYYY-MM',
+                '204' : 'Invalid CredentialCode or VoucherExpiryDate',
+                '204' : 'Invalid CredentialCode or Access Password',
+                '204' : 'Invalid CredentialCode or Expiry MM/YY',
+                '205' : 'Credential is not active',
+                '250' : 'Invalid Username and Password',
+                '254' : 'Invalid CredentialCode or CredentialPassword',
+                '301' : 'Invalid MerchantOutletCode',
+                '305' : 'Store [#] not in voucher program [#]',
+                '305' : 'Store [#] not in voucher program [#] As a Redemption Store',
+                '310' : 'Store [#] does not have an account',
+                '401' : 'Invalid Retailer',
+                '402' : 'Inactive Redeeming Retailer [#]',
+                '403' : 'Inactive Voucher Program [#]',
+                '504' : 'Original request message is not of a type that supports undo',
+                '507' : 'Transaction previously cancelled by RequestMessageId #########',
+                '508' : 'Can''t undo activation - voucher has been redeemed',
+                '606' : 'No-Settlement Store do not allow Transaction with other Settlement Stream',
+                '806' : 'You do not have access to this function.',
+                '806' : 'You do not have access to this Voucher Product',
+                '990' : 'Store [#] not in voucher program [#]',
+                '2001' : 'Error in XML Document (line, character)',
+                '2001' : 'SVML Timeout'
+                }
+
+
+
+class obj(object):
+	def __init__(self, d):
+		for a, b in d.items():
+			if isinstance(b, (list, tuple)):
+				setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])
+			else:
+				setattr(self, a, obj(b) if isinstance(b, dict) else b)
+
 def process_cart(request):
 	process_items = SwipedCard.objects.values('card_number','amount',
-			'card_type','gift_card_id').filter(cart_status__in=[1])
+			'card_type','gift_card_id','card_flavour').filter(cart_status__in=[1])
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
 	response_dict = {}
+	txn_status = []
 	for item in process_items:
 		if item['card_type'] == 'WLWRTH':
 			credential_codes = []
@@ -69,12 +123,12 @@ def process_cart(request):
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
-				txn_id = int(lines[0][9:])
+				txn_id = int(lines[0][13:])
 				f.close()
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
 			f = open('request_message_id.txt', 'w')
-			new_txn_id = 'wex-test-' + str(txn_id + 1)
+			new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
 			f.close()
 			xml_response = activation_request(credential_codes
@@ -83,9 +137,15 @@ def process_cart(request):
 			ResultCode = dom.getElementsByTagName('ResultCode')[1].firstChild.nodeValue
 			Description = dom.getElementsByTagName('Description')[1].firstChild.nodeValue
 			card_number = item['card_number']
-			response_from = {'ResultCode':ResultCode,'Description':Description,'card_number':card_number}
-			response_dict[card_number] = response_from
-        		#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
+			if ResultCode == 0:
+				activation_status = 'success'
+			else:
+				activation_status = 'failure'
+
+			response_from = {'ResultCode':error_codes[ResultCode],'Description':Description,'card_number':card_number, 'activation_status':activation_status,'card_flavour': item['card_flavour']}
+			txn_status.append(ResultCode)
+			response_dict[card_number] = obj(response_from)
+        	#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
@@ -94,26 +154,49 @@ def process_cart(request):
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
-				txn_id = int(lines[0][9:])
+
+				txn_id = int(lines[0][13:])
 				f.close()
 			except Exception as e:  
 				#print str(e)
 				print "Transaction ID will reset to 1"
 
 			f = open('request_message_id.txt', 'w')
-			new_txn_id = 'conn-test-' + str(txn_id + 1)
+			new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
 			f.close()
 			request_status = generate_xml_request(item['card_number'],item['amount'],new_txn_id)
 			dom = parseString(request_status['xml_response'])
 			Status = dom.getElementsByTagName('Status')[0].firstChild.nodeValue
 			card_number = item['card_number']
-			response_from = {'ResultCode':'','Description':Status,
-							'card_number':card_number}
-			response_dict[card_number] = response_from
 
+			if Status == 'NOT_AUTHORIZED':
+				activation_status = 'failure'
+				
+			else:
+				activation_status = 'success'
+
+			response_from = {'ResultCode':error_codes[ResultCode],'Description':Status,
+							'card_number':card_number, 'activation_status':activation_status,'card_flavour': item['card_flavour']}
+			response_dict[card_number] = obj(response_from)
+			txn_status.append(ResultCode)
 			#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
-	return render(request,'process.html', {'response_details':response_dict})
+
+		partial = []
+		d = { x:txn_status.count(x) for x in txn_status }
+		for key, value in d.iteritems():
+			partial.append(int(key))
+
+		partial.sort()
+		if partial.count(0) == 0:
+			ret_status = 1
+		elif partial.count(0) == len(partial):
+			ret_status = 0
+		else:
+			ret_status = 2
+
+	#return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
+	return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
