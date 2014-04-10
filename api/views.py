@@ -19,8 +19,9 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
   -----     --------    --------   --------    -----------------------------
-  Sprint3   Story #38   NaveeN      10/04/2014     Modified Acknowledgment
-                                                  page dispaly.
+  Sprint3   Story #38   NaveeN      10/04/2014     Modified python 
+						   compatability for 
+						   list comprehension
  End Change Log ************************************************************
 
 '''
@@ -112,6 +113,8 @@ def process_cart(request):
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
 	response_dict = {}
 	txn_status = []
+	partial = []
+	d = {}
 	for item in process_items:
 		if item['card_type'] == 'WLWRTH':
 			credential_codes = []
@@ -185,8 +188,11 @@ def process_cart(request):
 			#)
 			#web_txns.save()
 
-		partial = []
-		d = { x:txn_status.count(x) for x in txn_status }
+
+#		d = { x:txn_status.count(x) for x in txn_status }
+		for x in txn_status:
+			d[x]= txn_status.count(x)
+
 		for key, value in d.iteritems():
 			partial.append(int(key))
 
@@ -197,6 +203,6 @@ def process_cart(request):
 			ret_status = 0
 		else:
 			ret_status = 2
-
+		print 'i am fool'
 	#return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
 	return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
