@@ -94,7 +94,8 @@ error_codes = {
                 '806' : 'You do not have access to this Voucher Product',
                 '990' : 'Store [#] not in voucher program [#]',
                 '2001' : 'Error in XML Document (line, character)',
-                '2001' : 'SVML Timeout'
+                '2001' : 'SVML Timeout',
+                '9999':'NOT_AUTHORIZED'
                 }
 
 
@@ -145,10 +146,12 @@ def process_cart(request):
 			else:
 				activation_status = 'failure'
 
-			response_from = {'ResultCode':error_codes[ResultCode],'Description':Description,'card_number':card_number, 'activation_status':activation_status,'card_flavour': item['card_flavour']}
+			response_from = {'ResultCode':error_codes[ResultCode],'Description':Description,'card_number':card_number, 
+				'activation_status':activation_status,'card_flavour': item['card_flavour']}
 			txn_status.append(ResultCode)
 			response_dict[card_number] = obj(response_from)
-        	#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
+        	#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,
+		#activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
@@ -172,18 +175,20 @@ def process_cart(request):
 			dom = parseString(request_status['xml_response'])
 			Status = dom.getElementsByTagName('Status')[0].firstChild.nodeValue
 			card_number = item['card_number']
-
-			if Status == 'NOT_AUTHORIZED':
+                        
+     			if Status == 'NOT_AUTHORIZED':
 				activation_status = 'failure'
-				
+			        ResultCode = '9999'
 			else:
 				activation_status = 'success'
-
+                                ResultCode = '0'
 			response_from = {'ResultCode':error_codes[ResultCode],'Description':Status,
-							'card_number':card_number, 'activation_status':activation_status,'card_flavour': item['card_flavour']}
+							'card_number':card_number, 'activation_status':activation_status,
+						'card_flavour': item['card_flavour']}
 			response_dict[card_number] = obj(response_from)
 			txn_status.append(ResultCode)
-			#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
+			#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,
+			#	activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
@@ -203,6 +208,5 @@ def process_cart(request):
 			ret_status = 0
 		else:
 			ret_status = 2
-		print 'i am fool'
-	#return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
 	return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
+
