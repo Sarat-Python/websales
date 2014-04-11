@@ -463,7 +463,7 @@ def add_cart(request):
         batch = Batch.objects.get(batch_number = batch_number)
         cart_flavours = SwipedCard.objects.values('card_type', 'card_flavour',
                             'batch_id','upc_code','gift_card_id').filter(
-                             batch_id=batch.id, deleted=False).annotate(
+                             batch_id=batch.id, deleted=False).exclude(cart_status='2').annotate(
                              Count('card_flavour')).annotate(Sum('amount'))
         for c in cart_flavours:                         
             card_number = SwipedCard.objects.values('id','card_number',
@@ -515,9 +515,10 @@ def add_cart(request):
             cart_flag = SwipedCard.objects.values('id','cart_status'
                                                   ).filter(batch_id=batch.id)
             for flag in cart_flag:
-                flag = SwipedCard.objects.get(id=flag['id'])
-                flag.cart_status = 1
-                flag.save()
+                flag = SwipedCard.objects.filter(id=flag['id']).exclude(cart_status='2')
+                for cs in flag:
+                    cs.cart_status = 1
+                    cs.save()
                 request.session['card_flv'] = ''
                 request.session['card_selected'] = ''
     
