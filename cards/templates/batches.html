@@ -133,18 +133,23 @@
 			<button type="submit" class="btn btn-primary" value="add" name="cart" onclick="shopCart();">Add to cart</button>    
 		</li>
 		<li class="proccedcheckout">
-			<button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout">Proceed to checkout</button>    
+			<button type="submit" class="btn btn-primary" name="btnCheckout" value="checkout" onclick="process_cart();">Proceed to checkout</button>    
 		</li>
 	</ul>
 </div>
 <script>
+
 	function shopCart()
 	{
 		window.location="../add_cart/";
                 var newURL = window.location.protocol + "//" + window.location.host + "/cards/shop/shop_cart";
                 window.location.href = newURL;
 	}
-     
+	function process_cart()
+	{
+		var newURL = window.location.protocol + "//" + window.location.host + "/api/process_cart/direct_checkout";
+		window.location.href = newURL;
+	}
 </script>
 {% endif %}
 {% endspaceless %}
