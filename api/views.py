@@ -202,9 +202,11 @@ def process_cart(request,direct_checkout=''):
      			if Status == 'NOT_AUTHORIZED':
 				activation_status = 'failure'
 			        ResultCode = '9999'
+				activated = 1
 			else:
 				activation_status = 'success'
                                 ResultCode = '0'
+				activated = 0
 			response_from = {'ResultCode':error_codes[ResultCode],
 							'Description':Status,
 							'card_number':card_number,
