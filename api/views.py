@@ -18,10 +18,9 @@ PIT_STOP_RECHARGE_END_TAG
 
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
-  -----     --------    --------   --------    -----------------------------
-  Sprint3   Story #38   NaveeN      10/04/2014     Modified python 
-						   compatability for 
-						   list comprehension
+  -----     --------    --------   --------     -----------------------------
+  Sprint3   Story #38   NaveeN      11/04/2014  Implemented Items in shopping
+												cart not getting cleared
  End Change Log ************************************************************
 
 '''
@@ -108,7 +107,20 @@ class obj(object):
 			else:
 				setattr(self, a, obj(b) if isinstance(b, dict) else b)
 
-def process_cart(request):
+
+def process_cart(request,direct_checkout=''):
+
+	'''
+	direct_checkout : @param to check if user comes from swiped card details list page
+	activated : success : 0, failure:1
+	ret_status: success : 0, failure:1, partial:2
+
+	'''
+	if direct_checkout:
+		card_items = SwipedCard.objects.filter(cart_status=0)
+		for flag in card_items:
+			flag.cart_status = 1
+			flag.save()
 	process_items = SwipedCard.objects.values('card_number','amount',
 			'card_type','gift_card_id','card_flavour').filter(cart_status__in=[1])
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
@@ -143,15 +155,25 @@ def process_cart(request):
 			card_number = item['card_number']
 			if ResultCode == 0:
 				activation_status = 'success'
+				activated = 0
 			else:
 				activation_status = 'failure'
-
-			response_from = {'ResultCode':error_codes[ResultCode],'Description':Description,'card_number':card_number, 
-				'activation_status':activation_status,'card_flavour': item['card_flavour']}
+				activated = 1
+			response_from = {'ResultCode':error_codes[ResultCode],'Description':Description,
+							'card_number':card_number,
+							'activation_status':activation_status,
+							'card_flavour': item['card_flavour']}
 			txn_status.append(ResultCode)
 			response_dict[card_number] = obj(response_from)
-        	#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,
-		#activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
+			cart_status_details = SwipedCard.objects.filter(cart_status=1)
+			for flag_activated in cart_status_details:
+				flag_activated.cart_status = 2
+				flag_activated.activated = activated
+				flag_activated.save()
+        	#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],
+			#card_type = item['card_type'],gift_card_id = 0,
+			#activate_success=0,void_request=0,void_success=0,status='1',
+			#txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
@@ -171,7 +193,8 @@ def process_cart(request):
 			new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
 			f.close()
-			request_status = generate_xml_request(item['card_number'],item['amount'],new_txn_id)
+			request_status = generate_xml_request(item['card_number'],
+								item['amount'],new_txn_id)
 			dom = parseString(request_status['xml_response'])
 			Status = dom.getElementsByTagName('Status')[0].firstChild.nodeValue
 			card_number = item['card_number']
@@ -182,19 +205,31 @@ def process_cart(request):
 			else:
 				activation_status = 'success'
                                 ResultCode = '0'
-			response_from = {'ResultCode':error_codes[ResultCode],'Description':Status,
-							'card_number':card_number, 'activation_status':activation_status,
+			response_from = {'ResultCode':error_codes[ResultCode],
+							'Description':Status,
+							'card_number':card_number,
+							'activation_status':activation_status,
 						'card_flavour': item['card_flavour']}
 			response_dict[card_number] = obj(response_from)
 			txn_status.append(ResultCode)
-			#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],card_type = item['card_type'],gift_card_id = 0,
-			#	activate_success=0,void_request=0,void_success=0,status='1',txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
+
+			cart_status_details = SwipedCard.objects.filter(cart_status=1)
+			for flag_activated in cart_status_details:
+				flag_activated.cart_status = 2
+				flag_activated.activated = activated
+				flag_activated.save()
+
+			#web_txns = web_txn_gift_cards(gift_card_price = item['amount'],
+			#card_type = item['card_type'],gift_card_id = 0,
+			#	activate_success=0,void_request=0,void_success=0,status='1',
+			#txn_id=123,remarks='remarks',activate_request = xml_response['request_data'],
 			#	activate_response = xml_response['xml_response']
 			#)
 			#web_txns.save()
 
 
 #		d = { x:txn_status.count(x) for x in txn_status }
+
 		for x in txn_status:
 			d[x]= txn_status.count(x)
 
@@ -208,5 +243,8 @@ def process_cart(request):
 			ret_status = 0
 		else:
 			ret_status = 2
-	return render(request,'process.html', {'response_details':response_dict, 'txn_status':ret_status,'txn_id':txn_id})
+		
+		request.session['cartcount'] = ''
+	return render(request,'process.html', {'response_details':response_dict,
+				 'txn_status':ret_status,'txn_id':txn_id})
 
