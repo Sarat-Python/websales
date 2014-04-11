@@ -54,6 +54,7 @@
             <li ><a href="/home/">Home</a></li>
             <li ><a href="/about/">About</a></li>
             <li><a href="/contact/">Contact</a></li>
+            {% if request.session.email %}<li><a href="#" onclick="continueShop();">Add Card</a></li>{% endif %}
           </ul>
 <!--   -->
 {% if request.session.email == None %}
@@ -204,5 +205,12 @@
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
         -->
+<script>
+function continueShop()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/purchase";
+	window.location.href = newURL;
+}
+</script>
     </body>
 </html>
