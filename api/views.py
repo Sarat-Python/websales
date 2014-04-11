@@ -123,15 +123,18 @@ def process_cart(request,direct_checkout=''):
 			flag.save()
 	process_items = SwipedCard.objects.values('card_number','amount',
 			'card_type','gift_card_id','card_flavour').filter(cart_status__in=[1])
+	#print process_items.query()
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
 	response_dict = {}
 	txn_status = []
 	partial = []
 	d = {}
+	credential_codes = []
+	credential_codes_amount = []
 	for item in process_items:
 		if item['card_type'] == 'WLWRTH':
-			credential_codes = []
-			credential_codes_amount = []
+			#credential_codes = []
+			#credential_codes_amount = []
 			response_from = {}
 			credential_codes.insert(0, item['card_number'])
 			credential_codes_amount.insert(0, item['amount'])
