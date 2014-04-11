@@ -13,12 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log ***********************************************************
+Begin Change Log *******************************************************
                                                                       
  Itr    Def/Req  Userid    Date        Description
- -----  -------- --------  --------    -----------------------------------
- 0.9    339      NaveeN    08/04/2014  Added activation card urls 
- End Change Log ************************************************************
+ -----  -------- --------  --------    ---------------------------------
+ 0.9    339      NaveeN    11/04/2014  Added direct_checkout param
+ End Change Log ********************************************************
 '''
 
 from django.conf.urls import patterns, include, url
@@ -26,6 +26,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
     # For bulk card activation
     url(r'^process_cart/$', 'api.views.process_cart'),
+    url(r'^process_cart/(?P<direct_checkout>\w+)$', 'api.views.process_cart'),
 )
 
 
