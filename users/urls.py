@@ -44,5 +44,10 @@ urlpatterns = patterns('',
     
     #For updates
     url(r'^change/password/$', 'users.views.change_password'),
+    url(r'^settings', 'users.views.user_settings'),
+    url(r'^phone', 'users.views.edit_phone'),
+    url(r'^email', 'users.views.edit_email'),
+    url(r'^afteremail', 'users.views.after_email_change'),
+    url(r'^notlogged/$', 'users.views.notlogged'),		
     #url(r'^change/details/$', 'users.views.change_details'),
 )
