@@ -17,8 +17,8 @@ Begin Change Log **************************************************************
                                                                       
   Itr          Def/Req    Userid      Date       Description
   -----       --------    -------    --------   -------------------------------
-  Story #27    Task #28   Sarat      04/04/2014   Added Select Venue 
-                                                  during registration.
+  Story #44    Task #46   Sarat      22/04/2014   Added Account Settings 
+                                                  functionality.
  End Change Log ***************************************************************
 '''
 
@@ -27,6 +27,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.forms.models import modelformset_factory
 from django.db import models
 from django.forms import ModelForm
 from users.models import WebUser,kiosk_venues
@@ -49,8 +50,6 @@ class WebUserCreationForm(UserCreationForm):
     password.
     """
     email = forms.EmailField(required = True)
-    #password = forms.CharField(widget=forms.PasswordInput(render_value=False))
-    #retype_password = forms.CharField(widget=forms.PasswordInput(render_value=False))
     first_name = forms.CharField(min_length=3, max_length= 30,required = True)
     middle_name = forms.CharField(required = False)
     last_name = forms.CharField(max_length= 30,required = True)
@@ -63,13 +62,17 @@ class WebUserCreationForm(UserCreationForm):
     interest = forms.CharField(required = False)
     terms = forms.BooleanField(required = True, initial = False)
     venue = forms.ChoiceField(choices=venues, required=False)
-    #venue = forms.CharField(widget=forms.Select(choices=kiosk_venues.objects.values('name').filter(is_deleted=0).values_list('id','name')), required = True)
     
     class Meta:
         model = WebUser
         fields = ("email", "first_name",
                   "middle_name", "last_name", "mobile", "mobile_model",
                   "unit", "street", "suburb", "postcode", "interest","venue")
+
+    UpdateSettingBase = modelformset_factory(
+    WebUser, extra=0, fields=('email', 'first_name',
+                  'middle_name', 'last_name', 'mobile', 'mobile_model',
+                  'unit', 'street', 'suburb', 'postcode', 'interest','venue'))	
     
     def __init__(self, *args, **kargs):
         super(WebUserCreationForm, self).__init__(*args, **kargs)
@@ -83,41 +86,12 @@ class WebUserCreationForm(UserCreationForm):
         self.fields['mobile'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]','maxlength':20}
 	self.fields['venue'].widget.attrs = {'class':'styled form-control validate[required,custom[fname]]'}
 	self.fields['venue'].label = "Select Venue"
-	#self.fields['venue'].choices.insert(0, ('','Select Venue' ) )
         
     def clean_email(self):
         email = self.cleaned_data['email']
         if WebUser.objects.filter(email=email).exists():
             raise ValidationError(_("Email is already registered"), code='registered')
         return email
-    
-    #def clean_retype_password(self):
-    #    password = self.cleaned_data.get('password')
-    #    retype_password = self.cleaned_data.get('retype_password')
-    #    if password and retype_password and password != retype_password:
-    #        raise forms.ValidationError(_("Entered password don't match!"), code='password_mismatch')
-    #    return retype_password
-    
-    #def clean_first_name(self):
-    #    first_name = self.cleaned_data['first_name']
-    #    if not first_name:
-    #        raise ValidationError(_("Please enter your first name"), code='blank_first_name')
-    #    return first_name
-    #
-    #def clean_last_name(self):
-    #    last_name = self.cleaned_data['last_name']
-    #    if not last_name:
-    #        raise ValidationError(_("Please enter your last name"), code='blank_last_name')
-    #    return last_name
-    #
-    #def clean_mobile(self):
-    #    mobile = self.cleaned_data['mobile']
-    #    if not mobile:
-    #        raise ValidationError(_("Please enter your mobile number"), code='blank_mobile')
-    #    return mobile    
-    
-   
-
         
 # Used in admin site only
 class WebUserChangeForm(UserChangeForm):
@@ -138,37 +112,35 @@ class WebUserChangeForm(UserChangeForm):
         
 class WebPasswordChangeForm(forms.Form):
     """ A form for updating user passwords from shopping site. """
-    old_password = forms.CharField(widget=forms.PasswordInput(render_value=False))
-    password1 = forms.CharField(widget=forms.PasswordInput(render_value=False))
-    password2 = forms.CharField(widget=forms.PasswordInput(render_value=False))
+    current_password = forms.CharField(widget=forms.PasswordInput(render_value=False))
+    new_password = forms.CharField(widget=forms.PasswordInput(render_value=False))
+    renter_new_password = forms.CharField(widget=forms.PasswordInput(render_value=False))
      
     class Meta:
         model = WebUser
         fields = ('email',)
-        #fields = ["first_name",
-        #          "middle_name", "last_name", "mobile", "mobile_model",
-        #          "unit", "street", "suburb", "postcode", "interest"]
+
     
-    def clean_password2(self):
+    def clean_renter_new_password(self):
         # Check that the two password entries match
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
+        new_password = self.cleaned_data.get("new_password")
+        renter_new_password = self.cleaned_data.get("renter_new_password")
+        if new_password and renter_new_password and new_password != renter_new_password:
             msg = "Passwords don't match"
             raise forms.ValidationError(msg)
-        return password2
+        return renter_new_password
     
-    #def save(self, commit=True):
-    #    # Save the provided password in hashed format
-    #    user = super(WebUserChangeForm,
-    #                    self).save(commit=False)
-    #    user.set_password(self.cleaned_data["password1"])
-    #    if commit:
-    #        user.save()
-    #    return user
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        user = super(WebUserChangeForm,
+                        self).save(commit=False)
+        user.set_password(self.cleaned_data["new_password"])
+        if commit:
+            user.save()
+        return user
     
-    #def clean_password(self, ):
-    #    return self.initial['password']
+    def clean_password(self, ):
+        return self.initial['password']
 
 class ActivationForm(forms.Form):
     email = forms.EmailField(required = True)
@@ -184,4 +156,56 @@ class ActivationForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data['email']        
         return email
+
+
+class WebUserSettings(forms.Form):
+    """
+    A form that creates a user seetings form, to alter settings.
+    """
+    email = forms.EmailField(required = True)
+    first_name = forms.CharField(min_length=3, max_length= 30,required = True)
+    middle_name = forms.CharField(required = False)
+    last_name = forms.CharField(max_length= 30,required = True)
+    mobile = forms.CharField(max_length= 20,required = True)
+    terms = forms.BooleanField(required = True, initial = False)	
     
+    class Meta:
+        model = WebUser
+        fields = ("email", "first_name",
+                  "middle_name", "last_name", "mobile", "mobile_model",
+                  "unit", "street", "suburb", "postcode", "interest","venue")
+
+    def add_fields(self, form, index):
+        super(WebUserSettings, self).add_fields(form, index)
+	form.fields['first_name'] = forms.CharField(required=True)
+
+class WebMobileChangeForm(forms.Form):
+    mob = forms.CharField(max_length= 20,required = True)	
+    class Meta:
+        model = WebUser
+        fields = ('mobile',)
+
+	def __init__(self, *args, **kwargs):            
+		    super(WebMobileChangeForm, self).__init__(*args, **kwargs)
+		    self.fields['mob'].widget.attrs['class'] = 'styled form-control validate[required,custom[phone]]'
+		    
+
+    def clean_mobile(self, ):
+        return self.initial['mob']	
+    
+
+class WebEmailChangeForm(forms.Form):
+    eml = forms.EmailField(required = True)	
+    class Meta:
+        model = WebUser
+        fields = ('email',)
+
+	def __init__(self, *args, **kwargs):            
+		    super(WebEmailChangeForm, self).__init__(*args, **kwargs)
+		    self.fields['eml'].widget.attrs['class'] = 'styled form-control validate[required,custom[email]]'
+		    
+
+    def clean_mobile(self, ):
+        return self.initial['eml']	
+  
+        
