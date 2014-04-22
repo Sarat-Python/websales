@@ -69,6 +69,7 @@
 	
 	</table>
 
+<div style="margin-top:50px;"><a href="#" class="btn btn-primary" onclick="continueShop();">Continue Shopping</a> </div>
 </div>
 
 </div>
@@ -79,6 +80,13 @@
         </div>
 </div>
 </body>
+<script type="text/javascript">
+function continueShop()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/purchase";
+	window.location.href = newURL;
+}
+</script>
 {% endblock %}
 
 
