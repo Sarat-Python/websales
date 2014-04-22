@@ -1,13 +1,12 @@
-<html>
-	<head><title>{{ title }}</title></head>
-	<body>
-		<h1>logged in landing page : Welcome, {{ full_name }}</h1>
+{% extends 'base.html' %}
+{% block child %}
+<body>
+<div style="width:980px;margin:auto;">
+		<h2 style="color:green;">Password Changed Succesfully!!</h2>
 		{{error}}
-		<form action='/user/change/password/' method='GET'> 
-			<input type='submit' value='Change Password' />
-		</form>
-		<p>
-			<a href='/user/logout/'>Logout</a>
-		</p>
+		<a href='/user/settings/'> << Go Back to User Settings </a>
+
 	</body>
-</html>
+</div>	
+{% endblock %}
+
