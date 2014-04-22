@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block child %}
+<div class="jumbotron">
+	<div class="container">
+		<h3 class="title">Change User Settings</h3>
+		
+		{% load filters %}
+	<p>
+		{{error}}
+	<form  action="/user/register/" id="formRegister" method="POST" autocomplete="off">
+		
+<br>  
+   		{% for use in users%}
+	<table>
+			<tr>
+			    <td style="text-align:right;">Name: </td>
+			     <td style="text-indent:10px;">{{ use.first_name }} {{ use.last_name }}</td>
+			</tr>
+			<tr>
+			   <td style="text-align:right;">Email: </td>
+			    <td style="text-indent:10px;">{{request.session.email}}</td>
+			   <td></td>
+				<td style="text-align:right;text-indent:30px;"> <a href="/user/email" class="edit">
+	 			 Edit</a></td>			  
+			</tr>
+
+			<tr>
+			    <td style="text-align:right;">Password: 
+			    </td>
+			    <td style="text-indent:10px;">
+			     <input type="password" value="{{ use.password }}" style="border:none;background:transparent;" size=6></td>
+			    <td></td>
+				<td style="text-align:right;text-indent:30px;"> <a href="/user/change/password" class="edit">
+	 			 Edit</a></td>
+			</tr>
+
+			<tr>
+			  <td style="text-align:right;">Mobile Phone Number: </td>
+			   <td style="text-indent:10px;">{{ use.mobile }}</td>
+			    <td></td>
+				<td style="text-align:right;text-indent:30px;"> <a href="/user/phone" class="edit">
+	 			 Edit</a></td>
+			</tr>
+			
+			<tr>
+			  <td style="text-align:right;"></td>
+			   <td style="text-indent:10px;"></td>
+			    <td></td>
+			     <td style="text-align:right;"> <a href="#" onclick="continueShop();">
+			    <img src="{{ STATIC_URL }}images/Account_setting.png"></a></td>
+			</tr>
+
+		</table>	
+
+		{% endfor%}
+
+	</form>
+	</p>
+	</div>
+</div>
+<script>
+function continueShop()
+{
+	var newURL = window.location.protocol + "//" + window.location.host + "/cards/bulk/purchase";
+	window.location.href = newURL;
+}
+
+</script>	
+{% endblock %}
