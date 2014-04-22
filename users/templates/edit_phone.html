@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block child %}
+<div class="jumbotron">
+	<div class="container">
+		<h3 class="title">Change Phone Number</h3>
+		
+		{% load filters %}
+	<p>
+		
+	<form  action="" id="formRegister" method="POST" autocomplete="off">{% csrf_token %}
+		
+	<br>
+	   <div>Phone Number: {{mob_form.mob}}</div>
+	   	
+	<br>
+		<div class="col-lg-3" >
+			<div >
+			 <table>
+			  <tr>
+			   <td><button type="submit" name="action" value="Update" style="background:none;border:none;">
+			    <span class="save">Save</span> </button>
+			     </td>
+			    <td>
+			    <button type="button" name="action" onclick="parent.history.back();" style="background:none;border:none;">
+			     <span class="cancel">Cancel</span> </button></td>
+			  </tr>
+			</table>
+			</div>
+			</div>
+	</form>
+	</p>
+	</div>
+</div>
+{% endblock %}
