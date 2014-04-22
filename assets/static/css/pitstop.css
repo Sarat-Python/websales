@@ -332,3 +332,75 @@ min-height: 640px;
 .text-center{
  text-align: center;
 }
+
+######### Settings Template Formatting #############
+
+
+.child{float:left; margin-top:5px; margin-bottom:5px; height:33px; padding-left:15px; padding-right:15px; color:#b3b0b0; font-size:11px}
+.childBorder{border-right:1px solid #000000}
+
+.setting{background-image:url(../images/setting_org.png); background-repeat:no-repeat; background-position:center top}
+.setting:hover{background-image:url(../images/setting-h.png);color:#ff6834;}
+.topText{padding-top:15px;}
+
+.greet{text-align:right; background-image:url(../images/bar.png); background-repeat:no-repeat; background-position:right; padding-right:20px}
+.greet:first-line{text-transform:uppercase; color:#ff6834; }
+
+.welcome{margin-top: -5px;margin-right: -10px;}
+.greet_email{color:gray;margin-left:10px;margin-right: -10px;}
+
+.setting_border_left{border-left:1px solid black;height:30px;margin-left:5px;}
+.setting_text{
+margin-left:5px;
+margin-top:-3px;
+}
+.cart_left_border{border-left:1px solid black;height:30px;margin-left:5px;}
+.logout_left{border-left:1px solid black;height:30px;margin-left:5px;}
+.logout_text{margin-left:-35px;margin-top:2px;}
+.curveR{margin-right:-60px;margin-top:-10px;}
+#curveLeft{float:right; background-image:url(../images/menu/topbar_resized.png); background-repeat:no-repeat; width:550px;}
+#curveRight{ width:57px; margin-right:-57px;margin-top:-8px;}
+
+.save{
+padding:2px 28px; 
+background:#979797;
+width:30px;
+border-radius:25px;
+color:white;
+}
+
+.cancel{
+padding:2px 28px; 
+background:#292929;
+width:30px;
+color:white;
+}
+
+.edit{
+padding:2px 28px; 
+background:#A247FF;
+width:30px;
+border-radius:25px;
+color:white;
+
+}
+
+#old_email{
+font-family:arial;
+font-size:16px;
+font-weight:bold;
+}
+
+#new_email{
+font-family:arial;
+font-size:16px;
+font-weight:bold;
+}
+
+#password{
+font-family:arial;
+font-size:16px;
+font-weight:bold;
+}
+
+
