@@ -17,8 +17,8 @@ Begin Change Log *************************************************************
                                                                       
   Itr       Def/Req    Userid      Date        Description
   -----    --------   --------    --------    -------------------------------
-  Story#27  Task #28    Sarat    04/04/2014    Added Select Venue during 
-                                               registration
+  Story#44  Task #46    Sarat    22/04/2014    Added Account Settings 
+                                               functionality
 
 End Change Log ***************************************************************
 '''
@@ -36,7 +36,9 @@ from recaptcha.client import captcha
 from users.models import WebUser,kiosk_venues
 from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 from users.forms import WebUserCreationForm, WebUserChangeForm
-from users.forms import WebPasswordChangeForm
+from users.forms import WebMobileChangeForm
+from users.forms import WebPasswordChangeForm, WebUserSettings
+from users.forms import WebEmailChangeForm
 from users.forms import ActivationForm
 from users.utils import helpers
 
@@ -54,6 +56,7 @@ def login(request):
 				dj_login(request, user)
 				full_name = user.get_full_name()
 				request.session['email'] = email
+				request.session['user_id'] = user.id
 				params = {'full_name':full_name}
 				params.update(csrf(request))
 				return HttpResponseRedirect(
@@ -81,7 +84,7 @@ def loggedin(request):
 	
 def invalid(request):
 	return render(request, 'invalid.html')
-	
+
 @csrf_protect
 def register(request):	
 	if request.user != None and request.user.is_authenticated():
@@ -126,11 +129,9 @@ def register(request):
 			inactive_user.send_activation_email()
 			
 			# send the email for immediate activation
-			activation_form = ActivationForm(initial={'email\
-                                                  ':inactive_user.email}) 
+			activation_form = ActivationForm(initial={'email':inactive_user.email}) 
 			return redirect('/user/register/activate', 
-                                   {'aform':activation_form, 'just_registered\
-                                                                     ':True})
+                                   {'aform':activation_form, 'just_registered':True})
 			print venue
 		else:
 			response_dict.update({'f':webuser_form,'kiosk':kiosk})
@@ -195,24 +196,25 @@ def change_password(request):
 		if request.method == 'POST':
 			change_form = WebPasswordChangeForm(request.POST)
 			if change_form.is_valid():					
-				old = change_form.cleaned_data['old_password']
+				old = change_form.cleaned_data[
+							'current_password']
 				email = request.session['email']
 				user = authenticate(email = email
                                                     , password = old)			
 				if user:
 					newp = change_form.cleaned_data[
-                                                                 'password1']
+                                                                 'new_password']
 					user.set_password(newp)
 					user.save()
-					return HttpResponseRedirect('\
-                                               /user/loggedin/', 
-                                               {'error': 'Password changed\
-                                               successfully'})
+					return HttpResponseRedirect\
+					('/user/loggedin/', 
+                                        {'error': 'Password \
+					changed successfully'})
 				else:
 					return HttpResponseRedirect(
-                                             '/user/loggedin/',
-                                             {'error':'Unable to update,\
-                                              Please try again later'})
+                                             '/user/notlogged/',
+					 {'error':'Unable to update,\
+					 Please try again later'})
 			else:
 				return render(request, 'change_password.html',
                                              {'change_form':change_form,
@@ -234,4 +236,92 @@ def is_loggedin(request):
 
 def login_handler(request, error):
 		return render(request, 'login.html', {'error': error})
-	
+
+#View for Settings
+def user_settings(request):
+	email = request.user
+	users = WebUser.objects.filter(
+                          email=request.session['email'])
+	webuser_form = WebUserSettings(request.POST)
+	response_dict = {'users':users,'f':webuser_form}
+	return render(request, 'settings.html', response_dict)
+
+@csrf_protect
+def edit_phone(request):
+	if is_loggedin(request):
+		if request.method == 'POST':
+			mob_form = WebMobileChangeForm(request.POST)
+			if mob_form.is_valid():					
+				mob = mob_form.cleaned_data['mob']
+				phone_number = WebUser.objects.\
+				get(id=request.session['user_id'])
+				phone_number.mobile = mob
+				phone_number.save()
+				return HttpResponseRedirect('/user/settings/',
+				{'error': 'Number changed successfully'})
+			else:
+				return render(request, 'edit_phone.html',
+				{'mob_form':mob_form,'error':'Number mismatch'})
+		else:
+			mob_form = WebMobileChangeForm()
+			xss_safe = {'mob_form':mob_form}
+			xss_safe.update(csrf(request))
+			return render(request, 'edit_phone.html', xss_safe)
+	else:
+		return login_handler(request,'Login to change number!')
+
+
+def get_or_none(model, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        return None
+
+@csrf_protect
+def edit_email(request):
+	if is_loggedin(request):
+		if request.method == 'POST':
+			email_form = WebEmailChangeForm(request.POST)
+			if email_form.is_valid():					
+				eml = email_form.cleaned_data['eml']
+				new_email = WebUser.objects.\
+				get(id=request.session['user_id'])
+				validate_email = get_or_none(WebUser, email=eml)
+				
+				if new_email.email == eml:
+				    	
+				    return render(request, 'edit_email.html',
+				    {'email_form':email_form,
+				    'error':'Email Already Exists!\
+				     Please try another.'})		
+				elif validate_email:	
+				    return render(request, 'edit_email.html',
+				    {'email_form':email_form,
+				    'error':'Email \
+				     Already Exists! Please try another.'})		
+				else:
+                                    			
+				    new_email.email = eml
+				    new_email.save()
+				    return HttpResponseRedirect('/user/afteremail/',
+   				    {'error': 'Number changed successfully'})	
+				     
+			else:
+				return render(request, 'edit_email.html',
+				{'email_form':email_form})
+		else:
+			email_form = WebEmailChangeForm()
+			xss_safe = {'email_form':email_form}
+			xss_safe.update(csrf(request))
+			return render(request, 'edit_email.html', xss_safe)
+	else:
+		return login_handler(request,'Login to change number!')
+
+def after_email_change(request):
+		return render(request, 'after_email_change.html')
+
+def notlogged(request):
+		return render(request, 'notlogged.html')
+
+
+
