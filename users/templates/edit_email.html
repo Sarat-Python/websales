@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block child %}
+
+<div class="jumbotron">
+	<div class="container">
+		<h3 class="title">Change E-mail</h3>
+		<h5>Use the new e-mail address next time you log in to pitstop recharge online shopping.</h5>
+		
+		{% load filters %}
+		<br> <span style="color:red;">{{error}}</span>
+	<p>
+	
+	<form  action="" id="formRegister" method="POST" autocomplete="off">{% csrf_token %}
+
+		<table>
+  		 <tr>
+		   <td style="text-align:right;">Old E-mail address :</td>
+		    <td style="text-indent:10px;">{{request.session.email}}</td>
+		 </tr>
+
+   		 <tr>
+		  <td style="text-align:right;">New E-mail address: </td>
+		   <td style="text-indent:10px;"> {{email_form.eml}}</td>
+		 </tr>
+			
+		  <tr>
+		   <td style="text-align:right;">Re-enter your New E-mail address: </td>
+		    <td style="text-indent:10px;"> {{email_form.eml}}</td>
+		  </tr>
+	
+		   <tr>
+		    <td style="text-align:right;">Password: </td>
+		     <td style="text-indent:10px;"> <input type="password" value=""></td>
+		   </tr>
+		   <tr>
+		     <td style="text-align:right;">
+			<div >
+			 <button type="submit" name="action" value="Update" style="background:none;border:none;">
+			  <span class="save">Save</span> </button>
+
+  			 <button type="button" name="action" onclick="parent.history.back();" style="background:none;border:none;">
+			 <span class="cancel">Cancel</span> </button>
+			</div>
+		     </td>	
+		   </tr>
+
+		</table>
+
+	</form>
+	</p>
+	</div>
+</div>
+{% endblock %}
