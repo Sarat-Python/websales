@@ -54,13 +54,13 @@
             <li ><a href="/home/">Home</a></li>
             <li ><a href="/about/">About</a></li>
             <li><a href="/contact/">Contact</a></li>
-	    {% if request.session.email %}   <li><a href="#" onclick="continueShop();">Add Card</a></li>{% endif %}	
+	    {% if request.session.email %}   <li><a href="#" onclick="continueShop();">Shop Gift Cards</a></li>{% endif %}	
           </ul>
 <!--   -->
 {% if request.session.email == None %}
 <div class="noemail">
 {% else %}
-<div style="background-image: url({{ STATIC_URL }}images/menu/topbar.png);height:50px;width:500px;float:right;background-repeat:no-repeat;">
+<div id="curveLeft">
 {% endif %}
 	  {% if request.session.email == None %}
 		<form class="navbar-form navbar-right" action="/user/login/" method="POST">{% csrf_token %}
@@ -75,23 +75,27 @@
 		</form>
 	  {% else %}
 		<form class="navbar-form navbar-right" action="/user/logout/" method="POST">{% csrf_token %}
-			<ul class="nav navbar-nav" style="height:30px;border-left:1px double black;">
+		 <ul class="nav navbar-nav" style="height:30px;border-left:1px double black;">
+		  <li class="child greet welcome"><span>WELCOME</span><br>
+		   <span class="greet_email">{{request.session.email}}</span></li>
+		    <li  class="setting_border_left"></li>
+  		     <li class="setting"><a href="/user/settings/" class="setting_text" style="color:gray;">settings
+		      </a></li> 
+		       <li class="cart_left_border"></li>	
+		     <li><img src="{{ STATIC_URL }}images/menu/Bulk_Purchase.png" class="cart-image"></li>
+		    {% if request.session.cartcount  %}
+		   <li class="cartcount">
+		  <label id="cart_count"><a href="{% url "add_cart" %}">{{ request.session.cartcount }}</a></label> 
+		 </li>
+		<li class="cartlabel" style="margin-top:15px;color:gray">Cart</li>  
+		   {% endif %}
+ 		    <li  class="logout_left"></li>
+		     <li  class="logout"><a href="/user/logout/" class="logout_text" style="color:gray;">logout
+		    </a></li>   
+		  <li class="curveR"><img src="{{ STATIC_URL }}images/menu/curveR.png" style="height:45px;"></li>
 
-				<li class="usermessageabt">WELCOME</li>
-				<li class="useremail"><span style="">{{request.session.email}}</span></li>
-				<li class="leftline"><li>
-				<li><img src="{{ STATIC_URL }}images/menu/Bulk_Purchase.png" class="cart-image"></li>
-				{% if request.session.cartcount  %}
-				<li class="cartcount">
-					<label id="cart_count"><a href="{% url "add_cart" %}">{{ request.session.cartcount }}</a></label> 
-				</li>
-				<li class="cartlabelindex">Cart</li>  
-				{% endif %}
-				<li  style="border-left:1px solid black;height:30px;margin-left:5px;"></li>
-				<li  class="logout"><a href="/user/logout/" style="margin-left:-35px;color:gray;margin-top:2px;">logout
-                                </a></li> 
-				<li style="margin-right:-60px;margin-top:-10px;"><img src="{{ STATIC_URL }}images/menu/curveR.png" style="height:45px;"></li>
-			</ul>
+		</ul>
+
 		</form>
 	  {% endif %}
 </div>
