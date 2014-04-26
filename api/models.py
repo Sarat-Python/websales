@@ -15,14 +15,67 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 Begin Change Log **************************************************************
                                                                       
-  Itr    Def/Req  Userid      Date          Description
-  -----  -------- --------    --------    --------------------------------------
-  0.9    339      NaveeN      08/04/2014  Added model to store Activation Response
+  Itr       Def/Req     Userid      Date          Description
+  -----     --------    --------    --------    --------------------------------------
+  Story #31  Tasks #36   NaveeN      26/04/2014  Added model WebSales Transaction Details
  End Change Log ***************************************************************
 '''
 
 
 from django.db import models
+
+class WebsalesTxnHeads(models.Model):
+    id = models.IntegerField(primary_key=True)
+    websales_site_id = models.IntegerField()
+    websales_txn_id = models.IntegerField()
+    txn_type = models.CharField(max_length=10)  # Recharge: R, GiftCard: G, Epay: P, Surcharge: S
+    payment_mode = models.CharField(max_length=150)
+    customer_image = models.CharField(max_length=150)
+    txn_amount = models.FloatField(max_length=150)
+    collected_amount = models.FloatField()
+    customer_id = models.IntegerField()
+    payment_status = models.CharField(max_length=150)
+    txn_date = models.DateTimeField(auto_now_add=True)
+    receipt_status = models.IntegerField()
+    payment_receipt = models.CharField(max_length=150)
+    refund_status = models.IntegerField()
+    txn_refunded = models.IntegerField()
+    txn_cancelled = models.IntegerField()
+    txn_other = models.IntegerField()
+    last_updated_on = models.DateTimeField()
+    last_updated_by = models.IntegerField()
+
+    class Meta:
+       db_table = 'websales_txn_heads'
+
+
+class WebsalesTxnDetails(models.Model):
+    id = models.IntegerField(primary_key=True)
+    txn_head_id = models.IntegerField()
+    gift_card_id = models.IntegerField()
+    gift_card_txn_id = models.CharField(max_length=50)
+    gift_card_code = models.CharField(max_length=30)
+    gift_card_price = models.FloatField()
+    activate_request = models.TextField()
+    activate_response = models.TextField()
+    activate_success = models.IntegerField()
+    void_request = models.TextField()
+    void_response = models.TextField()
+    void_success = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField()
+    expiry_date = models.DateField()
+    gift_card_receipt = models.CharField(max_length=30)
+    profit_percentage = models.FloatField()
+    profit_amount = models.FloatField()
+    gst_in_commission = models.FloatField()
+    comm_overpayment = models.FloatField()
+    gst_overpayment = models.FloatField()
+    errorcode = models.CharField(max_length=30)
+    service_charge = models.FloatField()
+
+    class Meta:
+       db_table = 'websales_txn_details'
 
 # Create your models here.
 class web_txn_gift_cards(models.Model):
