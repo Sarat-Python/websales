@@ -13,13 +13,12 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 PIT_STOP_RECHARGE_END_TAG
 '''
 '''
-Begin Change Log *************************************************************
+Begin Change Log **************************************************************
                                                                       
-  Itr        Def/Req          Userid      Date           Description
-  -----     --------          --------  --------       ------------------
-  Sprint3    Story#21         Sarat    25/03/2014     Added amount field
-                                                       for gift_cards table
- End Change Log **************************************************************
+  Itr       Def/Req     Userid      Date          Description
+  -----     --------    --------    --------    --------------------------------------
+  Story #31  Tasks #36   NaveeN      26/04/2014  Added model GiftCards
+ End Change Log ***************************************************************
 '''
 
 from django.db import models
@@ -93,10 +92,31 @@ class gift_cards(models.Model):
     normal_image_file = models.CharField(max_length=150)
     service_charge = models.CharField(max_length=150)
     gst = models.CharField(max_length=150)
-    is_deleted = models.IntegerField(max_length=4)	
+    gst_in_commission = models.CharField(max_length=5)
+    profit_percentage = models.CharField(max_length=5)
+    gst_applicable = models.IntegerField()
+    is_deleted = models.IntegerField(max_length=4)
+    profit_amount = models.CharField(max_length=5) 	
     class Meta:
        db_table = 'gift_cards'
 
+class GiftCards(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=250)
+    amount = models.CharField(max_length=250)
+    small_image_file = models.CharField(max_length=150)
+    upc_code =models.CharField(max_length=50)
+    card_type = models.CharField(max_length=250)
+    normal_image_file = models.CharField(max_length=150)
+    service_charge = models.CharField(max_length=150)
+    gst = models.CharField(max_length=150)
+    gst_in_commission = models.CharField(max_length=5)
+    profit_percentage = models.CharField(max_length=5)
+    gst_applicable = models.IntegerField()
+    is_deleted = models.IntegerField(max_length=4)
+    profit_amount = models.CharField(max_length=5) 	
+    class Meta:
+       db_table = 'gift_cards'
 
 class SwipedCard(models.Model):
     card_number = models.CharField( max_length=100)
