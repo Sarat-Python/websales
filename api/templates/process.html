@@ -15,7 +15,7 @@
     <span style="color:#33BE09"><b>Cards Activated Successfully </b></span>
    <img src="{{ STATIC_URL }}images/tickmark.jpg" style="height:45px;">
 </h3>
-<h5>Your Transaction # is: <a href="#">{{ txn_id }}</a></h5>
+<h5>Your Transaction # is: <a href="#">{{ new_id }}</a></h5>
 {% endif %}
 
 {% if txn_status == 1 %}
@@ -23,7 +23,7 @@
 	<span style="color:red;"><b>Cards Not Activated</b></span>
 	<img src="{{ STATIC_URL }}images/close.jpg" style="height:45px;">
 	</h3>
-	<h5>Your Transaction # is: <a href="#">{{ txn_id }}</a> </h5>
+	<h5>Your Transaction # is: <a href="#">{{ new_id }}</a> </h5>
 	<h5>
 	<span style="color:red;"><b>Please contact pitstop with above transaction number</b></span>
 	</h5>
@@ -34,7 +34,7 @@
                     <span style="color:#C99C4D;"><b>Some Cards failed to acivate</b></span>
 		   <img src="{{ STATIC_URL }}images/excalamate.jpg" style="height:45px;">
                 </h3>
-	      <h5>Your Transaction # is: <a href="#">{{ txn_id }}</a> </h5>
+	      <h5>Your Transaction # is: <a href="#">{{ new_id }}</a> </h5>
 	     <h5>
 		<span style="color:#C99C4D;"><b>Please contact pitstop </b></span>
 	     </h5>
