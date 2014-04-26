@@ -1,0 +1,69 @@
+<html>
+<body>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/myTheme.css" media="screen">
+<style>
+ .fancyTable td, .fancyTable th { border: 1px solid #778899;}
+</style>
+
+<div style="border:4px solid gray;width:600px;height:600px;padding:5px 10px;">
+ <img src="http://210.215.149.7:5009/assets/static/images/new_logo.png" class="navbar-brand">
+  <div style="float:right;text-indent:-25px;">{{time_striped}} {{timestamp_stripped}} AETZ</div>
+       <table>
+         <tr>
+	  <td>ABN 82 145 328 703</td>
+         </tr>
+	  <tr>
+           <td>Pit Stop Recharge Pty Ltd</td>
+          </tr>
+	  <tr>
+         <td>Level 1, 4-6 Kingsway Cronulla | Sydney N.S.W 2230</td>
+        </tr>
+       </table>
+    <p>
+      <h5>Hello {{ full_name }}, 
+      </h5>
+    </p>
+   <p>
+   <h5>Thank you for your purchase at PitStop Recharge. Your order number is {{new_id}}.Please find the order information below.</h5>
+   </p>
+      
+	<h5 style="margin-left:10px;">Order Info</h5>
+
+     <div style="height:300px;">
+	<table class="fancyTable" style="border: 1px solid #778899;">
+	 <th >Card Number</th>
+	  <th>Gift Card Name</th>
+	  <th>Expiry Date</th>
+	  <th>Activation Status</th>
+         
+	 {% for details, status in response_dict.items %}
+			 <tr>
+			<td>{{ status.card_number }}</td>
+			<td>{{ status.card_flavour }}</td>
+			<td>{{ status.expiry }}</td>
+			<td>
+				{% if status.activation_status == "failure" %}
+					<img src="http://210.215.149.7:5009/assets/static/images/cross.png" >{{ status.ResultCode }}
+				{% elif status.activation_status == "success" %}
+					<img src="http://210.215.149.7:5009/assets/static/images/small_tick.jpg" >{{ status.ResultCode }}
+				{% else %}
+					{{ status.ResultCode }}naveen
+				{% endif %}
+			</td>
+			</tr>
+	    {% endfor %}
+
+	</table>
+    </div>
+
+ 
+      <div>
+	<p>
+	 <h5>Please donot reply to this email. Should you have a question regarding your order, contact pitstop recharge. To ensure a timley response , it is important to include your order number.
+         </h5>
+        </p>
+      </div>
+ </div>
+</body>
+</html>
+
