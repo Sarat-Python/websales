@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
 {% block child %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/validationEngine.jquery.css" type="text/css" media="screen" title="no title"
+charset="utf-8" />
+<script src="{{ STATIC_URL }}js/vendor/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.simpletip-1.3.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validationEngine-en.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validationEngine.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dd.css" />
+<script src="{{ STATIC_URL }}js/vendor/jquery.dd.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/skin2.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
 <div class="jumbotron">
 	<div class="container">
 		<h3 class="title">Change Phone Number</h3>
@@ -7,11 +17,19 @@
 		{% load filters %}
 	<p>
 		
-	<form  action="" id="formRegister" method="POST" autocomplete="off">{% csrf_token %}
+	<form  action="" id="formphone" method="POST" autocomplete="off">{% csrf_token %}
+	     <div style="color:red;">{{error}}</div>
+		<table>
+		 <tr>
+		  <td style="text-align:right;">Current Mobile Number :</td>
+		   <td style="text-indent:10px;">{% for use in users%}{{ use.mobile }}{% endfor%}</td>
+		 </tr>
+		<tr>
+		<td style="text-align:right;">New Mobile Number :</td>
+		<td style="text-indent:10px;">{{mob_form.mob}}</td>
+		</tr>
+		</table>
 		
-	<br>
-	   <div>Phone Number: {{mob_form.mob}}</div>
-	   	
 	<br>
 		<div class="col-lg-3" >
 			<div >
@@ -21,8 +39,8 @@
 			    <span class="save">Save</span> </button>
 			     </td>
 			    <td>
-			    <button type="button" name="action" onclick="parent.history.back();" style="background:none;border:none;">
-			     <span class="cancel">Cancel</span> </button></td>
+			    <button type="button" name="action" style="background:none;border:none;">
+			     <a href="/user/settings" style="text-decoration: none;"><span class="cancel">Cancel</span></a> </button></td>
 			  </tr>
 			</table>
 			</div>
@@ -31,4 +49,16 @@
 	</p>
 	</div>
 </div>
+<script>
+
+
+$(document).ready(function(e) {	
+
+	 $("#formphone").validationEngine();
+	 $("#id_mob").addClass("positive");
+	 $(".positive").numeric({ negative: false }, function() { alert("No negative values"); this.value = ""; this.focus(); });
+			        
+});
+
+</script>
 {% endblock %}
