@@ -218,7 +218,7 @@ def change_password(request):
 			else:
 				return render(request, 'change_password.html',
                                              {'change_form':change_form,
-                                               'error':'password mismatch'})
+                                               'error':'password mismatch!'})
 		else:
 			change_form = WebPasswordChangeForm()
 			xss_safe = {'change_form':change_form}
@@ -248,27 +248,30 @@ def user_settings(request):
 
 @csrf_protect
 def edit_phone(request):
+	email = request.user
+	users = WebUser.objects.filter(
+                   	email=request.session['email'])
 	if is_loggedin(request):
 		if request.method == 'POST':
 			mob_form = WebMobileChangeForm(request.POST)
-			if mob_form.is_valid():					
+			if mob_form.is_valid():		
 				mob = mob_form.cleaned_data['mob']
 				phone_number = WebUser.objects.\
 				get(id=request.session['user_id'])
 				phone_number.mobile = mob
 				phone_number.save()
 				return HttpResponseRedirect('/user/settings/',
-				{'error': 'Number changed successfully'})
+				{'error': 'Number changed successfully','users':users})
 			else:
 				return render(request, 'edit_phone.html',
-				{'mob_form':mob_form,'error':'Number mismatch'})
+				{'mob_form':mob_form,'error':'Please enter New Mobile Number!!','users':users})
 		else:
 			mob_form = WebMobileChangeForm()
-			xss_safe = {'mob_form':mob_form}
+			xss_safe = {'mob_form':mob_form,'users':users}
 			xss_safe.update(csrf(request))
 			return render(request, 'edit_phone.html', xss_safe)
 	else:
-		return login_handler(request,'Login to change number!')
+		return login_handler(request,'Login to change number!',users)
 
 
 def get_or_none(model, **kwargs):
@@ -284,8 +287,10 @@ def edit_email(request):
 			email_form = WebEmailChangeForm(request.POST)
 			if email_form.is_valid():					
 				eml = email_form.cleaned_data['eml']
+				#password = email_form.cleaned_data['password']
 				new_email = WebUser.objects.\
 				get(id=request.session['user_id'])
+				print "New Email",new_email
 				validate_email = get_or_none(WebUser, email=eml)
 				
 				if new_email.email == eml:
@@ -304,7 +309,7 @@ def edit_email(request):
 				    new_email.email = eml
 				    new_email.save()
 				    return HttpResponseRedirect('/user/afteremail/',
-   				    {'error': 'Number changed successfully'})	
+   				    {'error': 'Email changed successfully'})	
 				     
 			else:
 				return render(request, 'edit_email.html',
