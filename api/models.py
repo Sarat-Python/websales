@@ -15,9 +15,9 @@ PIT_STOP_RECHARGE_END_TAG
 '''
 Begin Change Log **************************************************************
                                                                       
-  Itr       Def/Req     Userid      Date          Description
-  -----     --------    --------    --------    --------------------------------------
-  Story #31  Tasks #36   NaveeN      26/04/2014  Added model WebSales Transaction Details
+  Itr    Def/Req  Userid      Date          Description
+  -----  -------- --------    --------    --------------------------------------
+  0.9    339      NaveeN      30/04/2014  Added model to Payment Response
  End Change Log ***************************************************************
 '''
 
@@ -44,7 +44,10 @@ class WebsalesTxnHeads(models.Model):
     txn_other = models.IntegerField()
     last_updated_on = models.DateTimeField()
     last_updated_by = models.IntegerField()
-
+    payment_card_type = models.CharField(max_length=150)
+    payment_card_number = models.IntegerField()
+    payment_account_type = models.CharField(max_length=150)
+    payment_response = models.CharField(max_length=150)
     class Meta:
        db_table = 'websales_txn_heads'
 
