@@ -379,9 +379,9 @@ def Ereciept(request,new_id,response_dict):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
     dirname = 'reciepts'
-    #os.mkdir(os.path.join('/home/user/websales/assets/static', dirname))
+    #os.mkdir(os.path.join('/home/user/websales/assets/static', dirname))/home/pitstop/websales/assets/static/reciepts
     filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/user/websales/assets/static', dirname, filename)
+    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
     fout.close()
