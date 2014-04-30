@@ -19,7 +19,7 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
   -----      --------    --------   --------     -----------------------------
-  Story #51   Tasks #52    Sarat     26/04/2014  Ereciept Generation after
+  Story #51   Tasks #52    Sarat     30/04/2014  Ereciept Generation after
 						  Proceed to checkout
  End Change Log ************************************************************
 
@@ -131,7 +131,7 @@ def totalAmount(request):
 					Sum('service_charge')).annotate(Sum('amount'))       
 	for batch_item in cart_items:
 		total_amount += round(batch_item['amount__sum'], 2)
-	print total_amount,'is my total amount'
+
 	return total_amount	
 
 def process_cart(request,direct_checkout=''):
@@ -173,6 +173,11 @@ def process_cart(request,direct_checkout=''):
 				txn_amount=total_amount,
 				collected_amount=total_amount,
 				websales_txn_id = new_id,
+				payment_card_type='DEBIT', 
+				payment_card_number='123456789',
+				payment_account_type='CHQ',
+				payment_response='Success',
+				receipt_status =1,
 				websales_site_id=1)
 	head_ids.save()
 
@@ -249,12 +254,15 @@ def process_cart(request,direct_checkout=''):
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
 								activate_success=0, gift_card_txn_id = new_txn_id,
-								activate_request=0,comm_overpayment=0,gst_overpayment=0,service_charge=0,
+								comm_overpayment=0,gst_overpayment=0,service_charge=0,
 								gift_card_code=item['card_number'],
 								gift_card_price=item['amount'],
 								profit_percentage=gift_cards['profit_percentage'],
 								profit_amount = profit_amount,
-								gst_in_commission = gst_in_commission
+								gst_in_commission = gst_in_commission,
+								errorcode=activation_status,
+								activate_request = xml_response['request_data'],
+								activate_response = xml_response['xml_response']
 								)
 				webtxndetails.save()
 		elif item['card_type'] == 'BLKHWK':
@@ -320,12 +328,13 @@ def process_cart(request,direct_checkout=''):
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
 								activate_success=0,gift_card_txn_id = new_txn_id,
-								activate_request=0,comm_overpayment=0,gst_overpayment=0,service_charge=0,
+								comm_overpayment=0,gst_overpayment=0,service_charge=0,
 								gift_card_code=item['card_number'],
 								gift_card_price=item['amount'],
 								profit_percentage=gift_cards['profit_percentage'],
 								profit_amount = profit_amount,
-								gst_in_commission = gst_in_commission
+								gst_in_commission = gst_in_commission,errorcode=activation_status,
+								activate_response = request_status['xml_response'],activate_request=0
 								)
 				webtxndetails.save()
 
@@ -377,14 +386,4 @@ def Ereciept(request,new_id,response_dict):
     fout.write(html_content)
     fout.close()
     return cart_status_details
-    
-'''    
-    dirname = 'reciepts'
-    os.mkdir(os.path.join('/home/dell/pitstop/websales/assets/static/', dirname))
-    
-    full_filename = os.path.join('/home/dell/pitstop/websales/assets/static/', dirname, 'Ereciept.html')
-    fout = open(full_filename, 'wb+')
-    for chunk in fout.chunks():
-        fout.write(chunk)
-    fout.close()
-'''
+
