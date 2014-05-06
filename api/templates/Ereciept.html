@@ -1,9 +1,6 @@
 <html>
 <body>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/myTheme.css" media="screen">
-<style>
- .fancyTable td, .fancyTable th { border: 1px solid #778899;}
-</style>
 
 <div style="border:4px solid gray;width:600px;height:600px;padding:5px 10px;">
  <img src="http://210.215.149.7:5009/assets/static/images/new_logo.png" class="navbar-brand">
@@ -30,22 +27,24 @@
 	<h5 style="margin-left:10px;">Order Information</h5>
 
      <div style="height:300px;">
-	<table class="fancyTable" style="border: 1px solid #778899;">
-	 <th >Card Number</th>
-	  <th>Gift Card Name</th>
-	  <th>Expiry Date</th>
-	  <th>Activation Status</th>
+	<table class="fancyTable" style="border: 1px solid #778899;border-collapse:collapse;">
+	 <th style="border: 1px solid #778899;padding: 5px;">Card Number</th>
+	  <th style="border: 1px solid #778899;padding: 5px;">Gift Card Name</th>
+	  <th style="border: 1px solid #778899;padding: 5px;">Expiry Date</th>
+	  <th style="border: 1px solid #778899;padding: 5px;">Activation Status</th>
          
 	 {% for details, status in response_dict.items %}
 			 <tr>
-			<td>{{ status.card_number }}</td>
-			<td>{{ status.card_flavour }}</td>
-			<td>{{ status.expiry }}</td>
-			<td>
+			<td style="border: 1px solid #778899;padding: 5px;background-color: #eef2f9;">{{ status.card_number }}</td>
+			<td style="border: 1px solid #778899;padding: 5px;background-color: #eef2f9;">{{ status.card_flavour }}</td>
+			<td style="border: 1px solid #778899;padding: 5px;background-color: #eef2f9;">{{ status.expiry }}</td>
+			<td style="border: 1px solid #778899;padding: 5px;background-color: #eef2f9;">
 				{% if status.activation_status == "failure" %}
-					<img src="http://210.215.149.7:5009/assets/static/images/cross.png" >{{ status.ResultCode }}
+					<img src="http://210.215.149.7:5009/assets/static/images/cross.png" >
+					 <span style="text-indent:5px;">{{ status.ResultCode }}</span>
 				{% elif status.activation_status == "success" %}
-					<img src="http://210.215.149.7:5009/assets/static/images/small_tick.jpg" >{{ status.ResultCode }}
+					<img src="http://210.215.149.7:5009/assets/static/images/small_tick.jpg" >
+					 <span style="text-indent:5px;">{{ status.ResultCode }}</span>
 				{% else %}
 					{{ status.ResultCode }}
 				{% endif %}
