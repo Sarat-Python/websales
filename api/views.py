@@ -19,8 +19,8 @@ PIT_STOP_RECHARGE_END_TAG
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
   -----      --------    --------   --------     -----------------------------
-  Story #51   Tasks #52    Sarat     30/04/2014  Ereciept Generation after
-						  Proceed to checkout
+  Story #51   Tasks #52    Sarat     06/05/2014  Updated Oder Number 
+
  End Change Log ************************************************************
 
 '''
@@ -360,17 +360,27 @@ def process_cart(request,direct_checkout=''):
 def Ereciept(request,new_id,response_dict):
     current_user = request.user
     email = current_user.email
-    time_stamp = datetime.now().isoformat()
-    time_striped = time_stamp[0:10]
-    timestamp_stripped = time_stamp[12:19]
+    time_stamp = datetime.now().strftime("%B %d,%Y")
+    time_striped = datetime.now()
+    hours = time_striped.hour
+    seconds = time_striped.second
+    microseconds = time_striped.microsecond
+    trm_microseconds = str(microseconds)
+    trimmed = trm_microseconds[:2]
     WebUserobj= WebUser.objects.get(email=current_user.email)
     WebUserobj.first_name
     cart_status_details = SwipedCard.objects.filter(cart_status=2)
-
+    try:
+	latest_id = WebsalesTxnHeads.objects.latest('id')
+	new_id = latest_id.id 
+    except ObjectDoesNotExist:
+	  new_id = 1	
     subject = 'PitStop e - Reciept for Products Purchased'
     html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
-						'time_striped':time_striped,
-						'timestamp_stripped':timestamp_stripped,
+						'time_stamp':time_stamp,
+						'hours':hours, 
+						'seconds':seconds,
+						'trimmed':trimmed,	
 						'response_dict':response_dict,
 						'new_id':new_id,
 						'cart_status_details':cart_status_details}) 
