@@ -169,7 +169,7 @@ def process_cart(request,direct_checkout=''):
 		new_id = 1
 
 	head_ids = WebsalesTxnHeads(txn_type="G",
-				payment_mode="C",payment_status='C',
+				payment_mode="S",payment_status='C',
 				txn_amount=total_amount,
 				collected_amount=total_amount,
 				websales_txn_id = new_id,
