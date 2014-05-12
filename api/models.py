@@ -100,3 +100,10 @@ class web_txn_gift_cards(models.Model):
     remarks = models.CharField(max_length=4)		
     class Meta:
        db_table = 'web_txn_gift_cards'
+
+class websales_sites(models.Model):
+    id = models.IntegerField(primary_key=True)
+    identifier = models.CharField(max_length=14)	
+    
+    class Meta:
+       db_table = 'websales_sites'
