@@ -18,8 +18,8 @@ PIT_STOP_RECHARGE_END_TAG
 
 Begin Change Log ***********************************************************
   Itr         Def/Req    Userid      Date           Description
-  -----      --------    --------   --------     -----------------------------
-  Story #51   Tasks #52    Sarat     06/05/2014  Updated Oder Number 
+  -----      --------    --------   --------     ---------------------------
+  Sprint 3   Bug#3       Sarat       12/05/2014    Updated Gift Card Txn ID  
 
  End Change Log ************************************************************
 
@@ -201,7 +201,7 @@ def process_cart(request,direct_checkout=''):
 	 		txn_id = 0
 			site = websales_sites.objects.get(id = 1)
 			site_id = site.identifier
-			stripped= site_id[6:]
+			#stripped= site_id[6:]
 			#site_id = 1
 			gift_card_txn_id = ''
 			try:
@@ -212,7 +212,7 @@ def process_cart(request,direct_checkout=''):
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(stripped).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
 			new_txn_id = gift_card_txn_id + str(txn_id + 1)
 			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
@@ -276,7 +276,7 @@ def process_cart(request,direct_checkout=''):
 	 		txn_id = 0
 			site = websales_sites.objects.filter(id = 1)
 			site_id = site.identifier
-			stripped= site_id[6:]	
+			#stripped= site_id[6:]	
 			#site_id = 1
 			gift_card_txn_id = ''
 			try:
@@ -290,7 +290,7 @@ def process_cart(request,direct_checkout=''):
 				print "Transaction ID will reset to 1"
 
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(stripped).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
 			new_txn_id = gift_card_txn_id + str(txn_id + 1)
 			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
