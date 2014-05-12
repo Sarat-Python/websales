@@ -271,7 +271,7 @@ def process_cart(request,direct_checkout=''):
 				webtxndetails.save()
 		elif item['card_type'] == 'BLKHWK':
 	 		txn_id = 0
-			site = websales_sites.objects.filter(id = 1)
+			site = websales_sites.objects.get(id = 1)
 			site_id = site.identifier
 			#stripped= site_id[6:]	
 			new_txn_id = ''
