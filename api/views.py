@@ -169,7 +169,7 @@ def process_cart(request,direct_checkout=''):
 		new_id = 1
 
 	head_ids = WebsalesTxnHeads(txn_type="G",
-				payment_mode="S",payment_status='C',
+				payment_mode="C",payment_status='C',
 				txn_amount=total_amount,
 				collected_amount=total_amount,
 				websales_txn_id = new_id,
@@ -199,6 +199,10 @@ def process_cart(request,direct_checkout=''):
 			credential_codes.insert(0, item['card_number'])
 			credential_codes_amount.insert(0, item['amount'])
 	 		txn_id = 0
+			site = WebsalesTxnHeads.objects.latest('id')
+			site_id = site.id
+			#site_id = 1
+			gift_card_txn_id = ''
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
@@ -207,7 +211,9 @@ def process_cart(request,direct_checkout=''):
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
 			f = open('request_message_id.txt', 'w')
-			new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
+			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			new_txn_id = gift_card_txn_id + str(txn_id + 1)
+			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
 			f.close()
 			xml_response = activation_request(credential_codes
@@ -267,6 +273,10 @@ def process_cart(request,direct_checkout=''):
 				webtxndetails.save()
 		elif item['card_type'] == 'BLKHWK':
 	 		txn_id = 0
+			site = WebsalesTxnHeads.objects.latest('id')
+			site_id = site.id	
+			#site_id = 1
+			gift_card_txn_id = ''
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
@@ -278,7 +288,9 @@ def process_cart(request,direct_checkout=''):
 				print "Transaction ID will reset to 1"
 
 			f = open('request_message_id.txt', 'w')
-			new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
+			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			new_txn_id = gift_card_txn_id + str(txn_id + 1)
+			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
 			f.close()
 			request_status = generate_xml_request(
@@ -353,7 +365,9 @@ def process_cart(request,direct_checkout=''):
 			ret_status = 2
 		
 		request.session['cartcount'] = ''
-	cart_status_details = Ereciept(request,txn_id,response_dict) 
+
+	cart_status_details = Ereciept(request,txn_id,response_dict)
+
 	return render(request,'process.html', {'response_details':response_dict,
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
 
@@ -370,12 +384,14 @@ def Ereciept(request,new_id,response_dict):
     WebUserobj= WebUser.objects.get(email=current_user.email)
     WebUserobj.first_name
     cart_status_details = SwipedCard.objects.filter(cart_status=2)
+    
     try:
 	latest_id = WebsalesTxnHeads.objects.latest('id')
 	new_id = latest_id.id 
     except ObjectDoesNotExist:
 	  new_id = 1	
     subject = 'PitStop e - Reciept for Products Purchased'
+    
     html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
 						'time_stamp':time_stamp,
 						'hours':hours, 
@@ -383,7 +399,12 @@ def Ereciept(request,new_id,response_dict):
 						'trimmed':trimmed,	
 						'response_dict':response_dict,
 						'new_id':new_id,
-						'cart_status_details':cart_status_details}) 
+						'cart_status_details':cart_status_details,
+						'total_amount':request.session['total_amount'],
+						'service_charge_total':request.session['service_charge_total'],
+						'gst_total':request.session['gst_total'],
+						'main_total':request.session['main_total']
+						}) 
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
     msg.attach_alternative(html_content, "text/html")
