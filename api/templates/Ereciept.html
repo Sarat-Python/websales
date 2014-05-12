@@ -55,25 +55,55 @@
 	</table>
     </div>
 
-     <div style="float: right;border-top:1px solid #dddddd;margin-top:10px;">
-		<div style="font-family:arial;color:#A52A2A;font-size:12px;font-weight:bold;">
-					Total Card(s) amount <span style="margin-left:4px;">:</span> 
-					<span span style="margin-left:4px;">AUD</span>  
-					<span style="margin-left:20px;">{{ total_amount }}</span>
-				</div>
-				<div style="font-family:arial;color:#BDBCBC;font-size:12px;font-weight:bold;">
-					Service Charge <span style="margin-left:35px;">:</span>
-					<span style="margin-left:4px;">AUD</span>
-					<span style="margin-left:29px;">{{ service_charge_total }}</span>
-				 </div>
-				<div style="font-family:arial;color:#BDBCBC;font-size:12px;font-weight:bold;">
-					GST Amount <span style="margin-left:53px;">:</span>
-					<span style="margin-left:4px;">AUD</span>
-					<span style="margin-left:20px;">{{ gst_total }} </span>
-				</div>
-				<hr>
-				<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span>:</span> AUD 			<span style="">{{ main_total }}</span> </div>
-     </div>
+	<div style="float: right">
+		<table>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+			<hr>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+	</div>
+    
+	<div style="float: right;border-top:1px solid #dddddd;margin-top:10px;margin-right:10px;">
+		<table >
+			<tr style="font-family:arial;color:#A52A2A;font-size:12px;font-weight:bold;">
+				<td>Total Card(s) amount</td>
+				<td width="60px"> : AUD</td>
+				<td align="right">{{ total_amount }}</td>
+			</tr>
+			<tr style="font-family:arial;color:#BDBCBC;font-size:12px;font-weight:bold;">
+				<td>Service Charge</td>
+				<td> : AUD</td>
+				<td align="right" >{{ service_charge_total }}</td>
+			</tr>
+			<tr style="font-family:arial;color:#BDBCBC;font-size:12px;font-weight:bold;">
+				<td>GST Amount</td>
+				<td> : AUD</td>
+				<td align="right">{{ gst_total }}</td>
+			</tr>
+			<tr>
+				<td colspan="3"><hr></td>
+			</tr>
+			<tr style="font-family:arial;font-size:12px;color:black;font-weight:bold;">
+				<td>Total Amount</td>
+				<td >: AUD</td>
+				<td align="right">{{ main_total }}</td>
+			</tr>
+		</table>
+	</div>
 <!-- Totals End -->	
        <div style="margin-top:350px;">
 	<p>
