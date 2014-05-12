@@ -39,7 +39,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from cards.forms import SwipedCardForm, UpdateSwipedCardForm, UpdateFormSet
 from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField, GiftCards
-from api.models import web_txn_gift_cards
+from api.models import web_txn_gift_cards, websales_sites
 from django_tables2 import RequestConfig
 from users.models import WebUser
 from django.db.models import Count,Sum
@@ -199,8 +199,9 @@ def process_cart(request,direct_checkout=''):
 			credential_codes.insert(0, item['card_number'])
 			credential_codes_amount.insert(0, item['amount'])
 	 		txn_id = 0
-			site = WebsalesTxnHeads.objects.latest('id')
-			site_id = site.id
+			site = websales_sites.objects.get(id = 1)
+			site_id = site.identifier
+			stripped= site_id[6:]
 			#site_id = 1
 			gift_card_txn_id = ''
 			try:
@@ -211,7 +212,7 @@ def process_cart(request,direct_checkout=''):
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			gift_card_txn_id = unicode(stripped).zfill(4) + unicode(gift_card_txn_id).zfill(5)
 			new_txn_id = gift_card_txn_id + str(txn_id + 1)
 			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
@@ -273,8 +274,9 @@ def process_cart(request,direct_checkout=''):
 				webtxndetails.save()
 		elif item['card_type'] == 'BLKHWK':
 	 		txn_id = 0
-			site = WebsalesTxnHeads.objects.latest('id')
-			site_id = site.id	
+			site = websales_sites.objects.filter(id = 1)
+			site_id = site.identifier
+			stripped= site_id[6:]	
 			#site_id = 1
 			gift_card_txn_id = ''
 			try:
@@ -288,7 +290,7 @@ def process_cart(request,direct_checkout=''):
 				print "Transaction ID will reset to 1"
 
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
+			gift_card_txn_id = unicode(stripped).zfill(4) + unicode(gift_card_txn_id).zfill(5)
 			new_txn_id = gift_card_txn_id + str(txn_id + 1)
 			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
 			f.write(new_txn_id)
