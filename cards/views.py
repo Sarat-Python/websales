@@ -71,13 +71,15 @@ def bulk(request, cart='', from_cart=''):
     msgs=''
     gift_card_id = 0
     is_different = True
+    amount_sum, main_total = 0.00, 0.00
+
     if not batch_number:
         batch_number = datetime.now().isoformat()
         try:
             batch = Batch.objects.get(batch_number = batch_number,
                                        created_by = email)
         except Batch.DoesNotExist:
-            print 'creating new batch %s' % batch_number
+            #print 'creating new batch %s' % batch_number
             user = WebUser.objects.get(email=email)
             total = 0
             batch = Batch(batch_number = batch_number,
@@ -336,6 +338,14 @@ def bulk(request, cart='', from_cart=''):
                               'msgs':msgs,
 			'cflavour':card_flv_name,'gift_card_id':gift_card_id})
     
+    request.session['total_amount'] = ''
+    request.session['main_total'] = ''
+    request.session['gst_total'] = ''
+    request.session['service_charge_total'] = ''
+    request.session['total_amount'] = amount_sum
+    request.session['main_total'] = main_total
+    request.session['gst_total'] = gst_total
+    request.session['service_charge_total'] = service_total 
     return render(request,'web_purchase.html', response_dict)
 
 
@@ -521,7 +531,7 @@ def add_cart(request):
                             'card_flavour','card_type','batch_id').filter(
                              batch_id=batch.id, card_type=c['card_type'], 
                              card_flavour=c['card_flavour'], deleted=False)
-            print card_number.query
+            #print card_number.query
             card_numbers.append(card_number)
         
     resp_dict1 = zip(cart_flavours,response_dict)                
@@ -563,7 +573,7 @@ def add_cart(request):
                                     total_amount = cart['amount__sum'],
                                         createdby_id = createdby_id.id)
             sr.save()
-
+	    
             cart_flag = SwipedCard.objects.values('id','cart_status'
                                                   ).filter(batch_id=batch.id)
             for flag in cart_flag:
@@ -617,7 +627,7 @@ def add_cart(request):
         resp_dict = {'cart_items':shop_cart, 
                      'card_numbers':card_numbers,
                      'total_amount':total_amount}
-    
+
     return render(request,'shopping_cart.html', resp_dict)
 
 
