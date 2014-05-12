@@ -202,8 +202,7 @@ def process_cart(request,direct_checkout=''):
 			site = websales_sites.objects.get(id = 1)
 			site_id = site.identifier
 			#stripped= site_id[6:]
-			#site_id = 1
-			gift_card_txn_id = ''
+			new_txn_id = ''
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
@@ -212,9 +211,7 @@ def process_cart(request,direct_checkout=''):
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
-			new_txn_id = gift_card_txn_id + str(txn_id + 1)
-			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
+			new_txn_id = unicode(site_id).zfill(4) + unicode(str(txn_id + 1)).zfill(6)
 			f.write(new_txn_id)
 			f.close()
 			xml_response = activation_request(credential_codes
@@ -277,8 +274,7 @@ def process_cart(request,direct_checkout=''):
 			site = websales_sites.objects.filter(id = 1)
 			site_id = site.identifier
 			#stripped= site_id[6:]	
-			#site_id = 1
-			gift_card_txn_id = ''
+			new_txn_id = ''
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
@@ -290,9 +286,7 @@ def process_cart(request,direct_checkout=''):
 				print "Transaction ID will reset to 1"
 
 			f = open('request_message_id.txt', 'w')
-			gift_card_txn_id = unicode(site_id).zfill(4) + unicode(gift_card_txn_id).zfill(5)
-			new_txn_id = gift_card_txn_id + str(txn_id + 1)
-			#new_txn_id = 'wex-test-ind-' + str(txn_id + 1)
+			new_txn_id = unicode(site_id).zfill(4) + unicode(txn_id + 1).zfill(6)
 			f.write(new_txn_id)
 			f.close()
 			request_status = generate_xml_request(
