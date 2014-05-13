@@ -206,7 +206,8 @@ def process_cart(request,direct_checkout=''):
 			try:
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
-				txn_id = int(lines[0][9:])
+				txn_id = int(lines[0][8:])
+				print "txn_id:",txn_id
 				f.close()
 			except Exception as e:  
 				print "Transaction ID will reset to 1"
@@ -279,7 +280,7 @@ def process_cart(request,direct_checkout=''):
 				f = open('request_message_id.txt', 'r')
 				lines = f.readlines()
 
-				txn_id = int(lines[0][9:])
+				txn_id = int(lines[0][8:])
 				f.close()
 			except Exception as e:  
 				#print str(e)
@@ -407,10 +408,10 @@ def Ereciept(request,new_id,response_dict):
     msg.send()
     dirname = 'reciepts'
     #os.mkdir(os.path.join('/home/user/websales/assets/static', dirname))/home/pitstop/websales/assets/static/reciepts
-    '''filename = 'Erectipt_'+str(new_id)+'.html'
+    filename = 'Erectipt_'+str(new_id)+'.html'
     full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
-    fout.close()'''
+    fout.close()
     return cart_status_details
 
