@@ -17,7 +17,7 @@ Begin Change Log *************************************************************
                                                                       
   Itr       Def/Req    Userid      Date        Description
   -----    --------   --------    --------    -------------------------------
-  Story#44  Task #46    Sarat    22/04/2014    Added Account Settings 
+  Sprint 4  Story #48  Sarat    13/05/2014    Added Recover Password
                                                functionality
 
 End Change Log ***************************************************************
@@ -30,17 +30,27 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as dj_login, logout as dj_logout
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from recaptcha.client import captcha
-
+from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
 from users.models import WebUser,kiosk_venues
 from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField
 from users.forms import WebUserCreationForm, WebUserChangeForm
 from users.forms import WebMobileChangeForm
 from users.forms import WebPasswordChangeForm, WebUserSettings
-from users.forms import WebEmailChangeForm
+from users.forms import WebEmailChangeForm, WebPasswordRecoveryForm
 from users.forms import ActivationForm
 from users.utils import helpers
+import hashlib
+from django.template.loader import get_template
+from django.template import Context
+from django.core.mail import send_mail
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from random import Random
 
 # Create your views here.
 @csrf_protect
@@ -328,5 +338,58 @@ def after_email_change(request):
 def notlogged(request):
 		return render(request, 'notlogged.html')
 
+@csrf_protect
+def RecoverPassword(request):	
+	recover_password = WebPasswordRecoveryForm(request.POST)
+	if request.method == 'POST':
+		recover_password = WebPasswordRecoveryForm(request.POST)
+		email = request.POST['email']
+		print "Email:",email
+		user = WebUser.objects.get(email=email)
+		recover_pwd = generate_passcode()
+		user.set_password(recover_pwd)
+		user.save()
+		if user is not None:
+			if user.is_active:
+				password = user.password
 
+				#print recover,"recover_pwd"
+				PasswordSendEmail(request,recover_pwd,email)
+				params = {'recover_password':recover_password}
+				params.update(csrf(request))
+				return render(request, 'email_send_password.html',params)
+			else:
+				return login_handler(request,'Account Inactive!\
+                                        Please activate your account')
+		else:
+			return HttpResponseRedirect("/user/invalid/")
+	else:
+		params = {'recover_password':recover_password}
+		return render(request, 'recover_password.html',params)
 
+def PasswordSendEmail(request,recover,email):
+	WebUserobj= WebUser.objects.get(email=email)
+	subject = 'PitStop Password Recovery'
+	html_content = render_to_string('Recoverpassword.html',{'full_name':WebUserobj.first_name,
+					'recover':recover
+					}) 
+	text_content = strip_tags(html_content)
+	msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()			
+
+def generate_passcode(passwordLength=12):
+    """
+    Generate 12 character default passcode. This can be used to generate passcode for
+    kiosk-server authentication
+    """
+    rng = Random()
+    righthand = '23456qwertasdfgzxcvbQWERTASDFGZXCVB'
+    lefthand = '789yuiophjknmYUIPHJKLNM'
+    allchars = righthand + lefthand
+    password = ''
+
+    for i in range(passwordLength):
+        password += rng.choice(allchars)
+
+    return password	
