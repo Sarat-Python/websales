@@ -17,8 +17,8 @@ Begin Change Log **************************************************************
                                                                       
   Itr          Def/Req    Userid      Date       Description
   -----       --------    -------    --------   -------------------------------
-  Story #44    Task #46   Sarat      22/04/2014   Added Account Settings 
-                                                  functionality.
+  Sprint 4    Story #48   Sarat      13/05/2014   Added form fields for Recover 
+                                                  Password functionality.
  End Change Log ***************************************************************
 '''
 
@@ -196,22 +196,29 @@ class WebMobileChangeForm(forms.Form):
 
 class WebEmailChangeForm(forms.Form):
     eml = forms.EmailField(required = True)
-    #eml1 = forms.EmailField(required = True)	
-    #password = forms.CharField(widget=forms.PasswordInput(render_value=False))		
+    
     class Meta:
         model = WebUser
         fields = ('email',)
 
 	def __init__(self, *args, **kwargs):            
 		    super(WebEmailChangeForm, self).__init__(*args, **kwargs)
-		   # self.fields['eml'].widget.attrs['class'] = 'styled validate[required,custom[email]]'
 		    self.fields['eml'].widget.attrs = {'class':'styled form-control validate[required,custom[email]]'}	
-		    #self.fields['eml1'].widget.attrs = {'class':'styled form-control validate[required,custom[email]]'}		
 		    
 
     def clean_mobile(self, ):
         return self.initial['eml']
 	#return self.initial['eml']
 	#return self.initial['password']	
-  
-        
+
+class WebPasswordRecoveryForm(forms.Form):
+    email = forms.EmailField(required = True)
+    
+    class Meta:
+        model = WebUser
+        fields = ('email',)
+
+    def __init__(self, *args, **kwargs):            
+            super(WebPasswordRecoveryForm, self).__init__(*args, **kwargs)
+            #self.fields['email'].widget.attrs = {'class':'styled form-control validate[required,custom[email]]'}  
+           
