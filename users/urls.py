@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     url(r'^phone', 'users.views.edit_phone'),
     url(r'^email', 'users.views.edit_email'),
     url(r'^afteremail', 'users.views.after_email_change'),
-    url(r'^notlogged/$', 'users.views.notlogged'),		
+    url(r'^notlogged/$', 'users.views.notlogged'),
+    url(r'^recover-password/$', 'users.views.RecoverPassword'),		
     #url(r'^change/details/$', 'users.views.change_details'),
 )
