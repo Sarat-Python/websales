@@ -5,7 +5,8 @@
 	<head><title>{{ title }}</title></head>
 	<body>
 {{error}}
-		<div style="margin:auto;width:980px;color:red;"><h3>Invaild Login!!<h3></div>
+		<div style="margin:auto;width:980px;color:red;">
+		<h3>{% if invalid%}{{invalid}} {% else %} Invaild Login!! {%endif%}<h3></div>
 	</body>
 </html>
 {% endblock %}
