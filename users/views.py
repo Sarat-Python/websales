@@ -300,7 +300,6 @@ def edit_email(request):
 				#password = email_form.cleaned_data['password']
 				new_email = WebUser.objects.\
 				get(id=request.session['user_id'])
-				print "New Email",new_email
 				validate_email = get_or_none(WebUser, email=eml)
 				
 				if new_email.email == eml:
@@ -344,16 +343,16 @@ def RecoverPassword(request):
 	if request.method == 'POST':
 		recover_password = WebPasswordRecoveryForm(request.POST)
 		email = request.POST['email']
-		print "Email:",email
-		user = WebUser.objects.get(email=email)
+		#user = WebUser.objects.get(email=email)
+		user = get_or_none(WebUser, email=email)
 		recover_pwd = generate_passcode()
-		user.set_password(recover_pwd)
-		user.save()
+		if user is not None:
+			user.set_password(recover_pwd)
+			user.save()
+		
 		if user is not None:
 			if user.is_active:
 				password = user.password
-
-				#print recover,"recover_pwd"
 				PasswordSendEmail(request,recover_pwd,email)
 				params = {'recover_password':recover_password}
 				params.update(csrf(request))
@@ -362,7 +361,8 @@ def RecoverPassword(request):
 				return login_handler(request,'Account Inactive!\
                                         Please activate your account')
 		else:
-			return HttpResponseRedirect("/user/invalid/")
+			params = {'invalid':'Email doesnot Exists!'} 
+			return render(request, 'invalid.html',params)
 	else:
 		params = {'recover_password':recover_password}
 		return render(request, 'recover_password.html',params)
@@ -380,8 +380,7 @@ def PasswordSendEmail(request,recover,email):
 
 def generate_passcode(passwordLength=12):
     """
-    Generate 12 character default passcode. This can be used to generate passcode for
-    kiosk-server authentication
+    Generate 12 character default passcode.
     """
     rng = Random()
     righthand = '23456qwertasdfgzxcvbQWERTASDFGZXCVB'
