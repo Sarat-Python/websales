@@ -151,7 +151,7 @@ def process_cart(request,direct_checkout=''):
 	process_items = SwipedCard.objects.values('card_number','amount',
 			'card_type','gift_card_id',
 			'card_flavour').filter(cart_status__in=[1])
-	#print process_items.query()
+
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
 	response_dict = {}
 	txn_status = []
@@ -180,10 +180,7 @@ def process_cart(request,direct_checkout=''):
 				receipt_status =1,
 				websales_site_id=1)
 	head_ids.save()
-
 	obje = WebsalesTxnHeads.objects.latest('id')
-	#print obje.id,'is my last inserted id'
-
 	for item in process_items:
 		gift_card_details = GiftCards.objects.values('gst_applicable',
 							'gst_in_commission',
@@ -256,8 +253,7 @@ def process_cart(request,direct_checkout=''):
 					gst_in_commission = round((gift_cards['gst'] / 100.00) * revenue, 2)
 					profit_amount = revenue - gift_cards['gst_in_commission']
 
-                                print '-------------------revenue,gst_applicable,gst',revenue, gift_cards['gst_applicable'],gift_cards['gst'], 'naveen',gst_in_commission,'-------------------'
-                
+                                
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
 								activate_success=0, gift_card_txn_id = new_txn_id,
@@ -334,8 +330,9 @@ def process_cart(request,direct_checkout=''):
 					profit_amount = revenue
 				elif gift_cards['gst_applicable']==2:
 					gst_in_commission = round((gift_cards['gst'] / 100.00) * revenue, 2)
+
 					profit_amount = revenue - gift_cards['gst_in_commission']
-                                print '-------------------revenue,gst_applicable,gst',revenue, gift_cards['gst_applicable'],gift_cards['gst'], 'naveen',gst_in_commission,'-------------------'
+
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
 								activate_success=0,gift_card_txn_id = new_txn_id,
@@ -367,11 +364,11 @@ def process_cart(request,direct_checkout=''):
 
 	txn_date = obje.txn_date.strftime("%B %d,%Y %H:%M:%S")	
 	cart_status_details = Ereciept(request,txn_id,response_dict,txn_date)
-
 	return render(request,'process.html', {'response_details':response_dict,
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
 
 def Ereciept(request,new_id,response_dict, txn_date):
+    limit = response_dict.keys()
     current_user = request.user
     email = current_user.email
     time_stamp = datetime.now().strftime("%B %d,%Y")
@@ -385,13 +382,12 @@ def Ereciept(request,new_id,response_dict, txn_date):
     WebUserobj.first_name
     cart_status_details = SwipedCard.objects.filter(cart_status=2)
     
-
     mail_totals = SwipedCard.objects.values('id','amount',
                         'gst','service_charge'
                         ).filter(batch_id=request.session['batchid'],cart_status=2
                     ).annotate(Sum('amount')).annotate(
                     Sum('gst')).annotate(
-                    Sum('service_charge'))
+                    Sum('service_charge')).order_by('-id')[:len(limit)]
 
     total_amt = 0
     gst_amt = 0
@@ -410,7 +406,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
     except ObjectDoesNotExist:
 	  new_id = 1	
     subject = 'PitStop e - Reciept for Products Purchased'
-    
+    print '---------------', response_dict, '---------------'
     html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
 						'time_stamp':time_stamp,
 						'hours':hours, 
@@ -429,9 +425,9 @@ def Ereciept(request,new_id,response_dict, txn_date):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
     dirname = 'reciepts'
-    #os.mkdir(os.path.join(' /home/pitstop/websales/assets/static/', dirname))
+    #os.mkdir(os.path.join('/home/pitstop/websales/assets/static/', dirname))
     filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
+    full_filename = os.path.join('/home/user/websales_may/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
     fout.close()
