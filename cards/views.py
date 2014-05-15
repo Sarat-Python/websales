@@ -243,6 +243,11 @@ def bulk(request, cart='', from_cart=''):
                 print request.session['small_image_file']	 
                 if check_card_flavor != -1 and is_new != False and is_different == False:
                      if verify_card_number(ctype, cleaned_card):
+	 		  if ctype != "BLKHWK":
+                              gst = 0
+                          else:
+                              gst = gst
+
 			  batch1 = SwipedCard(card_number = cleaned_card,
                           card_type = ctype,
                           card_flavour = gift_card_name,
@@ -558,7 +563,8 @@ def add_cart(request):
                                                             'service_charge']
 
             if cart['card_type'] == 'WLWRTH':
-                gst_total = cart['card_flavour__count'] * details['gst']
+                #gst_total = cart['card_flavour__count'] * details['gst']
+		gst_total = 0
                 service_charge_total = cart['card_flavour__count'] * details[
                                                             'service_charge']
                         
@@ -686,7 +692,8 @@ def goto_cart(request):
                                                             'service_charge']
 
             if cart['card_type'] == 'WLWRTH':
-                gst_total = cart['card_flavour__count'] * details['gst']
+                #gst_total = cart['card_flavour__count'] * details['gst']
+                gst_total = 0
                 service_charge_total = cart['card_flavour__count'] * details[
                                                             'service_charge']
                         
