@@ -300,6 +300,16 @@ $('#formSubmit').submit(function(ev) {
 $( "#dialog" ).dialog({
 			autoOpen: false,
 			width: 600,	
+			buttons: [
+			{
+					text: "Cancel",
+					click: function() {
+						$( this ).dialog( "close" );
+						$(".container").removeClass('blur-filter');
+						$(".row").removeClass('blur-filter');
+					}
+				}
+				]
 		});	
 	
 
