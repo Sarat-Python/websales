@@ -255,6 +255,8 @@ def process_cart(request,direct_checkout=''):
 				elif gift_cards['gst_applicable']==2:
 					gst_in_commission = round((gift_cards['gst'] / 100.00) * revenue, 2)
 					profit_amount = revenue - gift_cards['gst_in_commission']
+
+                                print '-------------------revenue,gst_applicable,gst',revenue, gift_cards['gst_applicable'],gift_cards['gst'], 'naveen',gst_in_commission,'-------------------'
                 
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
@@ -333,7 +335,7 @@ def process_cart(request,direct_checkout=''):
 				elif gift_cards['gst_applicable']==2:
 					gst_in_commission = round((gift_cards['gst'] / 100.00) * revenue, 2)
 					profit_amount = revenue - gift_cards['gst_in_commission']
-                
+                                print '-------------------revenue,gst_applicable,gst',revenue, gift_cards['gst_applicable'],gift_cards['gst'], 'naveen',gst_in_commission,'-------------------'
 				webtxndetails = WebsalesTxnDetails(txn_head_id=obje.id,
 								gift_card_id=item['gift_card_id'],
 								activate_success=0,gift_card_txn_id = new_txn_id,
@@ -363,12 +365,13 @@ def process_cart(request,direct_checkout=''):
 		
 		request.session['cartcount'] = ''
 
-	cart_status_details = Ereciept(request,txn_id,response_dict)
+	txn_date = obje.txn_date.strftime("%B %d,%Y %H:%M:%S")	
+	cart_status_details = Ereciept(request,txn_id,response_dict,txn_date)
 
 	return render(request,'process.html', {'response_details':response_dict,
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
 
-def Ereciept(request,new_id,response_dict):
+def Ereciept(request,new_id,response_dict, txn_date):
     current_user = request.user
     email = current_user.email
     time_stamp = datetime.now().strftime("%B %d,%Y")
@@ -382,6 +385,25 @@ def Ereciept(request,new_id,response_dict):
     WebUserobj.first_name
     cart_status_details = SwipedCard.objects.filter(cart_status=2)
     
+
+    mail_totals = SwipedCard.objects.values('id','amount',
+                        'gst','service_charge'
+                        ).filter(batch_id=request.session['batchid'],cart_status=2
+                    ).annotate(Sum('amount')).annotate(
+                    Sum('gst')).annotate(
+                    Sum('service_charge'))
+
+    total_amt = 0
+    gst_amt = 0
+    service_amt = 0
+    main_amt = 0
+    for m_t in mail_totals:
+        total_amt = total_amt + m_t['amount__sum']
+        gst_amt = gst_amt + m_t['gst__sum']
+        service_amt = service_amt + m_t['service_charge__sum']
+
+    main_amt = total_amt + gst_amt + service_amt
+
     try:
 	latest_id = WebsalesTxnHeads.objects.latest('id')
 	new_id = latest_id.id 
@@ -393,25 +415,24 @@ def Ereciept(request,new_id,response_dict):
 						'time_stamp':time_stamp,
 						'hours':hours, 
 						'seconds':seconds,
-						'trimmed':trimmed,	
+						'trimmed':txn_date,	
 						'response_dict':response_dict,
 						'new_id':new_id,
 						'cart_status_details':cart_status_details,
-						'total_amount':request.session['total_amount'],
-						'service_charge_total':request.session['service_charge_total'],
-						'gst_total':request.session['gst_total'],
-						'main_total':request.session['main_total']
+						'total_amount':total_amt,
+						'service_charge_total':service_amt,
+						'gst_total':gst_amt,
+						'main_total':main_amt
 						}) 
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
     dirname = 'reciepts'
-    #os.mkdir(os.path.join('/home/user/websales/assets/static', dirname))/home/pitstop/websales/assets/static/reciepts
+    #os.mkdir(os.path.join(' /home/pitstop/websales/assets/static/', dirname))
     filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
+    full_filename = os.path.join(' /home/pitstop/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
     fout.close()
     return cart_status_details
-
