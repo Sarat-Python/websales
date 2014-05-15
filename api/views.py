@@ -431,7 +431,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
     dirname = 'reciepts'
     #os.mkdir(os.path.join(' /home/pitstop/websales/assets/static/', dirname))
     filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join(' /home/pitstop/websales/assets/static/', dirname, filename)
+    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
     fout.close()
