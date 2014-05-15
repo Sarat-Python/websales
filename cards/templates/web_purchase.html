@@ -27,6 +27,13 @@ charset="utf-8" />
 	.fakewindowcontain .ui-widget-overlay {
 		position: absolute;
 	}
+	.blur-filter {
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+}
 	</style>
 
 <script>
@@ -75,7 +82,8 @@ function movetoNext(current, nextFieldID) {
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flags.css" />
 <link href="{{ STATIC_URL }}css/ui-lightness/jquery-ui-1.10.4.css" rel="stylesheet">
 <script src="{{ STATIC_URL }}js/popupbox/jquery-ui-1.10.4.js"></script>
-   <div class="container contains">
+<body>
+   <div style="width:1170px;margin:auto;">
         <div class="row">
             <div class="col-lg-6"><br>
                 <h3>
@@ -88,6 +96,7 @@ function movetoNext(current, nextFieldID) {
 	{% endif %}
 		
 	<form class="form-inline" action="" id="formSubmit" method="POST">{% csrf_token %}
+<div class="container contains">	
 	<div class="row">
 		<div class="col-lg-4"
 			{% if request.session.link_from == 'update' or request.session.link_from == 'delete' %}
@@ -193,6 +202,7 @@ function movetoNext(current, nextFieldID) {
 		{% endif %}
 		</div>
 </div>
+</body>
 	<script>
 	function validateControls()
 	{
@@ -228,6 +238,8 @@ $(document).ready(function(e) {
 		// Link to open the dialog
 		{% if wish_gift_card_id == 'giftcard' %}
 			$( "#dialog" ).dialog( "open" );
+			$(".container").addClass('blur-filter');
+			$(".row").addClass('blur-filter');
 		{% endif %}
 	{% if wish_card_number %}
 	 $('#card_number').val("{{ wish_card_number }}"); 
@@ -247,7 +259,7 @@ card_number = document.getElementById('card_number').value;
 //var n = card_number.length;
 var subs = card_number.substring(0,2);
 
-if(subs == "%B" || subs== "07")
+if(subs == "%B" || subs== "07" || subs == "%G")
 	{
 		$("#amount_start").addStyle("positive");
 	}
@@ -288,9 +300,7 @@ $('#formSubmit').submit(function(ev) {
 $( "#dialog" ).dialog({
 			autoOpen: false,
 			width: 600,	
-			
-		});
-		
+		});	
 	
 
 
