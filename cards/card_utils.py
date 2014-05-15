@@ -46,20 +46,27 @@ def woolworth_card_number(swipe_data):
   return card_number;
 
 def blackhawk_card_number(swipe_data):
+    print "cnumber In:",swipe_data
     number_extract = swipe_data[2:swipe_data.find(' ')]
     separator_index = number_extract.find('^')
     first_block = number_extract[separator_index+1:]
     second_block = number_extract[:separator_index]
     formed_length = len(first_block) + len(second_block)
+    form_length = str(first_block) + str(second_block)	
     
     if formed_length < 30:
-        to_fill = formed_length - 30
+	to_fill = formed_length - 30
         zeroes =''
         for i in range(0, to_fill):
             zeroes += '0'
         if len(second_block) < 0:
             zeroes = '-'+ zeroes
         second_block = zeroes + second_block
+    else:
+	 no_spcl = str(form_length).replace('$','0')
+	 no_carrot = str(no_spcl).replace('^','0')
+ 	 formed_length = no_carrot[:28]
+	 return formed_length
         
     return first_block + second_block
 
@@ -77,16 +84,15 @@ def get_woolworth_upc_code(cnumber):
 
 def extract_card_number(card_number, card_type):
     if card_number != None and card_type != None:
-        if card_type in CARD_TYPES[0]:
-            return woolworth_card_number(card_number)
-        if card_type in CARD_TYPES[1]:
-            return blackhawk_card_number(card_number)  
+	if card_type == 'WLWRTH':
+            return woolworth_card_number(card_number)	
+        if card_type == 'BLKHWK':
+	    return blackhawk_card_number(card_number)  
     else:
         return card_number
 
 def extract_cnumber(cnumber):
     check = len(cnumber)
-    
     if check == 19:
         upc_code = cnumber[:9]
         return upc_code
@@ -96,10 +102,10 @@ def extract_cnumber(cnumber):
     clean= cnumber[:2]
     spcl = cnumber.find("=")
     if spcl != -1:
-       if (clean == "%B"):
-           cleaned =  blackhawk_card_number(cnumber)
-           upc_code = get_blackhawk_upc_code(cleaned)  	
-           return upc_code
+       if (clean == "%B" or clean == "%G"):
+	   cleaned =  blackhawk_card_number_manual(cnumber)
+           upc_code = get_blackhawk_upc_code(cleaned)
+	   return upc_code
            
        else:
            cleaned =  woolworth_cnumber(cnumber)
@@ -116,20 +122,20 @@ def extract_cnumber(cnumber):
            
 def woolworth_cnumber(cnumber):
   number = cnumber[1:cnumber.find('=')]
-  print "Here"	
   print 'processed %s' % number 
   return number
 
 def woolworth_cnumber_manual(cnumber):
   return cnumber;
 
-def blackhawk_card_number(cnumber):
+def blackhawk_card_number_manual(cnumber):
+    print "cnumber In:",cnumber	
     number_extract = cnumber[2:cnumber.find(' ')]
     separator_index = number_extract.find('^')
     first_block = number_extract[separator_index+1:]
     second_block = number_extract[:separator_index]
     formed_length = len(first_block) + len(second_block)
-    
+    form_length = str(first_block) + str(second_block)
     if formed_length < 30:
         to_fill = formed_length - 30
         zeroes =''
@@ -138,6 +144,12 @@ def blackhawk_card_number(cnumber):
         if len(second_block) < 0:
             zeroes = '-'+ zeroes
         second_block = zeroes + second_block
+    else:
+        no_spcl = str(form_length).replace('$','0')
+	no_carrot = str(no_spcl).replace('^','0')
+ 	formed_length = no_carrot[:28]
+	return formed_length
+
         
     return first_block + second_block
 
