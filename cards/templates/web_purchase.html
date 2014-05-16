@@ -126,7 +126,7 @@ function movetoNext(current, nextFieldID) {
 		    {% if card_count > 1 %}
 				
 				<input type="hidden" name="wish_gift_card_id" id="wish_gift_card_id" value="">
-				 <div id="dialog" title="Please select a Gift Card from the below">
+				 <div id="dialog" title="Please select a Gift Card from the image below.">
 					{% for code in upc_code_query %} 
 				   <div class=" navbar-brand" id ="wish_{{ code.id }}"><img src="{{ STATIC_URL }}images/gift_cards/Woolworths/	{{code.small_image_file}}" alt="{{ code.id }} " onclick="getGiftCardId('{{ code.id }}','{{code.small_image_file}}');" /></div>
 				{% endfor %}
