@@ -338,6 +338,7 @@ def bulk(request, cart='', from_cart=''):
             response_dict.update({'batch_total':batch.total_cost})
         
         table = tables.SwipedCardTable(new_cards)
+        cards_count = new_cards.count()
         RequestConfig(request,paginate={"per_page": 100}).configure(table)    
         response_dict.update({'table':table,
                               'msgs':msgs,
@@ -351,7 +352,7 @@ def bulk(request, cart='', from_cart=''):
     request.session['main_total'] = main_total
     request.session['gst_total'] = gst_total
     request.session['service_charge_total'] = service_total
-    request.session['card_items_count'] = SwipedCard.objects.count()
+    request.session['card_items_count'] = ''
     return render(request,'web_purchase.html', response_dict)
 
 
@@ -415,7 +416,7 @@ def load_flavours(request, card_type=''):
 def update(request,ctype=''):
     for_cart = request.POST.get('for_cart')
     action = request.POST.get('action')
-    
+    swiped_count = request.POST.get('swiped_count')
     if request.method == 'POST':
            form_set  = SwipedCardForm(request.POST or None)
            action = request.POST.get('action')
@@ -442,9 +443,9 @@ def update(request,ctype=''):
                           update = SwipedCard.objects.get(id=valid)
                           update.amount = amount
                           update.save()
-                          request.session['card_items_count'] = SwipedCard.objects.count()
-                      	  if request.session['amt'] != 0:
-                              request.session['amtdel'] = request.session['amt']
+                          #request.session['card_items_count'] = SwipedCard.objects.count()
+                      	  #if request.session['amt'] != 0:
+                          #    request.session['amtdel'] = request.session['amt']
                           gift_card_ids = SwipedCard.objects.values(
                                                    'gift_card_id').filter(
                                                     id=valid)
@@ -478,13 +479,29 @@ def update(request,ctype=''):
 	
                       del_cards = SwipedCard.objects.filter(id__in=selected)
                       del_cards.delete()
-                      request.session['card_items_count'] = SwipedCard.objects.count()
-                      if request.session['amt'] != 0:
-                          request.session['amtdel'] = request.session['amt']
+
+                      if swiped_count == '0':
+                      	  request.session['card_selected'] = ''
+                          request.session['small_image_file'] = ''
+                          request.session['amt'] = ''
+                          request.session['amt_new'] = request.session['amt']
+                      else:
+                          if request.session['amt'] != 0:
+                      	      request.session['amt_new'] = request.session['amt']
+
+
+                      #request.session['card_items_count'] = swiped_count
+                      #if request.session['amt'] != 0:
+                      #    request.session['amtdel'] = request.session['amt']
                       gift_card_id = str(gift_card_id)
 
+                      if swiped_count == '0':
+                          redirect_url = '/cards/bulk/purchase/'
+                      else:
+                      	  redirect_url = '/cards/bulk/'+request.session['card_selected']+'/'+gift_card_id+'/'
+
                       request.session['link_from'] = 'delete'
-               return HttpResponseRedirect('/cards/bulk/'+request.session['card_selected']+'/'+gift_card_id+'/')
+               return HttpResponseRedirect(redirect_url)
 
             
     form_set = UpdateFormSet(queryset = SwipedCard.objects.filter(
