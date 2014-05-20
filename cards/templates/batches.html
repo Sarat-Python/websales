@@ -95,6 +95,13 @@
 		{% else %}<li></li>
 		{% endif %}
 	<li>
+		{% if table.page %}
+			{% with table.page.paginator.count as total %}
+				<input type="hidden" id="swiped_count" value="{{ total }}" name="swiped_count" >	
+			{% endwith %}
+		{% else %}
+			<input type="hidden" value="0" id="swiped_count"  name="swiped_count" >		
+		{% endif %}	
 		<button type="submit" class="btn btn-primary" name="action" value="delete" onclick="return CheckSelection();">Delete</button>    
 	</li>
 		{% endif %}
@@ -104,7 +111,7 @@
 		{% endwith %}
 
 	</ul>
-
+		
 </form>
 </div>
 <div class="totalsdiv">
