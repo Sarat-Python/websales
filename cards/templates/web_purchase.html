@@ -112,17 +112,13 @@ function movetoNext(current, nextFieldID) {
 	       </div>
 		<div class="col-lg-2"><b>Card Type</b><br>	
 		 <input type="hidden" name="card_type" value="{{ request.session.card_selected }}" >
-		 {% if request.session.card_items_count > 0 %}
-			  {% if request.session.card_selected == 'WLWRTH'%}	
-			   <lable>Woolworths</label>
-			    {% elif request.session.card_selected == 'BLKHWK' %}	
-			   <lable>BlackHawk</label>
-			  {% else %}	
-			 <lable></label>		
-			 {% endif %}
-		{% else %}	
-			 <lable></label>	
-		{% endif %}	 
+		  {% if request.session.card_selected == 'WLWRTH'%}	
+		   <lable>Woolworths</label>
+		    {% elif request.session.card_selected == 'BLKHWK' %}	
+		   <lable>BlackHawk</label>
+		  {% else %}	
+		 <lable></label>		
+		 {% endif %}
 		</div>
 	<div class="col-lg-2">
 		<b>Card Flavour</b><br>
@@ -130,7 +126,7 @@ function movetoNext(current, nextFieldID) {
 		    {% if card_count > 1 %}
 				
 				<input type="hidden" name="wish_gift_card_id" id="wish_gift_card_id" value="">
-				 <div id="dialog" title="Please select a Gift Card from the image below.">
+				 <div id="dialog" title="Please select a Gift Card from the below">
 					{% for code in upc_code_query %} 
 				   <div class=" navbar-brand" id ="wish_{{ code.id }}"><img src="{{ STATIC_URL }}images/gift_cards/Woolworths/	{{code.small_image_file}}" alt="{{ code.id }} " onclick="getGiftCardId('{{ code.id }}','{{code.small_image_file}}');" /></div>
 				{% endfor %}
@@ -142,65 +138,45 @@ function movetoNext(current, nextFieldID) {
 				{% if card_details %}
 						{% for details in card_details %} 
 							{% if request.session.card_selected == 'WLWRTH'%}
-							   {% if request.session.card_items_count > 0 %}
 								<img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />
-								
 								 <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 								  <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">	
-								  {% endif %}
-							{% elif request.session.card_selected == 'BLKHWK' %}
-							   	{% if request.session.card_items_count > 0 %}
+							{% elif request.session.card_selected == 'BLKHWK' %}	
 								 <img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
 								  <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 								 <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-								 {% endif %}
 							{% else %}
-								 <img src="{{ STATIC_URL }}images/noImage.png" alt="noImage" class="navbar-brand" style="width:120px;"/>
+								 <img src="#" alt="noImage" class="navbar-brand" style="width:120px;"/>
 								  <input type="hidden" name="gift_card_id" value="">
 								 <input type="hidden" name="flavour_image" value="">
 							{% endif %}
 								</div>
 								<div class="col-lg-2" style="width:125px;">{{ form.amount.label_tag }}<br>
-							{% if request.session.card_items_count > 0 %}	
-								{% if details.card_type == 'WLWRTH'%}
-
-									<input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" 
-									value="{{request.session.amt}}" size=5 maxlength="5" onsubmit="AmountValidation();">
-								{% else %}
-									<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5>
-								{% endif %}
+							{% if details.card_type == 'WLWRTH'%}
+								<input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" value="{{request.session.amt}}" size=5 maxlength="5" onsubmit="AmountValidation();">
 							{% else %}
-									<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="" size=5>
-							{% endif %}	
+								<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5>
+							{% endif %}
 						{% endfor %}
 					{% else %}
 
-						{% if request.session.card_items_count > 0 %}	
-							{% if request.session.card_selected == 'WLWRTH'%}	
-								
-									<img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />
-									
-									<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-								 	<input type="hidden" name="gift_card_id" value={{gift_card_id}}>
-								
-							{% elif request.session.card_selected == 'BLKHWK' %}
-									<img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}"  class="navbar-brand" />
-								 	<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
-								 	<input type="hidden" name="gift_card_id" value={{gift_card_id}}>
-								
-							{% else %}	
-								<img src="{{ STATIC_URL }}images/noImage.png" alt="noImage" class="navbar-brand" style="width:80px;height:1px;" />	
-							{% endif %}
-						{% endif %}	
+						{% if request.session.card_selected == 'WLWRTH'%}	
+							<img src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand"/>
+							<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+							 <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
+						{% elif request.session.card_selected == 'BLKHWK' %}	
+							<img src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}"  class="navbar-brand" />
+							<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
+							 <input type="hidden" name="gift_card_id" value={{gift_card_id}}>
 
-						<div class="col-lg-2 " style="margin-top:-20px;text-indent:20px;width:25px;float:right">{{ form.amount.label_tag }}
+						{% else %}	
+							<img src="#" alt="noImage" class="navbar-brand" style="width:80px;height:1px;" />	
+						{% endif %}
+
+						<div class="col-lg-2 " style="margin-top:-20px;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
 						<br>
-						{% if request.session.card_items_count > 0 %}	
-							<input type="text" id="amount_start" class="positive " name="amount" maxlength="5"
-							{% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amtdel}}"  style="margin-left:40px;">
-						{% else %}
-									<input type="text" id="amount_start" class="" name="amount" style="margin-left:40px;" value="" size=5>
-							{% endif %}	
+						<input type="text" id="amount_start" class="positive " name="amount" maxlength="50"
+						{% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amt_new}}"   style="margin-left:40px;">
 						</div>
 				  {% endif %}
 		    {% endif %}
@@ -274,7 +250,7 @@ $(document).ready(function(e) {
 function getGiftCardId(gift_id){
  	$("#wish_gift_card_id").val(gift_id)
 	$( "#dialog" ).dialog( "close" );
-	 $('#wish_card').attr('src','{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}');
+	$('#wish_card').attr('src','{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}');
 	$( "#formSubmit" ).submit();
 }
 
@@ -304,14 +280,34 @@ if (amounts <= 0){
 
    function CheckSelection()
         {
-	    var n = $( "input:checked" ).length;
+
+        var total = 0;
+        var n = 0;
+        var full_check = 0;
+        {% if table.page %}
+			{% with table.page.paginator.count as total %}
+				total = {{ total }}
+			{% endwith %}
+		{% else %}
+				total = 0;
+		{% endif %}
+
+	    n = $( "input:checked" ).length;
+		
+		full_check = total - n;
+
+		if (full_check < 0 ){
+			full_check = 0;
+		}
+		$('#swiped_count').val(full_check); 
+
             if(n===0){
 		alert('Please select the card(s)');
                 return false;
 	    }else{
 		return true;
-            }   
-         }
+            }  
+  }
 
 
 
