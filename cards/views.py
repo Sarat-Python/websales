@@ -351,7 +351,7 @@ def bulk(request, cart='', from_cart=''):
     request.session['main_total'] = main_total
     request.session['gst_total'] = gst_total
     request.session['service_charge_total'] = service_total
-    request.session['card_items_count'] = SwipedCard.objects.count()
+    request.session['card_items_count'] = 0
     return render(request,'web_purchase.html', response_dict)
 
 
@@ -442,6 +442,9 @@ def update(request,ctype=''):
                           update = SwipedCard.objects.get(id=valid)
                           update.amount = amount
                           update.save()
+                          request.session['card_items_count'] = SwipedCard.objects.count()
+                      	  if request.session['amt'] != 0:
+                              request.session['amtdel'] = request.session['amt']
                           gift_card_ids = SwipedCard.objects.values(
                                                    'gift_card_id').filter(
                                                     id=valid)
