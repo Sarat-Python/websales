@@ -125,13 +125,15 @@ def bulk(request, cart='', from_cart=''):
             request.session['amt'] = ''
 
         if from_cart:
-
             c_flavour = gift_cards.objects.filter(id=from_cart)
             for card_flavour_name in c_flavour:         
                 request.session['selectd_flv_name'] = card_flavour_name.name
                 request.session['from_cart'] = from_cart
                 if card_flavour_name.card_type == 'WLWRTH':
-                    request.session['amt'] 	= request.session['amt_new']
+                    woolworth_amount = SwipedCard.objects.values('amount').filter(batch_id=batch.id,gift_card_id=from_cart)
+                    for w_amt in woolworth_amount:
+                        request.session['amt'] 	= w_amt['amount']
+                    #request.session['amt_new'] = ''
                 else:
                     request.session['amt'] = card_flavour_name.amount
                 request.session['link_from'] = 'shopcart'
@@ -362,6 +364,8 @@ def bulk(request, cart='', from_cart=''):
     request.session['card_items_count'] = ''
     #print request.session['amt_new'],'@@@@@@@@@@@',request.session['amt']
     #request.session['amt_new'] = ''
+    if from_cart == '':
+        request.session['amt_new'] = ''
     return render(request,'web_purchase.html', response_dict)
 
 
