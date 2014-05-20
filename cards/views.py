@@ -100,6 +100,7 @@ def bulk(request, cart='', from_cart=''):
         batch = Batch.objects.get(batch_number = batch_number)
         request.session['batchid'] = batch.id
         #request.session['link_from'] = ''
+
         wish_gift_card_id = ''
         upc_code_query = ''
         wish_card_number = ''
@@ -116,7 +117,8 @@ def bulk(request, cart='', from_cart=''):
                 flavours_data.append(flavours)
             request.session['card_flv'] = flavours_data
             request.session['card_selected'] = cart
-            
+            #request.session['amt_new'] = 
+          
         else:
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
@@ -128,7 +130,10 @@ def bulk(request, cart='', from_cart=''):
             for card_flavour_name in c_flavour:         
                 request.session['selectd_flv_name'] = card_flavour_name.name
                 request.session['from_cart'] = from_cart
-                request.session['amt'] = card_flavour_name.amount
+                if card_flavour_name.card_type == 'WLWRTH':
+                    request.session['amt'] 	= request.session['amt_new']
+                else:
+                    request.session['amt'] = card_flavour_name.amount
                 request.session['link_from'] = 'shopcart'
                 request.session['small_image_file'] = card_flavour_name.small_image_file	
                 gift_card_id = from_cart 	
@@ -136,7 +141,8 @@ def bulk(request, cart='', from_cart=''):
         if request.method == 'POST':
             cnumber = request.POST.get('card_number')
             gid = request.POST.get('gift_card_id')
-	    post_amt = request.POST.get('amount') 	
+            post_amt = request.POST.get('amount')
+            request.session['amt_new'] = post_amt 	
             request.session['link_from'] = 'addcard'
 
             if gid == None: 
@@ -285,6 +291,7 @@ def bulk(request, cart='', from_cart=''):
         if cart:
             if from_cart:
                gift_card_id = from_cart
+               request.session['amt_new'] = request.session['amt']
             
             charge_list = SwipedCard.objects.values('id','cart_status').filter(
                         batch_id=batch.id).filter(
@@ -353,6 +360,8 @@ def bulk(request, cart='', from_cart=''):
     request.session['gst_total'] = gst_total
     request.session['service_charge_total'] = service_total
     request.session['card_items_count'] = ''
+    #print request.session['amt_new'],'@@@@@@@@@@@',request.session['amt']
+    #request.session['amt_new'] = ''
     return render(request,'web_purchase.html', response_dict)
 
 
@@ -487,6 +496,7 @@ def update(request,ctype=''):
                           request.session['amt_new'] = request.session['amt']
                       else:
                           if request.session['amt'] != 0:
+                              print request.session['amt'],'jere'
                       	      request.session['amt_new'] = request.session['amt']
 
 
