@@ -127,7 +127,7 @@ class SwipedCard(models.Model):
     amount = models.FloatField()
     activated = models.BooleanField(default=False)    
     batch = models.ForeignKey(Batch)
-    created_on = models.DateTimeField(default=timezone.now)
+    created_on = models.DateTimeField()
     deleted = models.BooleanField(default=False)
     gst = models.FloatField()
     service_charge = models.FloatField()
