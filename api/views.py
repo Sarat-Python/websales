@@ -60,7 +60,7 @@ from xml.dom.minidom import parseString
 from django.template.loader import get_template
 from django.template import Context
 from django.core.mail import send_mail
-
+from datetime import datetime
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -170,7 +170,7 @@ def process_cart(request,direct_checkout=''):
 
 	head_ids = WebsalesTxnHeads(txn_type="G",
 				payment_mode="S",payment_status='C',
-				txn_amount=total_amount,
+				txn_amount=total_amount,created_at=datetime.now(),
 				collected_amount=total_amount,
 				websales_txn_id = new_id,
 				payment_card_type='DEBIT', 
@@ -241,6 +241,7 @@ def process_cart(request,direct_checkout=''):
 				flag_activated.save()
 
 			for gift_cards in gift_card_details:
+				profit_amount = 0
 				revenue = round((item['amount'] * gift_cards['profit_percentage'] /100.0), 2)
 				#: ('0', 'GST Exclusive'), ('1', 'GST Free'), ('2', 'GST Inclusive')
 				if gift_cards['gst_applicable']==0:
@@ -320,6 +321,7 @@ def process_cart(request,direct_checkout=''):
 				flag_activated.save()
 
 			for gift_cards in gift_card_details:
+				profit_amount = 0                                
 				revenue = round((item['amount'] * gift_cards['profit_percentage'] /100.0), 2)
 				#: ('0', 'GST Exclusive'), ('1', 'GST Free'), ('2', 'GST Inclusive')
 				if gift_cards['gst_applicable']==0:
@@ -405,7 +407,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
 	new_id = latest_id.id 
     except ObjectDoesNotExist:
 	  new_id = 1	
-
+    subject = 'PitStop e - Reciept for Products Purchased'
     html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
 						'time_stamp':time_stamp,
 						'hours':hours, 
@@ -424,10 +426,10 @@ def Ereciept(request,new_id,response_dict, txn_date):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
     dirname = 'reciepts'
-    #os.mkdir(os.path.join('/home/pitstop/websales/assets/static/', dirname))
+    #os.mkdir(os.path.join('/home/user/hexagon/websales/assets/static/', dirname))
     filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
-    #full_filename = os.path.join('/home/user/websales_may/websales/assets/static/', dirname, filename)
+    full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
+    full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
     fout = open(full_filename, 'wb+')
     fout.write(html_content)
     fout.close()
