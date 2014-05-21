@@ -38,7 +38,7 @@ class WebsalesTxnHeads(models.Model):
     customer_id = models.IntegerField()
     payment_status = models.CharField(max_length=150)
     txn_date = models.DateTimeField(auto_now_add=True)
-    created_at = models.DateTimeField()
+    #created_at = models.DateTimeField(auto_now_add=True)
     receipt_status = models.IntegerField()
     payment_receipt = models.CharField(max_length=150)
     refund_status = models.IntegerField()
@@ -54,6 +54,10 @@ class WebsalesTxnHeads(models.Model):
     class Meta:
        db_table = 'websales_txn_heads'
 
+class websales_txn_heads(models.Model):
+    created_at = models.DateTimeField()
+    class Meta:
+       db_table = 'websales_txn_heads'
 
 class WebsalesTxnDetails(models.Model):
     id = models.IntegerField(primary_key=True)
