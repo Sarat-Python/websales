@@ -155,7 +155,7 @@ function movetoNext(current, nextFieldID) {
 							{% if details.card_type == 'WLWRTH'%}
 								<input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" value="{{request.session.amt}}" size=5 maxlength="5" onsubmit="AmountValidation();">
 							{% else %}
-								<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5>
+								<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5 maxlength="5">
 							{% endif %}
 						{% endfor %}
 					{% else %}
@@ -175,7 +175,7 @@ function movetoNext(current, nextFieldID) {
 
 						<div class="col-lg-2 " style="margin-top:-20px;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
 						<br>
-						<input type="text" id="amount_start" class="positive " name="amount" maxlength="50"
+						<input type="text" id="amount_start" class="positive " name="amount" maxlength="5"
 						{% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amt_new}}"   style="margin-left:40px;">
 						</div>
 				  {% endif %}
