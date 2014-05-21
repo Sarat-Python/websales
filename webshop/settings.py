@@ -17,10 +17,9 @@ Begin Change Log ***************************************************************
                                                                       
   Itr    Def/Req  Userid      Date       Description
   -----  -------- --------    --------   --------------------------------------
-  0.9    339      NaveeN  25/03/2014  Changed Static Folder Path
+  0.9    339      prashanth  19/01/2014  Added copyright Info
  End Change Log ****************************************************************
 '''
-
 
 # Django settings for webshop project.
 
@@ -39,12 +38,12 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'pit_stop_2',                      # Or path to database file if using sqlite3.
+        'NAME': 'webshop',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER':'root',
-        'PASSWORD':'toor',
-        'HOST':'',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT':'',                      # Set to empty string for default.
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',                      # Set to empty string for default.
     }
 }
 
@@ -56,7 +55,7 @@ ALLOWED_HOSTS = []
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'Australia/Sydney'
+#TIME_ZONE = 'Australia/Sydney'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -68,13 +67,12 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
 USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -89,7 +87,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/home/pitstop/websales/assets/static/css/'
+STATIC_ROOT = '/home/dev/venv/lab/webshop/assets/static/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -100,7 +98,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/pitstop/websales/assets/static',
+    '/home/dev/venv/lab/webshop/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -144,9 +142,8 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_ROOT,'templates'),
-    '/home/pitstop/websales/users/templates',
-    '/home/pitstop/websales/cards/templates',
-
+    '/home/dev/venv/lab/webshop/users/templates',
+    '/home/dev/venv/lab/webshop/cards/templates',
 )
 
 INSTALLED_APPS = (
@@ -165,7 +162,6 @@ INSTALLED_APPS = (
      'shopping',
      'south',
      'django_tables2',
-     'api',
 )
 
 AUTH_USER_MODEL = 'users.WebUser'
@@ -180,14 +176,8 @@ ACTIVATION_EXPIRY_DAYS = 7
 ACCOUNT_REMOVAL_DAYS = 30
 
 # for testing emails
-#EMAIL_HOST = 'localhost'
-#EMAIL_PORT = 1482
-
-EMAIL_HOST = 'smtp.gmail.com' 
-EMAIL_HOST_USER = 'sarat@hexagonglobal.in' 
-EMAIL_HOST_PASSWORD = 'HexagonGlobal3#' 
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1482
 
 # for sessions
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + (
