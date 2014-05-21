@@ -23,6 +23,8 @@ Begin Change Log **************************************************************
 
 
 from django.db import models
+import datetime
+from django.utils.timezone import utc
 
 class WebsalesTxnHeads(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -36,6 +38,7 @@ class WebsalesTxnHeads(models.Model):
     customer_id = models.IntegerField()
     payment_status = models.CharField(max_length=150)
     txn_date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     receipt_status = models.IntegerField()
     payment_receipt = models.CharField(max_length=150)
     refund_status = models.IntegerField()
