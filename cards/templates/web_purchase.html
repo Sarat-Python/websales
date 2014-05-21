@@ -7,7 +7,18 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/validationEngine.jquery.css" type="text/css" media="screen" title="no title"
 charset="utf-8" />
 <style>
-	
+	#dialogclosing{
+		float:right;
+		background-color:red;
+		padding: 0px 4px;
+
+	}
+	.ui-button {
+		border: 1px solid #D3D3D3;
+        color: #555555;
+        font-weight: normal;
+        background-color:red;
+    }
 	.demoHeaders {
 		margin-top: 2em;
 	}
@@ -316,10 +327,29 @@ $('#formSubmit').submit(function(ev) {
 	
 });
 
+$("#dialog").dialog({
+	autoOpen: false,
+        create: function (event, ui) {
+            //$('.ui-dialog-titlebar').css({'background':'none','border':'none'});
+            $(".ui-dialog-titlebar").html('&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Please select a Gift Card from Image the below. <a href="#" role="button"><span class="dialogclose" id="dialogclosing">X</span></a>');
+            $("#dialog-model").css({ 'font-family': 'Helvetica', 'padding': '0', 'font-size': '12px' });
+        },
+        width: 520,
+        //height: auto,       
+        modal: true,
+        resizable: true
+    });
+
+$('.dialogclose').click(function() { 
+    
+	$("#dialog").dialog("close"); 
+	$(".container").removeClass('blur-filter');
+	$(".row").removeClass('blur-filter');
+});
 
 $( "#dialog" ).dialog({
 			autoOpen: false,
-			width: 600,	
+			width: 520,	
 			buttons: [
 			{
 					text: "Cancel",
