@@ -39,7 +39,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from cards.forms import SwipedCardForm, UpdateSwipedCardForm, UpdateFormSet
 from cards.models import SwipedCard, Batch, shopcart,gift_cards,EnumField, GiftCards
-from api.models import web_txn_gift_cards, websales_sites
+from api.models import web_txn_gift_cards, websales_sites,websales_txn_heads
 from django_tables2 import RequestConfig
 from users.models import WebUser
 from django.db.models import Count,Sum
@@ -56,6 +56,9 @@ from wexapi import send_request_to_wex,activation_request
 import blackhawkapi
 from blackhawkapi import generate_xml_request
 from xml.dom.minidom import parseString
+
+from time import gmtime, strftime
+import time
 
 from django.template.loader import get_template
 from django.template import Context
@@ -113,7 +116,6 @@ error_codes = {
                 }
 
 
-
 class obj(object):
 	def __init__(self, d):
 		for a, b in d.items():
@@ -167,10 +169,11 @@ def process_cart(request,direct_checkout=''):
 		new_id = latest_id.id + 1
 	except ObjectDoesNotExist:
 		new_id = 1
-
+	
+	#created_at = created_at.strftime("YYYY-MM-DD HH:MM:SS")
 	head_ids = WebsalesTxnHeads(txn_type="G",
 				payment_mode="S",payment_status='C',
-				txn_amount=total_amount,created_at=datetime.now(),
+				txn_amount=total_amount,
 				collected_amount=total_amount,
 				websales_txn_id = new_id,
 				payment_card_type='DEBIT', 
@@ -363,9 +366,17 @@ def process_cart(request,direct_checkout=''):
 			ret_status = 2
 		
 		request.session['cartcount'] = ''
+	localtime   = time.localtime()
+	timeString  = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+	#txn_date = timeString
 
-	txn_date = obje.created_at.strftime("%B %d,%Y %H:%M:%S")	
-	cart_status_details = Ereciept(request,txn_id,response_dict,txn_date)
+	query = "select id, created_at from websales_txn_heads where id='"+str(obje.id)+"'";
+	created_date = websales_txn_heads.objects.raw(query)
+	timeString = ''
+	for c_date in created_date:
+		timeString = c_date.created_at
+
+	cart_status_details = Ereciept(request,txn_id,response_dict,timeString)
 	return render(request,'process.html', {'response_details':response_dict,
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
 
@@ -435,6 +446,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
     fout.write(html_content)
     fout.close()
     return cart_status_details
+
     '''
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
