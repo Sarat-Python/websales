@@ -362,7 +362,7 @@ def process_cart(request,direct_checkout=''):
 		
 		request.session['cartcount'] = ''
 
-	txn_date = obje.txn_date.strftime("%B %d,%Y %H:%M:%S")	
+	txn_date = obje.created_at.strftime("%B %d,%Y %H:%M:%S")	
 	cart_status_details = Ereciept(request,txn_id,response_dict,txn_date)
 	return render(request,'process.html', {'response_details':response_dict,
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
@@ -405,8 +405,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
 	new_id = latest_id.id 
     except ObjectDoesNotExist:
 	  new_id = 1	
-    subject = 'PitStop e - Reciept for Products Purchased'
-    print '---------------', response_dict, '---------------'
+
     html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
 						'time_stamp':time_stamp,
 						'hours':hours, 
