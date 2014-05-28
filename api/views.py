@@ -410,7 +410,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
         total_amt = total_amt + m_t['amount__sum']
         gst_amt = gst_amt + m_t['gst__sum']
         service_amt = service_amt + m_t['service_charge__sum']
-
+    gst_amt = 0
     main_amt = total_amt + gst_amt + service_amt
 
     try:
