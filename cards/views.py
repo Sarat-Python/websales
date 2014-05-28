@@ -288,7 +288,7 @@ def bulk(request, cart='', from_cart=''):
                           wish_gift_card_id = ''
                 else:
                         if wish_gift_card_id=='giftcard':  
-                            msgs = 'Selected Card Flavour does not match with the Card Swiped'
+                            msgs = ''
                         else:
                             msgs = 'Selected Card Flavour does '\
 				'not match with the Card Swiped'          
