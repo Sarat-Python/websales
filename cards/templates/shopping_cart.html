@@ -59,7 +59,7 @@
 			<table class="item-total">
 				<tr>
 					<td></td>
-					<td colspan="2" id="item-amnt">AUD {{ items.total_amount }}</td></tr><tr>
+					<td colspan="2" id="item-amnt">$ {{ items.total_amount|floatformat:2 }}</td></tr><tr>
 					<td><a class="deleteLink" href="#" onclick="javascript:removeCartItems({{ forloop.parentloop.counter }})"> Remove  </a>
 					|&nbsp;</td><td><a href="#" onclick="javascript:updateCartItems({{ forloop.parentloop.counter }})">  Update </a> </td>
 				</tr>
@@ -76,23 +76,23 @@
 		{% if main_total %}
 	<div id="totalamounts">
 			Total Card(s) amount <span style="margin-left:4px;">:</span> 
-			<span span style="margin-left:4px;">AUD</span>  
-			<span style="margin-left:20px;">{{ batch_total }}</span>
+			<span span style="margin-left:4px;">$</span>  
+			<span style="margin-left:20px;">{{ batch_total|floatformat:2 }}</span>
 		</div>
 		<div id="servicecharges">
-			Service Charge <span style="margin-left:47px;">:</span>
-			<span style="margin-left:4px;">AUD</span>
-			<span style="margin-left:29px;">{{ service_charge_total }}</span>
+			Service Charge <span style="margin-left:48px;">:</span>
+			<span style="margin-left:4px;">$</span>
+			<span style="margin-left:24px;">{{ service_charge_total|floatformat:2 }}</span>
 		 </div>
-		<div id="gsts">
+		<!--div id="gsts">
 			GST Amount <span style="margin-left:66px;">:</span>
-			<span style="margin-left:4px;">AUD</span>
-			<span style="margin-left:20px;">{{ gst_total }}</span>
-		</div>
+			<span style="margin-left:4px;">$</span>
+			<span style="margin-left:20px;">{{ gst_total|floatformat:2 }}</span>
+		</div-->
 		<hr>
-		<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span style="margin-left:40px;">:</span> AUD 			<span style="margin-left:10px;">{{ main_total }}</span> </div>
+		<div id="totalamount" style="font-size:20px;color:black;margin-left:8px;">Total Amount<span style="margin-left:40px;">:</span> $ 			<span style="margin-left:10px;">{{ main_total|floatformat:2 }}</span> </div>
 			<ul class="pagination">
-				<li><a href="#" class="btn btn-primary" onclick="continueShop();" style="margin-right:15px;">Continue Shopping</a></li>
+				<li><a href="#" class="btn btn-primary" onclick="continueShop();" style="margin-right:10px;">Continue Shopping</a></li>
 				<li class="p-checkout"><a href="#" class="btn btn-primary"  onclick="process_cart();">Proceed To Checkout</a>
 				</li>
 			</ul>
