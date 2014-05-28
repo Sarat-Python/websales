@@ -11,7 +11,6 @@ PIT_STOP_RECHARGE_BEGIN_TAG
 * deposited with the Australian Copyright Office. 
 *
 PIT_STOP_RECHARGE_END_TAG
-
 '''
 
 '''
@@ -61,7 +60,14 @@ from django.core.exceptions import ObjectDoesNotExist
 @login_required
 @csrf_exempt
 def bulk(request, cart='', from_cart=''):
-    
+    print cart,from_cart,'is my cart'
+    if request.method != 'POST':
+        if cart == '': 
+            print 'is my if'           
+            request.session['old_upc_code'] = ''
+
+        
+    #print cart, from_cart,request.session['old_upc_code'], 'cates'
     form = SwipedCardForm(request.POST or None)
     response_dict = {'form':form}
     batch_number = request.session.get('batch_number', False)
@@ -99,7 +105,6 @@ def bulk(request, cart='', from_cart=''):
 
         batch = Batch.objects.get(batch_number = batch_number)
         request.session['batchid'] = batch.id
-        #request.session['link_from'] = ''
 
         wish_gift_card_id = ''
         upc_code_query = ''
@@ -117,23 +122,22 @@ def bulk(request, cart='', from_cart=''):
                 flavours_data.append(flavours)
             request.session['card_flv'] = flavours_data
             request.session['card_selected'] = cart
-            #request.session['amt_new'] = 
           
         else:
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
             request.session['amt'] = ''
-
+        print from_cart,'from Cart'
         if from_cart:
             c_flavour = gift_cards.objects.filter(id=from_cart)
             for card_flavour_name in c_flavour:         
                 request.session['selectd_flv_name'] = card_flavour_name.name
                 request.session['from_cart'] = from_cart
+                request.session['old_upc_code'] = card_flavour_name.upc_code
                 if card_flavour_name.card_type == 'WLWRTH':
                     woolworth_amount = SwipedCard.objects.values('amount').filter(batch_id=batch.id,gift_card_id=from_cart)
                     for w_amt in woolworth_amount:
                         request.session['amt'] 	= w_amt['amount']
-                    #request.session['amt_new'] = ''
                 else:
                     request.session['amt'] = card_flavour_name.amount
                 request.session['link_from'] = 'shopcart'
@@ -156,7 +160,8 @@ def bulk(request, cart='', from_cart=''):
             upc_code_res = extract_cnumber(cnumber)
             card_details = gift_cards.objects.values('id','upc_code','card_type','name','amount','small_image_file').filter(upc_code=upc_code_res)
             card_count = ''
-	    card_count = card_details.count()	
+	    card_count = card_details.count()
+            wish_card_ids = []	
             for details in card_details:
                 ctype = details['card_type']
                 if request.session['card_selected']==ctype:
@@ -164,6 +169,7 @@ def bulk(request, cart='', from_cart=''):
                 request.session['card_selected'] = ctype
                 name = details['name']
                 request.session['selectd_flv_name'] = name
+                wish_card_ids.append(details['id'])
 		if ctype=="WLWRTH":
                     amt = post_amt
                 else:
@@ -220,7 +226,7 @@ def bulk(request, cart='', from_cart=''):
       	
                 
                 if card_count > 1 and upc_code == '628000309':
-                    print gift_card_id, 'gift_card_id'
+
                     gift_card_id = request.POST.get('wish_gift_card_id','0')
                     wish_card_number = request.POST.get('card_number')
                     if gift_card_id == '0':
@@ -230,7 +236,6 @@ def bulk(request, cart='', from_cart=''):
                     else:
                         is_different = False
                         
-                  
                     wish_gift_card_id = 'giftcard'
                 else:
                     wish_gift_card_id = ''
@@ -238,24 +243,29 @@ def bulk(request, cart='', from_cart=''):
                 if gift_card_id:
                     g_c = gift_cards.objects.values('id','name','small_image_file','upc_code').filter(id=gift_card_id) 
                     for w_g_c in g_c:
-                        #request.session['small_image_file'] = w_g_c['small_image_file']
                         gift_card_name = w_g_c['name']
-                        
                         if w_g_c['upc_code'] == 628000309:
                             request.session['small_image_file'] = ''
                         else:
                             request.session['small_image_file'] = w_g_c['small_image_file']
-                        
-                #print gift_card_name, 'details'
-                #print is_different,'is different'
-                print request.session['small_image_file']	 
+
+                old_upc_code = request.session.get('old_upc_code', '')
+                
+                if old_upc_code != '':
+                    if upc_code == old_upc_code:
+                        if is_different != True:
+                            is_different = False
+                    else:
+                        is_different = True
+                        wish_card_number = ''
+                        #wish_gift_card_id = ''
+	 
                 if check_card_flavor != -1 and is_new != False and is_different == False:
                      if verify_card_number(ctype, cleaned_card):
 	 		  if ctype != "BLKHWK":
                               gst = 0
                           else:
                               gst = gst
-
 			  batch1 = SwipedCard(card_number = cleaned_card,
                           card_type = ctype,
                           card_flavour = gift_card_name,
@@ -268,6 +278,7 @@ def bulk(request, cart='', from_cart=''):
                           batch1.save()
                           batch.total_cost=float(batch.total_cost)+float(amt)
                           batch.save()
+                          request.session['old_upc_code'] = upc_code
                           msgs = 'Success'
                           wish_card_number = ''
                           wish_gift_card_id = ''
@@ -277,7 +288,7 @@ def bulk(request, cart='', from_cart=''):
                           wish_gift_card_id = ''
                 else:
                         if wish_gift_card_id=='giftcard':  
-                            msgs = ''
+                            msgs = 'Selected Card Flavour does not match with the Card Swiped'
                         else:
                             msgs = 'Selected Card Flavour does '\
 				'not match with the Card Swiped'          
@@ -316,8 +327,9 @@ def bulk(request, cart='', from_cart=''):
             gst_total = other_totals['gst__sum']
             service_total = other_totals['service_charge__sum']
             amount_sum = other_totals['amount__sum']
+            gst_total = 0
             main_total = amount_sum + gst_total + service_total
-            
+            '''
             new_cards = SwipedCard.objects.filter(
                                  cart_status__in=cart_status_id).filter(
                                  batch_id=batch.id,
@@ -326,11 +338,28 @@ def bulk(request, cart='', from_cart=''):
                                   'gst_total':gst_total,
                                   'main_total': main_total, 
                                   'service_charge_total': service_total})
+            '''
+            upc_code = gift_cards.objects.values('id','upc_code').filter(id=gift_card_id) 
+            for w_g_c in upc_code:
+                gift_card_name = w_g_c['upc_code']
+
+            new_cards = SwipedCard.objects.filter(
+                                 cart_status__in=cart_status_id).filter(
+                                 batch_id=batch.id,
+                                 deleted=False, upc_code=gift_card_name)
+
+            response_dict.update({'batch_total':amount_sum,
+                                  'gst_total':gst_total,
+                                  'main_total': main_total, 
+                                  'service_charge_total': service_total})
+            
+            
         elif charge_list:
             other_totals = reduce(sum_dict, charge_list)
             gst_total = other_totals['gst__sum']
             service_total = other_totals['service_charge__sum']
             amount_sum = other_totals['amount__sum']
+            gst_total = 0
             main_total = amount_sum + gst_total + service_total
             new_cards = SwipedCard.objects.filter(batch_id=batch.id,
                                  deleted=False,cart_status=cart_flag)
@@ -348,7 +377,7 @@ def bulk(request, cart='', from_cart=''):
         
         table = tables.SwipedCardTable(new_cards)
         cards_count = new_cards.count()
-        RequestConfig(request,paginate={"per_page": 100}).configure(table)    
+        RequestConfig(request,paginate={"per_page": 10}).configure(table)    
         response_dict.update({'table':table,
                               'msgs':msgs,
 			'cflavour':card_flv_name,'gift_card_id':gift_card_id})
@@ -662,6 +691,7 @@ def add_cart(request):
         gst_total = other_totals['total_gst__sum']
         total_amount = other_totals['total_amount__sum']
         service_total = other_totals['total_service_charge__sum']
+        gst_total = 0
         main_total = total_amount + gst_total + service_total
         resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers,
                      'batch_total':total_amount, 'gst_total':gst_total,
@@ -787,6 +817,7 @@ def goto_cart(request):
         gst_total = other_totals['total_gst__sum']
         total_amount = other_totals['total_amount__sum']
         service_total = other_totals['total_service_charge__sum']
+        gst_total = 0
         main_total = total_amount + gst_total + service_total
         resp_dict = {'cart_items':shop_cart, 'card_numbers':card_numbers,
                      'batch_total':total_amount, 'gst_total':gst_total,
