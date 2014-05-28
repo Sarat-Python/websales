@@ -142,8 +142,15 @@ function movetoNext(current, nextFieldID) {
 				   <div class=" navbar-brand" id ="wish_{{ code.id }}"><img src="{{ STATIC_URL }}images/gift_cards/Woolworths/	{{code.small_image_file}}" alt="{{ code.id }} " onclick="getGiftCardId('{{ code.id }}','{{code.small_image_file}}');" /></div>
 				{% endfor %}
  				</div>
-  				 <div class="navbar-brand" ><img id ="wish_card" src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" /></div>
-				<div style="margin-left:153px;margin-top:-21px;"><b>Amount:</b><input type="text" id="amount" class="" name="amount" readonly value="{{request.session.amt}}" size=5></div>
+  				 <div class="navbar-brand" >
+ {% if request.session.card_selected == 'WLWRTH'%}	
+		   <img id ="wish_card" src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />{% endif %}
+{% if request.session.card_selected == 'BLKHWK' %}	
+		   <img id ="wish_card" src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
+		 {% endif %}
+</div>
+<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">	
+				<div style="margin-left:153px;margin-top:-21px;"><b>Amount:</b><input type="text" id="amount" class="" name="amount" readonly value="{{request.session.amt|floatformat:2}}" size=5></div>
 
 			{% else %}
 				{% if card_details %}
@@ -164,9 +171,9 @@ function movetoNext(current, nextFieldID) {
 								</div>
 								<div class="col-lg-2" style="width:125px;">{{ form.amount.label_tag }}<br>
 							{% if details.card_type == 'WLWRTH'%}
-								<input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" value="{{request.session.amt}}" size=5 maxlength="5" onsubmit="AmountValidation();">
+								<input type="text" id="amount"  style="margin-left:5px;" class="positive validate[required,custom[amount]]" name="amount" value="{{request.session.amt|floatformat:2}}" size=5 maxlength="5" onsubmit="AmountValidation();">
 							{% else %}
-								<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt}}" size=5 maxlength="5">
+								<input type="text" id="amount" class="" name="amount" readonly style="margin-left:5px;" value="{{request.session.amt|floatformat:2}}" size=5 maxlength="5">
 							{% endif %}
 						{% endfor %}
 					{% else %}
@@ -187,7 +194,7 @@ function movetoNext(current, nextFieldID) {
 						<div class="col-lg-2 " style="margin-top:-20px;text-indent:20px;width:25px;">{{ form.amount.label_tag }}
 						<br>
 						<input type="text" id="amount_start" class="positive " name="amount" maxlength="5"
-						{% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amt_new}}"   style="margin-left:40px;">
+						{% if request.session.card_selected == 'BLKHWK'%} readonly {% else %}  {%endif %}  size="5" value="{{request.session.amt_new|floatformat:2}}"   style="margin-left:40px;">
 						</div>
 				  {% endif %}
 		    {% endif %}
@@ -261,7 +268,9 @@ $(document).ready(function(e) {
 function getGiftCardId(gift_id){
  	$("#wish_gift_card_id").val(gift_id)
 	$( "#dialog" ).dialog( "close" );
-	$('#wish_card').attr('src','{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}');
+	$(".container").removeClass('blur-filter');
+	$(".row").removeClass('blur-filter');
+	//$('#wish_card').attr('src','{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}');
 	$( "#formSubmit" ).submit();
 }
 
@@ -331,7 +340,7 @@ $("#dialog").dialog({
 	autoOpen: false,
         create: function (event, ui) {
             //$('.ui-dialog-titlebar').css({'background':'none','border':'none'});
-            $(".ui-dialog-titlebar").html('&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Please select a Gift Card from Image the below. <a href="#" role="button"><span class="dialogclose" id="dialogclosing">X</span></a>');
+            $(".ui-dialog-titlebar").html('&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Please select a Gift Card from the Image below. <a href="#" role="button"><span class="dialogclose" id="dialogclosing">X</span></a>');
             $("#dialog-model").css({ 'font-family': 'Helvetica', 'padding': '0', 'font-size': '12px' });
         },
         width: 520,
