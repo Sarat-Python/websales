@@ -107,6 +107,8 @@ function movetoNext(current, nextFieldID) {
 	{% endif %}
 		
 	<form class="form-inline" action="" id="formSubmit" method="POST">{% csrf_token %}
+	<input type="hidden" name="wish_gift_card_id" id="wish_gift_card_id" value="">
+	
 <div class="container contains">	
 	<div class="row">
 		<div class="col-lg-4"
@@ -123,6 +125,7 @@ function movetoNext(current, nextFieldID) {
 	       </div>
 		<div class="col-lg-2"><b>Card Type</b><br>	
 		 <input type="hidden" name="card_type" value="{{ request.session.card_selected }}" >
+		 	
 		  {% if request.session.card_selected == 'WLWRTH'%}	
 		   <lable>Woolworths</label>
 		    {% elif request.session.card_selected == 'BLKHWK' %}	
@@ -136,20 +139,25 @@ function movetoNext(current, nextFieldID) {
 			
 		    {% if card_count > 1 %}
 				
-				<input type="hidden" name="wish_gift_card_id" id="wish_gift_card_id" value="">
+				
 				 <div id="dialog" title="Please select a Gift Card from the below">
+				 <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 					{% for code in upc_code_query %} 
 				   <div class=" navbar-brand" id ="wish_{{ code.id }}"><img src="{{ STATIC_URL }}images/gift_cards/Woolworths/	{{code.small_image_file}}" alt="{{ code.id }} " onclick="getGiftCardId('{{ code.id }}','{{code.small_image_file}}');" /></div>
 				{% endfor %}
  				</div>
   				 <div class="navbar-brand" >
+  				
  {% if request.session.card_selected == 'WLWRTH'%}	
+  <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 		   <img id ="wish_card" src="{{ STATIC_URL }}images/gift_cards/Woolworths/{{request.session.small_image_file}}" class="navbar-brand" />{% endif %}
 {% if request.session.card_selected == 'BLKHWK' %}	
+ <input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">
 		   <img id ="wish_card" src="{{ STATIC_URL }}images/gift_cards/Blackhawk/{{request.session.small_image_file}}" class="navbar-brand" />
 		 {% endif %}
 </div>
-<input type="hidden" name="flavour_image" value="{{request.session.small_image_file}}">	
+
+
 				<div style="margin-left:153px;margin-top:-21px;"><b>Amount:</b><input type="text" id="amount" class="" name="amount" readonly value="{{request.session.amt|floatformat:2}}" size=5></div>
 
 			{% else %}
@@ -267,6 +275,7 @@ $(document).ready(function(e) {
 
 function getGiftCardId(gift_id){
  	$("#wish_gift_card_id").val(gift_id)
+ 	//alert(gift_id);
 	$( "#dialog" ).dialog( "close" );
 	$(".container").removeClass('blur-filter');
 	$(".row").removeClass('blur-filter');
