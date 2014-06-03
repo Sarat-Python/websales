@@ -140,10 +140,10 @@ class WebUser(AbstractBaseUser, PermissionsMixin):
 		Sends an email to this User.
 		"""
 		send_mail(subject, message, from_email, [self.email])
-		
-		
+	
 	def send_activation_email(self):
 		full_name = self.get_full_name()
+		activation_url = 'http://210.215.149.7:5009'
 		activation_code = self.activation_code
 		subject = settings.ACTIVATION_EMAIL_SUBJECT
 		expiry_days = settings.ACTIVATION_EXPIRY_DAYS
@@ -152,10 +152,11 @@ class WebUser(AbstractBaseUser, PermissionsMixin):
 				'full_name': full_name,
 				'activation_code': activation_code,
 				'expiry_days': expiry_days,
-				'remove_days': removal_days
+				'remove_days': removal_days,
+				'activation_url':activation_url
 			}))
 		from_email = settings.ACTIVATION_ADMIN_EMAIL
-		print(contents)
+		#print(contents)
 		send_mail(subject,contents,from_email,[self.email])
 		
 	def activate(self, user_code=None):
