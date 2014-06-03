@@ -52,13 +52,10 @@ from django.core.exceptions import ObjectDoesNotExist
 @return  list of swiped card details in the datatables grid format
 '''
 
-
 @login_required
 @csrf_exempt
 def bulk(request, cart='', from_cart=''):
-    if request.method != 'POST':
-        if cart == '':
-            request.session['old_upc_code'] = ''
+
     form = SwipedCardForm(request.POST or None)
     response_dict = {'form': form}
     batch_number = request.session.get('batch_number', False)
@@ -68,8 +65,11 @@ def bulk(request, cart='', from_cart=''):
     msgs = ''
     gift_card_id = 0
     is_different = True
+    is_new = True
     amount_sum, main_total = 0.00, 0.00
 
+    for i, j in request.session.iteritems():
+        print i, j,'--------------session'
     if not batch_number:
         batch_number = datetime.now().isoformat()
         try:
@@ -99,6 +99,7 @@ def bulk(request, cart='', from_cart=''):
         gift_card_name = ''
 
         if cart:
+            print 'in one'
             flavours_data = []
             form = SwipedCardForm(request.POST or None)
             response_dict = {'form': form}
@@ -112,11 +113,19 @@ def bulk(request, cart='', from_cart=''):
             request.session['card_selected'] = cart
 
         else:
+            print 'in one one'
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
             request.session['amt'] = ''
+            '''
+            request.session['card_type'] = ''
+            request.session['small_image_file'] = ''
+            request.session['upccode'] = ''
+            request.session['amount'] = ''
+            '''
             
         if from_cart:
+            print 'in two'
             c_flavour = gift_cards.objects.filter(id=from_cart)
             for card_flavour_name in c_flavour:
                 request.session['selectd_flv_name'] = card_flavour_name.name
@@ -126,244 +135,207 @@ def bulk(request, cart='', from_cart=''):
                     woolworth_amount = SwipedCard.objects.values('amount'
                              ).filter(batch_id=batch.id,gift_card_id=from_cart)
                     for w_amt in woolworth_amount:
-                        request.session['amt'] = w_amt['amount']
+                        request.session['amount'] = w_amt['amount']
                 else:
-                    request.session['amt'] = card_flavour_name.amount
+                    request.session['amount'] = card_flavour_name.amount
                 request.session['link_from'] = 'shopcart'
                 request.session['small_image_file'] = card_flavour_name.small_image_file
                 request.session['link_id'] = from_cart
-                gift_card_id = from_cart
+                request.session['card_type'] = card_flavour_name.card_type
+                request.session['upccode'] = card_flavour_name.upc_code
+                #request.session['amount'] = card_flavour_name.upc_code
 
+                
+                gift_card_id = from_cart
         
         if request.method == 'POST':
-            cnumber = request.POST.get('card_number')
-            gid = request.POST.get('gift_card_id')
-            post_amt = request.POST.get('amount')
-            request.session['amt_new'] = post_amt
+            card_number = request.POST.get('card_number','')
+            upccode  = request.POST.get('upc_code','')
+            card_type = request.POST.get('card_type', '')
+            small_image_file = request.POST.get('small_image_file', '')
+            amount = request.POST.get('amount', '')                        
+            latest_id = request.POST.get('latest_id','')
+            wish_gift_card_id = request.POST.get('wish_gift_card_id','')
+            cleaned_card = card_utils.extract_card_number(card_number,card_type)
+            upc_code_res = extract_cnumber(card_number)
             request.session['link_from'] = 'addcard'
-
-            if gid is None:
-                gid = 0
-                gift_card_id = 0
-
-            ctype = ''
-            amt = ''
-            card_count = ''
-            wish_card_ids = []
-            upc_code_res = extract_cnumber(cnumber)
             card_details = gift_cards.objects.values(
                                                     'id',
                                                     'upc_code',
                                                     'card_type',
                                                     'name',
                                                     'amount',
-                                                    'small_image_file'
+                                                    'small_image_file',
+                                                    'gst',
+                                                    'service_charge'
                                                     ).filter(
                                                     upc_code=upc_code_res)
-
             card_count = card_details.count()
+            
+            #response_dict.update({'wish_gift_card_id': 'giftcard',})       
+            #wish_gift_card_id = 164 
+            
+            card_type_session = request.session.get('card_type','')
+            upccode_session = request.session.get('upccode','')
+            small_image_file_session = request.session.get('small_image_file','')
+            amount_session = request.session.get('amount','')
+            card_number_session = request.session.get('card_number','')
+            latest_id = request.session.get('latest_id','')
 
-            for details in card_details:
-                ctype = details['card_type']
-                if request.session['card_selected'] == ctype:
-                    is_different = False
-                
-                name = details['name']
-                request.session['selectd_flv_name'] = name
-                wish_card_ids.append(details['id'])
-                if ctype == "WLWRTH":
-                    amt = post_amt
-                else:
-                    amt = details['amount']
-                request.session['amt'] = amt
-                gift_card_id = details['id']
-                small_image_file = details['small_image_file']
-                image_file = request.session.get('small_image_file', None)
-                request.session['small_image_file'] = small_image_file
-                request.session['card_selected'] = ctype
-                                
-            if ctype is None:
-                ctype = request.POST.get('card_type')
-            if gift_card_id is None:
-                gift_card_id = request.POST.get('cardflavour_dropdown')
-            if amt is None:
-                amt = request.POST.get('amount')
-                request.session['amt'] = request.POST.get('amount')
-
-            clean_card = card_utils.extract_cnumber(cnumber)
-            gt_upc_code = card_utils.extract_upc_code(cnumber, ctype)
-
-
-            if gift_card_id:
-                card_flavour = gift_cards.objects.filter(id=gift_card_id)
-
-                for card_flavour_name in card_flavour:
-                    card_flv_name = card_flavour_name.name
-                    request.session['selectd_flv_name'] = card_flv_name
-                    upc_code = card_flavour_name.upc_code
-                    gst = card_flavour_name.gst
-
-                    service_charge = card_flavour_name.service_charge
-                    check_card_flavor = cnumber.find(upc_code)
-
-            cleaned_card = card_utils.extract_card_number(cnumber,
-                                                          ctype)
-
-            if gift_card_id:
-                if int(gid) == 0: 
+            if card_type_session and small_image_file_session and amount_session:          
+                if card_number_session == cleaned_card:
                     is_new = True
-                    is_different = False
+                    is_different = True
+                    card_number = request.POST.get('card_number','')
+                    check_card_flavor = card_number.find(request.session['upccode'])
+                    msgs = 'Card Number aleardy added'
+                    #nedd to check to card already added condition
+                    
+                elif str(upccode) != str(upc_code_res):
+                    is_new = True
+                    is_different = True
+                    card_number = request.POST.get('card_number','')
+                    check_card_flavor = card_number.find(request.session['upccode'])
+                    msgs = 'Selected Card Flavour does not match with the Card Swiped'
+                else:
+                    request.session['card_type'] = request.session['card_type']
+                    request.session['small_image_file'] = request.session['small_image_file']
+                    request.session['upccode'] = request.session['upccode']
+                    if request.session['card_type'] == 'WLWRTH':
+                        request.session['amount'] = request.POST.get('amount','')
+                    elif request.session['card_type'] == 'BLKHWK':
+                        request.session['amount'] = request.session['amount']
 
-                    if card_count > 1:
-                        wgift_card_id = request.POST.get('wish_gift_card_id', '')
-                        if wgift_card_id and upc_code == "628000309":
-                            wish_card_flavour = gift_cards.objects.filter(id=wgift_card_id)
-                            for flavour_name in wish_card_flavour:
-                                if request.POST.get('card_type') == "BLKHWK":
-                                    request.session['small_image_file'] = request.POST.get('flavour_image')
-                                    request.session['card_selected'] =  request.POST.get('card_type')
-                                    request.session['amt'] = request.session['amt']
-
-                                elif request.POST.get('card_type') == "" and request.session['small_image_file']:
-                                    request.session['small_image_file'] = request.session['small_image_file']
-                                    request.session['card_selected'] =  request.session['card_selected']
-                                    request.session['amt'] = request.session['amt']
-                                elif request.POST.get('card_type') == "":
-                                    request.session['small_image_file'] = request.POST.get('flavour_image')
-                                    request.session['card_selected'] =  request.POST.get('card_type')
-                                    request.session['amt'] = request.session['amt']
-
-                                else:
-                                    request.session['small_image_file'] = flavour_name.small_image_file
-                                    request.session['card_selected'] =  flavour_name.card_type
-                                    request.session['amt'] = request.session['amt']
-
-                                if request.POST.get('wish_gift_card_id') != "" and request.POST.get('card_type') == "":
-
-                                    for flavour_name in wish_card_flavour:
-                                        request.session['small_image_file'] = flavour_name.small_image_file
-                                    
-                        elif request.POST.get('flavour_image') is not None and upc_code != "628000309":
-                            request.session['small_image_file'] = request.POST.get('flavour_image')
-                            request.session['card_selected'] = request.POST.get('card_type')
-                            request.session['amt'] = request.POST.get('amount')
-                            
-                        else:
-                            wgift_card_id = request.POST.get('wish_gift_card_id', '')
-                            if wgift_card_id and upc_code == "628000309":
-                                wish_card_flavour = gift_cards.objects.filter(id=wgift_card_id)
-                                for flavour_name in wish_card_flavour:
-                                    request.session['small_image_file'] = flavour_name.small_image_file
-                                    request.session['card_selected'] =  flavour_name.card_type
-                                    request.session['amt'] = request.session['amt']
-                                
-                            else:    
-                                request.session['small_image_file'] = request.POST.get('flavour_image')
-                                request.session['card_selected'] = request.POST.get('card_type')
-                                request.session['amt'] = request.POST.get('amount')
-                    else:
-                        if request.POST.get('flavour_image') is not None:
-                            request.session['small_image_file'] = request.POST.get('flavour_image')
-                            request.session['card_selected'] = request.POST.get('card_type')
-                            request.session['amt'] = request.POST.get('amount')
-                        else:
-                            request.session['small_image_file'] = request.session['small_image_file']
-                            request.session['card_selected'] = request.session['card_selected']
-                            request.session['amt'] = request.session['amt']
-
-                elif int(gid) != int(gift_card_id):
+                    #request.session['latest_id']  = details['id']
+                    card_number = request.POST.get('card_number','')
+                    request.session['gst'] = request.session['gst']
+                    request.session['service_charge'] = request.session['service_charge']
+                    check_card_flavor = card_number.find(request.session['upccode'])
+                    request.session['card_flavour'] = request.session['card_flavour']
+                    request.session['gift_card_id'] = request.session['gift_card_id']                                        
                     is_new = False
-                    request.session['small_image_file'] = request.POST.get('flavour_image')
-                    request.session['card_selected'] = request.POST.get('card_type')
-                    request.session['amt'] = request.POST.get('amount')
-
-                else:
-                    is_new = True
                     is_different = False
-                    request.session['small_image_file'] = request.POST.get('flavour_image')
-                    request.session['card_selected'] = request.POST.get('card_type')
-                    request.session['amt'] = request.POST.get('amount')
+                    msgs = 'success'
+                    
+            else:
+                is_new = False
+                is_different = False
+                msgs = 'Success'
+                if card_count > 1 and wish_gift_card_id == '':
 
-                if upc_code == '628000309':
-                    upc_code_query = gift_cards.objects.values('id','small_image_file').filter(
-                                    upc_code=upc_code_res, is_deleted=False)
+                    is_new = True
+                    is_different = True
+                    card_number = request.POST.get('card_number','')
+                                                                        
+                    for details in card_details:
+                        #request.session['card_type'] = details['card_type']
+                        #request.session['small_image_file'] = details['small_image_file']
+                        request.session['upccode'] = details['upc_code']
+                        if details['card_type'] == 'WLWRTH':
+                            request.session['amount'] = request.POST.get('amount','')
+                        elif details['card_type'] == 'BLKHWK':
+                            request.session['amount'] = details['amount']
+                        #request.session['latest_id']  = details['id']
+                        check_card_flavor = card_number.find(details['upc_code'])
+                        #gst = details['gst']
+                        #request.session['gst'] = gst
+                        #service_charge = details['service_charge']
+                        #request.session['service_charge'] = service_charge
+                        #request.session['card_flavour'] = details['name']
+                        #request.session['gift_card_id'] = details['id']
 
-                query_id = gift_card_id
-                if card_count > 1 and upc_code == '628000309':
-
-                    wgift_card_id = request.POST.get('wish_gift_card_id', '0')
-                    wish_card_number = request.POST.get('card_number')
-                    if wgift_card_id == '0':
-                        is_different = True
-                    elif wgift_card_id == '':
-                        is_different = True
-                    else:
-                        is_different = False
+                        if details['upc_code'] == '628000309':
+                            upc_code_query = gift_cards.objects.values('id','small_image_file').filter(
+                                    upc_code=details['upc_code'], is_deleted=False)
 
                     wish_gift_card_id = 'giftcard'
-                    
-                    if wgift_card_id or wgift_card_id == 0:
-                        query_id = wgift_card_id                   
-                else:
-                    wish_gift_card_id = ''
-                    
-                old_upc_code = request.session.get('old_upc_code', '')
-               
-                if old_upc_code != '':
-                    if upc_code == old_upc_code:
-                        if is_different is not True:
-                            is_different = False
-                    else:
-                        is_different = True
-                        wish_card_number = ''
-                
-                wgift_card_id = request.POST.get('wish_gift_card_id', '')
-                if wgift_card_id:
-                    gift_card_id = wgift_card_id
-                    
-                wish_card_flavour = gift_cards.objects.filter(id=gift_card_id)
-                for flavour_name in wish_card_flavour:
-                    gift_card_name = flavour_name.name
-                        
-                if check_card_flavor != -1 and is_new is not False and is_different is False:
-                    if verify_card_number(ctype, cleaned_card):
-                        if ctype != "BLKHWK":
-                            gst = 0
-                        else:
-                            gst = gst
-                        batch1 = SwipedCard(card_number=cleaned_card,
-                                            card_type=ctype,
-                                            card_flavour=gift_card_name,
-                                            gift_card_id=gift_card_id,
-                                            upc_code=upc_code,
-                                            amount=amt,
-                                            gst=gst,
-                                            service_charge=service_charge,
-                                            cart_status=0,
-                                            batch_id=batch.id)
-                        batch1.save()
-                        batch.total_cost = float(batch.total_cost) + float(amt)
-                        batch.save()
-                        request.session['old_upc_code'] = upc_code
-                        request.session['link_id'] = gift_card_id
-                        msgs = 'Success'
-                        wish_card_number = ''
-                        wish_gift_card_id = ''
-                    else:
-                        msgs = 'Card Number already added!!'
-                        wish_card_number = ''
-                        wish_gift_card_id = ''
-                else:
-                    if wish_gift_card_id == 'giftcard':
-                        msgs = ''
-                    else:
-                        msgs = 'Selected Card Flavour does '\
-                            'not match with the Card Swiped'
-            else:
-                msgs = 'Please Select valid card'
+                    wish_card_number = request.POST.get('card_number')
 
-            form = SwipedCardForm(initial={'card_type': ctype,
-                                           'amount': amt, 'card_focus': 'on'})
+                elif card_count > 1 and wish_gift_card_id:
+                    card_details = gift_cards.objects.values(
+                                                        'id',
+                                                        'upc_code',
+                                                        'card_type',
+                                                        'name',
+                                                        'amount',
+                                                        'small_image_file',
+                                                        'gst',
+                                                        'service_charge'
+                                                        ).filter(
+                                                        id=wish_gift_card_id)                                      
+                    for details in card_details:
+                        request.session['card_type'] = details['card_type']
+                        request.session['small_image_file'] = details['small_image_file']
+                        request.session['upccode'] = details['upc_code']
+                        if details['card_type'] == 'WLWRTH':
+                            request.session['amount'] = request.POST.get('amount','')
+                        elif details['card_type'] == 'BLKHWK':
+                            request.session['amount'] = details['amount']
+                        request.session['latest_id']  = details['id']
+                        check_card_flavor = card_number.find(details['upc_code'])
+                        gst = details['gst']
+                        request.session['gst'] = gst
+                        service_charge = details['service_charge']
+                        request.session['service_charge'] = service_charge
+                        request.session['card_flavour'] = details['name']
+                        request.session['gift_card_id'] = details['id']
+                        msgs = 'Success'
+                else:
+            
+                    for details in card_details:
+                        request.session['card_type'] = details['card_type']
+                        request.session['small_image_file'] = details['small_image_file']
+                        request.session['upccode'] = details['upc_code']
+                        if details['card_type'] == 'WLWRTH':
+                            request.session['amount'] = request.POST.get('amount','')
+                        elif details['card_type'] == 'BLKHWK':
+                            request.session['amount'] = details['amount']
+
+                        request.session['latest_id']  = details['id']
+                        check_card_flavor = card_number.find(details['upc_code'])
+                        gst = details['gst']
+                        request.session['gst'] = gst
+                        service_charge = details['service_charge']
+                        request.session['service_charge'] = service_charge
+                        request.session['card_flavour'] = details['name']
+                        request.session['gift_card_id'] = details['id']              
+                
+            card_number = request.POST.get('card_number','')
+            card_type = request.session.get('card_type','')
+            cleaned_card = card_utils.extract_card_number(card_number,card_type)
+
+            if check_card_flavor != -1 and is_new is False and is_different is False:
+                if verify_card_number(request.session['card_type'], cleaned_card):
+                    if card_type != "BLKHWK":
+                        request.session['gst'] = 0
+                    else:
+                        request.session['gst'] = request.session['gst']
+                    batch1 = SwipedCard(card_number=cleaned_card,
+                                        card_type=request.session['card_type'],
+                                        card_flavour=request.session['card_flavour'],
+                                        gift_card_id=request.session['gift_card_id'],
+                                        upc_code=request.session['upccode'],
+                                        amount=request.session['amount'],
+                                        gst=request.session['gst'],
+                                        service_charge=request.session['service_charge'],
+                                        cart_status=0,
+                                        batch_id=batch.id)
+                    batch1.save()
+                    batch.total_cost = float(batch.total_cost) + float(request.session['amount'])
+                    batch.save()
+                    request.session['old_upc_code'] = request.session['upccode']
+                    request.session['link_id'] = gift_card_id
+                    msgs = 'Success'
+                    wish_card_number = ''
+                    wish_gift_card_id = ''
+                else:
+                    msgs = 'Card Number already added!!'
+                    wish_card_number = ''
+                    wish_gift_card_id = ''
+
+            
+            form = SwipedCardForm(initial={'card_type': card_type,
+                                           'amount': amount, 'card_focus': 'on'})
             response_dict.update({'form': form,
                                   'card_count': card_count,
                                   'wish_card_number': wish_card_number,
@@ -467,6 +439,12 @@ def bulk(request, cart='', from_cart=''):
     request.session['card_items_count'] = ''
     if from_cart == '':
         request.session['amt_new'] = ''
+    
+    try:
+        latest_insert_id = SwipedCard.objects.latest('id')
+        request.session['latest_insert_id'] = latest_insert_id.gift_card_id
+    except: 
+        request.session['latest_insert_id'] = ''                                                
     return render(request, 'web_purchase.html', response_dict)
 
 '''
@@ -577,7 +555,7 @@ def update(request, ctype=''):
                     gift_card_id = str(gift_card_id)
 
             return HttpResponseRedirect(
-                                '/cards/bulk/' + request.session['card_selected'] + '/' + gift_card_id + '/')
+                                '/cards/bulk/' + request.session['card_type'] + '/' + gift_card_id + '/')
 
         if action == 'delete':
 
@@ -602,13 +580,20 @@ def update(request, ctype=''):
                 del_cards.delete()
 
                 if swiped_count == '0':
-                    request.session['card_selected'] = ''
+                    request.session['card_type'] = ''
                     request.session['small_image_file'] = ''
-                    request.session['amt'] = ''
-                    request.session['amt_new'] = request.session['amt']
+                    request.session['upccode'] = ''
+                    request.session['amount'] = ''                
+                    #request.session['card_selected'] = ''
+                    #request.session['small_image_file'] = ''
+                    #request.session['amt'] = ''
+                    #request.session['amt_new'] = request.session['amt']
                 else:
                     if request.session['amt'] != 0:
-                        request.session['amt_new'] = request.session['amt']
+                        request.session['card_type'] = request.session['card_type']
+                        request.session['small_image_file'] = request.session['small_image_file']
+                        request.session['upccode'] = request.session['upccode']
+                        request.session['amount'] = request.session['amount']
 
                 #request.session['card_items_count'] = swiped_count
                 # if request.session['amt'] != 0:
@@ -619,7 +604,7 @@ def update(request, ctype=''):
                     redirect_url = '/cards/bulk/purchase/'
                 else:
                     redirect_url = '/cards/bulk/' + \
-                        request.session['card_selected'] + \
+                        request.session['card_type'] + \
                         '/' + gift_card_id + '/'
 
                 request.session['link_from'] = 'delete'
@@ -671,6 +656,12 @@ def add_cart(request):
     card_numbers = []
     total_amount, gst_total, service_total = 0.00, 0.00, 0.00
     request.session['selectd_flv_name'] = ''
+    
+    request.session['card_type'] = ''
+    request.session['small_image_file'] = ''
+    request.session['upccode'] = ''
+    request.session['amount'] = ''
+        
     if request.session.get('batch_number', False):
         batch_number = request.session.get('batch_number', False)
         batch = Batch.objects.get(batch_number=batch_number)
