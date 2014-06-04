@@ -111,6 +111,7 @@ def bulk(request, cart='', from_cart=''):
             request.session['card_selected'] = cart
 
         else:
+
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
             request.session['amt'] = ''
@@ -122,6 +123,7 @@ def bulk(request, cart='', from_cart=''):
             '''
             
         if from_cart:
+
             c_flavour = gift_cards.objects.filter(id=from_cart)
             for card_flavour_name in c_flavour:
                 request.session['selectd_flv_name'] = card_flavour_name.name
@@ -165,7 +167,7 @@ def bulk(request, cart='', from_cart=''):
                                                     'gst',
                                                     'service_charge'
                                                     ).filter(
-                                                    upc_code=upc_code_res).filter(is_deleted=0)
+                                                    upc_code=upc_code_res)
             card_count = card_details.count()
             
             #response_dict.update({'wish_gift_card_id': 'giftcard',})       
