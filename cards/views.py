@@ -165,7 +165,7 @@ def bulk(request, cart='', from_cart=''):
                                                     'gst',
                                                     'service_charge'
                                                     ).filter(
-                                                    upc_code=upc_code_res).filter(status=1)
+                                                    upc_code=upc_code_res).filter(is_deleted=0)
             card_count = card_details.count()
             
             #response_dict.update({'wish_gift_card_id': 'giftcard',})       
