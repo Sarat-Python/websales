@@ -415,45 +415,41 @@ def process_cart(request,direct_checkout=''):
 				 'txn_status':ret_status,'txn_id':txn_id,'new_id':new_id,'cart_status_details':cart_status_details})
 
 def Ereciept(request,new_id,response_dict, txn_date):
-    limit = response_dict.keys()
-    current_user = request.user
-    email = current_user.email
-    time_stamp = datetime.now().strftime("%B %d,%Y")
-    time_striped = datetime.now()
-    hours = time_striped.hour
-    seconds = time_striped.second
-    microseconds = time_striped.microsecond
-    trm_microseconds = str(microseconds)
-    trimmed = trm_microseconds[:2]
-    WebUserobj= WebUser.objects.get(email=current_user.email)
-    WebUserobj.first_name
-    cart_status_details = SwipedCard.objects.filter(cart_status=2)
-    
-    mail_totals = SwipedCard.objects.values('id','amount',
-                        'gst','service_charge'
-                        ).filter(batch_id=request.session['batchid'],cart_status=2
-                    ).annotate(Sum('amount')).annotate(
-                    Sum('gst')).annotate(
-                    Sum('service_charge')).order_by('-id')[:len(limit)]
+	limit = response_dict.keys()
+	current_user = request.user
+	email = current_user.email
+	time_stamp = datetime.now().strftime("%B %d,%Y")
+	time_striped = datetime.now()
+	hours = time_striped.hour
+	seconds = time_striped.second
+	microseconds = time_striped.microsecond
+	trm_microseconds = str(microseconds)
+	trimmed = trm_microseconds[:2]
+	WebUserobj= WebUser.objects.get(email=current_user.email)
+	WebUserobj.first_name
+	cart_status_details = SwipedCard.objects.filter(cart_status=2)
+	mail_totals = SwipedCard.objects.values('id','amount','gst','service_charge').filter(
+							batch_id=request.session['batchid'],cart_status=2).annotate(
+							Sum('amount')).annotate(Sum('gst')).annotate(Sum('service_charge')).order_by(
+							'-id')[:len(limit)]
+	total_amt = 0
+	gst_amt = 0
+	service_amt = 0
+	main_amt = 0
+	for m_t in mail_totals:
+		total_amt = total_amt + m_t['amount__sum']
+		gst_amt = gst_amt + m_t['gst__sum']
+		service_amt = service_amt + m_t['service_charge__sum']
+	gst_amt = 0
+	main_amt = total_amt + gst_amt + service_amt
 
-    total_amt = 0
-    gst_amt = 0
-    service_amt = 0
-    main_amt = 0
-    for m_t in mail_totals:
-        total_amt = total_amt + m_t['amount__sum']
-        gst_amt = gst_amt + m_t['gst__sum']
-        service_amt = service_amt + m_t['service_charge__sum']
-    gst_amt = 0
-    main_amt = total_amt + gst_amt + service_amt
-
-    try:
-	latest_id = WebsalesTxnHeads.objects.latest('id')
-	new_id = latest_id.id 
-    except ObjectDoesNotExist:
-	  new_id = 1	
-    subject = 'PitStop e - Reciept for Products Purchased'
-    html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
+	try:
+		latest_id = WebsalesTxnHeads.objects.latest('id')
+		new_id = latest_id.id 
+	except ObjectDoesNotExist:
+		new_id = 1
+	subject = 'PitStop e - Reciept for Products Purchased'
+	html_content = render_to_string('Ereciept.html',{'full_name':WebUserobj.first_name,
 						'time_stamp':time_stamp,
 						'hours':hours, 
 						'seconds':seconds,
@@ -466,32 +462,32 @@ def Ereciept(request,new_id,response_dict, txn_date):
 						'gst_total':gst_amt,
 						'main_total':main_amt
 						})
-	'''
-    text_content = strip_tags(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    dirname = 'reciepts'
-    #os.mkdir(os.path.join('/home/user/hexagon/websales/assets/static/', dirname))
-    filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
-    full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
-    fout = open(full_filename, 'wb+')
-    fout.write(html_content)
-    fout.close()
-    return cart_status_details
 
-    '''
-    text_content = strip_tags(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    dirname = 'reciepts'
-    #os.mkdir(os.path.join('/home/pitstop/websales/assets/static/', dirname))
-    filename = 'Erectipt_'+str(new_id)+'.html'
-    full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
-    #full_filename = os.path.join('/home/user/websales_may/websales/assets/static/', dirname, filename)
-    fout = open(full_filename, 'wb+')
-    fout.write(html_content)
-    fout.close()
-    return cart_status_details
+	text_content = strip_tags(html_content)
+	msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()
+	dirname = 'reciepts'
+	#os.mkdir(os.path.join('/home/user/hexagon/websales/assets/static/', dirname))
+	filename = 'Erectipt_'+str(new_id)+'.html'
+	full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
+	full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
+	fout = open(full_filename, 'wb+')
+	fout.write(html_content)
+	fout.close()
+	return cart_status_details
+	'''
+	text_content = strip_tags(html_content)
+	msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()
+	dirname = 'reciepts'
+	#os.mkdir(os.path.join('/home/pitstop/websales/assets/static/', dirname))
+	filename = 'Erectipt_'+str(new_id)+'.html'
+	full_filename = os.path.join('/home/pitstop/websales/assets/static/', dirname, filename)
+	#full_filename = os.path.join('/home/user/websales_may/websales/assets/static/', dirname, filename)
+	fout = open(full_filename, 'wb+')
+	fout.write(html_content)
+	fout.close()
+	return cart_status_details
+	'''
