@@ -107,21 +107,15 @@ def bulk(request, cart='', from_cart=''):
             card_flavours = gift_cards.objects.raw(query)
             for flavours in card_flavours:
                 flavours_data.append(flavours)
+                
             request.session['card_flv'] = flavours_data
             request.session['card_selected'] = cart
-
         else:
 
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
             request.session['amt'] = ''
-            '''
-            request.session['card_type'] = ''
-            request.session['small_image_file'] = ''
-            request.session['upccode'] = ''
-            request.session['amount'] = ''
-            '''
-            
+
         if from_cart:
 
             c_flavour = gift_cards.objects.filter(id=from_cart)
@@ -142,8 +136,8 @@ def bulk(request, cart='', from_cart=''):
                 request.session['card_type'] = card_flavour_name.card_type
                 request.session['upccode'] = card_flavour_name.upc_code
                 #request.session['amount'] = card_flavour_name.upc_code
-
-                
+                request.session['card_flavour'] = card_flavour_name.name
+                request.session['gift_card_id'] = from_cart
                 gift_card_id = from_cart
         
         if request.method == 'POST':
@@ -167,7 +161,7 @@ def bulk(request, cart='', from_cart=''):
                                                     'gst',
                                                     'service_charge'
                                                     ).filter(
-                                                    upc_code=upc_code_res)
+                                                    upc_code=upc_code_res).filter(is_deleted=0)
             card_count = card_details.count()
             
             #response_dict.update({'wish_gift_card_id': 'giftcard',})       
