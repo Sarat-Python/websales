@@ -96,6 +96,7 @@ class gift_cards(models.Model):
     profit_percentage = models.CharField(max_length=5)
     gst_applicable = models.IntegerField()
     is_deleted = models.IntegerField(max_length=4)
+    status = models.IntegerField(max_length=4)
     profit_amount = models.CharField(max_length=5) 	
     class Meta:
        db_table = 'gift_cards'
