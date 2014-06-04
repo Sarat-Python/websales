@@ -92,7 +92,7 @@
 			Cards: {{ total }}{% endif %} </li>{% endblock pagination.cardinality %}{% endnospaceless %}
 		{% nospaceless %}
 	{%if table %}
-		{% if request.session.card_selected == 'BLKHWK'%}
+		{% if request.session.card_type == 'BLKHWK'%}
 	<li>
 		<button type="submit" class="btn btn-primary" name="action" value="edit" onclick="return CheckSelection();">Update</button>    
 	</li>
