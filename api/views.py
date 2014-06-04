@@ -217,11 +217,28 @@ def process_cart(request,direct_checkout=''):
 			f.close()
 			xml_response = activation_request(credential_codes
 					, credential_codes_amount, new_txn_id)
+					
+			check_key = xml_response.get('xml_response','')		
+			if check_key:
+				dom = parseString(xml_response['xml_response'])
+				ResultCode = dom.getElementsByTagName\
+				('ResultCode')[1].firstChild.nodeValue
+				Description = dom.getElementsByTagName\
+				('Description')[1].firstChild.nodeValue
+			else:
+				request_status['xml_response'] = 'Error'
+				ResultCode = 'Error'
+				Description = 'timeout'
+				xml_response['request_data'] = ''
+				
+			'''						
 			dom = parseString(xml_response['xml_response'])
 			ResultCode = dom.getElementsByTagName\
 			('ResultCode')[1].firstChild.nodeValue
 			Description = dom.getElementsByTagName\
 			('Description')[1].firstChild.nodeValue
+			'''
+			
 			card_number = item['card_number']
 			if ResultCode == 0:
 				activation_status = 'success'
@@ -229,6 +246,12 @@ def process_cart(request,direct_checkout=''):
 			else:
 				activation_status = 'failure'
 				activated = 1
+
+			if check_key == '':
+				activation_status = 'failure'
+				ResultCode = '2001'
+		        activated = 1
+		        				
 			response_from = {'ResultCode':error_codes[ResultCode],
 					 'Description':Description,
 					 'card_number':card_number,
@@ -296,19 +319,30 @@ def process_cart(request,direct_checkout=''):
 							item['card_number'],
 							item['amount'],
 							new_txn_id)
-			dom = parseString(request_status['xml_response'])
-			Status = dom.getElementsByTagName\
-			('Status')[0].firstChild.nodeValue
+			check_key = request_status.get('xml_response','')							
+			if check_key:
+				dom = parseString(request_status['xml_response'])
+				Status = dom.getElementsByTagName('Status')[0].firstChild.nodeValue
+			else:
+				request_status['xml_response'] = 'Error'
+				Status = 'Error'
+				
 			card_number = item['card_number']
                         
-     			if Status == 'NOT_AUTHORIZED':
+ 			if Status == 'NOT_AUTHORIZED':
 				activation_status = 'failure'
-			        ResultCode = '9999'
+				ResultCode = '9999'
 				activated = 1
 			else:
 				activation_status = 'success'
-                                ResultCode = '0'
+				ResultCode = '0'
 				activated = 0
+			
+			if check_key == '':
+				activation_status = 'failure'
+				ResultCode = '2001'
+		        activated = 1
+								
 			response_from = {'ResultCode':error_codes[ResultCode],
 					 'Description':Status,
 					 'card_number':card_number,
@@ -432,7 +466,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
 						'gst_total':gst_amt,
 						'main_total':main_amt
 						})
-    ''' 
+
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
     msg.attach_alternative(html_content, "text/html")
@@ -461,4 +495,5 @@ def Ereciept(request,new_id,response_dict, txn_date):
     fout.write(html_content)
     fout.close()
     return cart_status_details
+    '''
 
