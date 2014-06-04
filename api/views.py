@@ -466,7 +466,7 @@ def Ereciept(request,new_id,response_dict, txn_date):
 						'gst_total':gst_amt,
 						'main_total':main_amt
 						})
-
+	'''
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
     msg.attach_alternative(html_content, "text/html")
@@ -495,5 +495,3 @@ def Ereciept(request,new_id,response_dict, txn_date):
     fout.write(html_content)
     fout.close()
     return cart_status_details
-    '''
-
