@@ -68,8 +68,6 @@ def bulk(request, cart='', from_cart=''):
     is_new = True
     amount_sum, main_total = 0.00, 0.00
 
-    for i, j in request.session.iteritems():
-        print i, j,'--------------session'
     if not batch_number:
         batch_number = datetime.now().isoformat()
         try:
@@ -99,7 +97,7 @@ def bulk(request, cart='', from_cart=''):
         gift_card_name = ''
 
         if cart:
-            print 'in one'
+
             flavours_data = []
             form = SwipedCardForm(request.POST or None)
             response_dict = {'form': form}
@@ -113,7 +111,6 @@ def bulk(request, cart='', from_cart=''):
             request.session['card_selected'] = cart
 
         else:
-            print 'in one one'
             request.session['card_selected'] = ''
             request.session['card_flv'] = ''
             request.session['amt'] = ''
@@ -125,7 +122,6 @@ def bulk(request, cart='', from_cart=''):
             '''
             
         if from_cart:
-            print 'in two'
             c_flavour = gift_cards.objects.filter(id=from_cart)
             for card_flavour_name in c_flavour:
                 request.session['selectd_flv_name'] = card_flavour_name.name
@@ -169,7 +165,7 @@ def bulk(request, cart='', from_cart=''):
                                                     'gst',
                                                     'service_charge'
                                                     ).filter(
-                                                    upc_code=upc_code_res)
+                                                    upc_code=upc_code_res).filter(status=1)
             card_count = card_details.count()
             
             #response_dict.update({'wish_gift_card_id': 'giftcard',})       
