@@ -155,6 +155,11 @@ def process_cart(request,direct_checkout=''):
 			'card_flavour').filter(cart_status__in=[1])
 
 	Logger.initialize('wex.log', True, 'LOG_DEBUG')
+	request.session['card_type'] = ''
+	request.session['small_image_file'] = ''
+	request.session['upccode'] = ''
+	request.session['amount'] = ''
+
 	response_dict = {}
 	txn_status = []
 	partial = []
@@ -462,16 +467,16 @@ def Ereciept(request,new_id,response_dict, txn_date):
 						'gst_total':gst_amt,
 						'main_total':main_amt
 						})
-	'''
+	
 	text_content = strip_tags(html_content)
 	msg = EmailMultiAlternatives(subject, text_content, 'sarat@hexagonglobal.in', [email])
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
 	dirname = 'reciepts'
-	#os.mkdir(os.path.join('/home/user/hexagon/websales/assets/static/', dirname))
+	#os.mkdir(os.path.join('/home/dell/pitstop/websales/assets/static/', dirname))
 	filename = 'Erectipt_'+str(new_id)+'.html'
-	full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
-	full_filename = os.path.join('/home/user/hexagon/websales/assets/static/', dirname, filename)
+	full_filename = os.path.join('/home/dell/pitstop/websales/assets/static/', dirname, filename)
+	full_filename = os.path.join('/home/dell/pitstop/websales/assets/static/', dirname, filename)
 	fout = open(full_filename, 'wb+')
 	fout.write(html_content)
 	fout.close()
@@ -490,3 +495,4 @@ def Ereciept(request,new_id,response_dict, txn_date):
 	fout.write(html_content)
 	fout.close()
 	return cart_status_details
+	'''
