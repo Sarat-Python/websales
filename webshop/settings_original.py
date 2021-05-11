@@ -39,10 +39,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'pit_stop_3',                      # Or path to database file if using sqlite3.
+        'NAME': 'pit_stop_2',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER':'root',
-        'PASSWORD':'password',
+        'PASSWORD':'toor',
         'HOST':'',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT':'',                      # Set to empty string for default.
     }
@@ -89,7 +89,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/home/dell/pitstop/websales/assets/static/css/'
+STATIC_ROOT = '/home/pitstop/websales/assets/static/css/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -100,7 +100,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/dell/pitstop/websales/assets/static',
+    '/home/pitstop/websales/assets/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -144,8 +144,8 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_ROOT,'templates'),
-    '/home/dell/pitstop/websales/users/templates',
-    '/home/dell/pitstop/websales/cards/templates',
+    '/home/pitstop/websales/users/templates',
+    '/home/pitstop/websales/cards/templates',
 
 )
 
